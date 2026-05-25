@@ -1,6 +1,6 @@
 {-# LANGUAGE RecordWildCards #-}
 
-module Search
+module Full.Search
   ( IterationCount
   , RotationScore
   , SearchOptions (..)
@@ -14,7 +14,7 @@ import Control.Monad (when)
 import Data.HashMap.Strict qualified as HashMap
 import Data.List (intercalate)
 import Data.Maybe (mapMaybe)
-import Game
+import Full.Game
   ( Board
   , LeafCount
   , Move (..)
@@ -71,9 +71,9 @@ data SearchState = SearchState
     -- ^ Number of completed calls to the main search loop.
   }
 
--- | Explore the full reduced-game graph for the given start size.
+-- | Explore the full game graph for the given start size.
 --
--- Precondition: the start count is non-negative.
+-- Precondition: the leaf count is non-negative.
 -- Postcondition: returns the highest-scoring completed game reachable from the
 -- start board.
 solveGame :: SearchOptions -> LeafCount -> IO Winner
@@ -142,9 +142,9 @@ successorsFrom board positionInfo =
 
 -- | Score contribution of a single move.
 moveScore :: Move -> RotationScore
-moveScore Rotate = 1
-moveScore Concat = 0
-moveScore Tail = 0
+moveScore (Rotate _) = 1
+moveScore (Concat _ _) = 0
+moveScore (Tail _) = 0
 
 -- | Remove one arbitrary entry from the frontier hashmap.
 --

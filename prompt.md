@@ -165,3 +165,49 @@ tuples, and updated the CSV format to:
 n,score,ratio,iterations,moves
 
 --help, normal solving, --start, --verbose, and --plot all work with the refactored build.
+
+
+2026-05-25 III
+==============
+
+We are changing the rules of the game.
+Instead of arbitrary concatenation, only concatenations with a Leaf on the right are allowed
+(`moveConcat t = Node t Leaf`).
+The board is now a single tree plus the number of such concatenations still available as moves.
+The moves do not need index information any longer.
+They can be printed as just `c` (concatenation with a Leaf), `r` (rotate) `t` (tail),
+and the move sequence does not need separating spaces but can just e.g. be `ccrtt`.
+
+Preserve the old game and simulation and run it when command-line option `--full` is supplied.
+Move the modules for the old game to `Full`: `module Full.Game` and `Full.Search`,
+to make modules `Game` and `Search` available for the new game.
+
+Without that option, the new game should be used.
+The parameter N is then the number of concatenation moves available in the beginning,
+and we start with N=1.
+Scoring does not change (still the number of rotation moves).
+
+Answer
+------
+
+Done. The solver now supports both rule sets:
+
+ - Default mode uses the new reduced game in Game and Search:
+  - board = one Tree plus remaining concat credits
+  - Concat is only Node t Leaf
+  - moves are c, r, t
+  - move trails render compactly, e.g. ccrtt
+  - default start is N=1
+ - --full mode preserves the old indexed board game in Full.Game and Full.Search:
+  - old board/list semantics
+  - indexed moves like 0&0 r0 t0 ...
+  - default start remains N=3
+
+Main now routes between the two modes with --full, while --plot still reads the CSV and
+renders SVG. The Cabal file was updated to include Full.Game and Full.Search.
+
+I also verified:
+
+ - default mode writes rows like 1,0,"0.00",3,"ct" and prints winners starting at N=1
+ - --full still reproduces the old search/output style starting at N=3
+ - --plot works with the shared CSV format n,score,ratio,iterations,moves
