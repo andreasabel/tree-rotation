@@ -168,7 +168,7 @@ isTerminalBoard _ = False
 -- | Render a move in the requested textual syntax.
 renderMove :: Move -> String
 renderMove = \case
-  Concat firstIndex secondIndex -> show firstIndex <> "&" <> show secondIndex
+  Concat firstIndex secondIndex -> show firstIndex <> "+" <> show secondIndex
   Rotate boardIndex -> "r" <> show boardIndex
   Tail boardIndex -> "t" <> show boardIndex
 
