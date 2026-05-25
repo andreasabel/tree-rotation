@@ -125,3 +125,43 @@ including:
  - N=3 score=1 ratio=0.33
 
 I treated the N=0 ratio as n/a to avoid dividing by zero.
+
+2026-05-25 II
+=============
+
+Make the following changes:
+- start with N=3
+- make `--quiet` the default (no leader printing) and add an option `--verbose` (leader printing)
+- Remove the following data types and use tuples (and preferably matching on tuples rather than projections) instead:
+  RemovedTree, FrontierEntry, FrontierPop, SuccessorPosition.
+- record the number of iterations (calls to searchLoop) and print them before the move list (output and csv file)
+- add an option to start with a certain N: `--start=N`
+- add an option (`--plot`) that reads the CSV file and prints a SVG plot that has on the x axis N and on the y axis the high-score
+- organize the project into several modules:
+  * one for just the `Tree` and the operations on trees
+  * one for the game logic: `Board`, `Move`, valid moves, performing moves on the board, terminal board
+  * one for the search: everything concerning the hash map, the state, the search, winner, reporting
+  * one for the plotting (see above)
+  * one for `main`, the options, the option parsing
+
+Answer
+------
+
+Done. The solver now starts at N=3 by default, uses quiet mode by default with --verbose to
+print improving leaders, tracks and prints iteration counts before the move list, supports
+--start N, and adds --plot to read the CSV and print an SVG score chart.
+
+The code is split into the requested modules:
+
+ - app/Tree.hs for Tree and tree operations
+ - app/Game.hs for Board, Move, legal moves, move execution, terminal detection
+ - app/Search.hs for hashmap-based exploration, winner tracking, reporting, CSV output
+ - app/Plot.hs for CSV parsing and SVG rendering
+ - app/Main.hs for options and program entry
+
+I also removed RemovedTree, FrontierEntry, FrontierPop, and SuccessorPosition in favor of
+tuples, and updated the CSV format to:
+
+n,score,ratio,iterations,moves
+
+--help, normal solving, --start, --verbose, and --plot all work with the refactored build.

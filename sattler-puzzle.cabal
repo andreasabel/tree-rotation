@@ -6,6 +6,11 @@ build-type: Simple
 executable sattler-puzzle
   main-is: Main.hs
   hs-source-dirs: app
+  other-modules:
+      Game
+    , Plot
+    , Search
+    , Tree
   default-language: GHC2021
   ghc-options: -Wall
   build-depends:
