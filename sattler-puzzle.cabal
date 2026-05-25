@@ -10,7 +10,9 @@ executable sattler-puzzle
       Full.Game
     , Full.Search
     , Game
+    , MCTS
     , Plot
+    , Random
     , Search
     , Tree
   default-language: GHC2021
@@ -20,4 +22,5 @@ executable sattler-puzzle
     , directory >= 1.3
     , hashable >= 1.4
     , optparse-applicative >= 0.18
+    , random >= 1.2
     , unordered-containers >= 0.2

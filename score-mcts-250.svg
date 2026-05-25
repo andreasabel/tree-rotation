@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500">
+  <rect width="800" height="500" fill="white"/>
+  <line x1="70" y1="430" x2="760" y2="430" stroke="black" stroke-width="2"/>
+  <line x1="70" y1="430" x2="70" y2="40" stroke="black" stroke-width="2"/>
+  <text x="415" y="470" text-anchor="middle" font-family="monospace" font-size="16">N</text>
+  <text x="25" y="235" text-anchor="middle" font-family="monospace" font-size="16" transform="rotate(-90 25 235)">high-score</text>
+  <polyline fill="none" stroke="#005cc5" stroke-width="3" points="70,430 76,429 83,425 90,422 97,419 104,414 111,414 118,407 125,400 132,399 139,392 145,392 152,384 159,375 166,380 173,375 180,367 187,367 194,357 201,347 208,360 214,347 221,342 228,334 235,324 242,327 249,325 256,327 263,315 270,322 277,314 283,310 290,300 297,319 304,280 311,289 318,285 325,284 332,282 339,282 346,274 352,262 359,275 366,257 373,272 380,270 387,244 394,237 401,254 408,240 415,239 421,224 428,234 435,227 442,219 449,219 456,219 463,202 470,212 477,204 484,209 490,187 497,190 504,199 511,187 518,177 525,172 532,164 539,179 546,169 553,164 559,169 566,129 573,149 580,130 587,164 594,134 601,132 608,137 615,119 622,119 628,109 635,89 642,95 649,122 656,99 663,92 670,75 677,87 684,125 691,127 697,92 704,64 711,65 718,80 725,45 732,55 739,57 746,40 753,55 760,47"/>
+  <circle cx="70" cy="430" r="4" fill="#d73a49"/>
+  <circle cx="76" cy="429" r="4" fill="#d73a49"/>
+  <circle cx="83" cy="425" r="4" fill="#d73a49"/>
+  <circle cx="90" cy="422" r="4" fill="#d73a49"/>
+  <circle cx="97" cy="419" r="4" fill="#d73a49"/>
+  <circle cx="104" cy="414" r="4" fill="#d73a49"/>
+  <circle cx="111" cy="414" r="4" fill="#d73a49"/>
+  <circle cx="118" cy="407" r="4" fill="#d73a49"/>
+  <circle cx="125" cy="400" r="4" fill="#d73a49"/>
+  <circle cx="132" cy="399" r="4" fill="#d73a49"/>
+  <circle cx="139" cy="392" r="4" fill="#d73a49"/>
+  <circle cx="145" cy="392" r="4" fill="#d73a49"/>
+  <circle cx="152" cy="384" r="4" fill="#d73a49"/>
+  <circle cx="159" cy="375" r="4" fill="#d73a49"/>
+  <circle cx="166" cy="380" r="4" fill="#d73a49"/>
+  <circle cx="173" cy="375" r="4" fill="#d73a49"/>
+  <circle cx="180" cy="367" r="4" fill="#d73a49"/>
+  <circle cx="187" cy="367" r="4" fill="#d73a49"/>
+  <circle cx="194" cy="357" r="4" fill="#d73a49"/>
+  <circle cx="201" cy="347" r="4" fill="#d73a49"/>
+  <circle cx="208" cy="360" r="4" fill="#d73a49"/>
+  <circle cx="214" cy="347" r="4" fill="#d73a49"/>
+  <circle cx="221" cy="342" r="4" fill="#d73a49"/>
+  <circle cx="228" cy="334" r="4" fill="#d73a49"/>
+  <circle cx="235" cy="324" r="4" fill="#d73a49"/>
+  <circle cx="242" cy="327" r="4" fill="#d73a49"/>
+  <circle cx="249" cy="325" r="4" fill="#d73a49"/>
+  <circle cx="256" cy="327" r="4" fill="#d73a49"/>
+  <circle cx="263" cy="315" r="4" fill="#d73a49"/>
+  <circle cx="270" cy="322" r="4" fill="#d73a49"/>
+  <circle cx="277" cy="314" r="4" fill="#d73a49"/>
+  <circle cx="283" cy="310" r="4" fill="#d73a49"/>
+  <circle cx="290" cy="300" r="4" fill="#d73a49"/>
+  <circle cx="297" cy="319" r="4" fill="#d73a49"/>
+  <circle cx="304" cy="280" r="4" fill="#d73a49"/>
+  <circle cx="311" cy="289" r="4" fill="#d73a49"/>
+  <circle cx="318" cy="285" r="4" fill="#d73a49"/>
+  <circle cx="325" cy="284" r="4" fill="#d73a49"/>
+  <circle cx="332" cy="282" r="4" fill="#d73a49"/>
+  <circle cx="339" cy="282" r="4" fill="#d73a49"/>
+  <circle cx="346" cy="274" r="4" fill="#d73a49"/>
+  <circle cx="352" cy="262" r="4" fill="#d73a49"/>
+  <circle cx="359" cy="275" r="4" fill="#d73a49"/>
+  <circle cx="366" cy="257" r="4" fill="#d73a49"/>
+  <circle cx="373" cy="272" r="4" fill="#d73a49"/>
+  <circle cx="380" cy="270" r="4" fill="#d73a49"/>
+  <circle cx="387" cy="244" r="4" fill="#d73a49"/>
+  <circle cx="394" cy="237" r="4" fill="#d73a49"/>
+  <circle cx="401" cy="254" r="4" fill="#d73a49"/>
+  <circle cx="408" cy="240" r="4" fill="#d73a49"/>
+  <circle cx="415" cy="239" r="4" fill="#d73a49"/>
+  <circle cx="421" cy="224" r="4" fill="#d73a49"/>
+  <circle cx="428" cy="234" r="4" fill="#d73a49"/>
+  <circle cx="435" cy="227" r="4" fill="#d73a49"/>
+  <circle cx="442" cy="219" r="4" fill="#d73a49"/>
+  <circle cx="449" cy="219" r="4" fill="#d73a49"/>
+  <circle cx="456" cy="219" r="4" fill="#d73a49"/>
+  <circle cx="463" cy="202" r="4" fill="#d73a49"/>
+  <circle cx="470" cy="212" r="4" fill="#d73a49"/>
+  <circle cx="477" cy="204" r="4" fill="#d73a49"/>
+  <circle cx="484" cy="209" r="4" fill="#d73a49"/>
+  <circle cx="490" cy="187" r="4" fill="#d73a49"/>
+  <circle cx="497" cy="190" r="4" fill="#d73a49"/>
+  <circle cx="504" cy="199" r="4" fill="#d73a49"/>
+  <circle cx="511" cy="187" r="4" fill="#d73a49"/>
+  <circle cx="518" cy="177" r="4" fill="#d73a49"/>
+  <circle cx="525" cy="172" r="4" fill="#d73a49"/>
+  <circle cx="532" cy="164" r="4" fill="#d73a49"/>
+  <circle cx="539" cy="179" r="4" fill="#d73a49"/>
+  <circle cx="546" cy="169" r="4" fill="#d73a49"/>
+  <circle cx="553" cy="164" r="4" fill="#d73a49"/>
+  <circle cx="559" cy="169" r="4" fill="#d73a49"/>
+  <circle cx="566" cy="129" r="4" fill="#d73a49"/>
+  <circle cx="573" cy="149" r="4" fill="#d73a49"/>
+  <circle cx="580" cy="130" r="4" fill="#d73a49"/>
+  <circle cx="587" cy="164" r="4" fill="#d73a49"/>
+  <circle cx="594" cy="134" r="4" fill="#d73a49"/>
+  <circle cx="601" cy="132" r="4" fill="#d73a49"/>
+  <circle cx="608" cy="137" r="4" fill="#d73a49"/>
+  <circle cx="615" cy="119" r="4" fill="#d73a49"/>
+  <circle cx="622" cy="119" r="4" fill="#d73a49"/>
+  <circle cx="628" cy="109" r="4" fill="#d73a49"/>
+  <circle cx="635" cy="89" r="4" fill="#d73a49"/>
+  <circle cx="642" cy="95" r="4" fill="#d73a49"/>
+  <circle cx="649" cy="122" r="4" fill="#d73a49"/>
+  <circle cx="656" cy="99" r="4" fill="#d73a49"/>
+  <circle cx="663" cy="92" r="4" fill="#d73a49"/>
+  <circle cx="670" cy="75" r="4" fill="#d73a49"/>
+  <circle cx="677" cy="87" r="4" fill="#d73a49"/>
+  <circle cx="684" cy="125" r="4" fill="#d73a49"/>
+  <circle cx="691" cy="127" r="4" fill="#d73a49"/>
+  <circle cx="697" cy="92" r="4" fill="#d73a49"/>
+  <circle cx="704" cy="64" r="4" fill="#d73a49"/>
+  <circle cx="711" cy="65" r="4" fill="#d73a49"/>
+  <circle cx="718" cy="80" r="4" fill="#d73a49"/>
+  <circle cx="725" cy="45" r="4" fill="#d73a49"/>
+  <circle cx="732" cy="55" r="4" fill="#d73a49"/>
+  <circle cx="739" cy="57" r="4" fill="#d73a49"/>
+  <circle cx="746" cy="40" r="4" fill="#d73a49"/>
+  <circle cx="753" cy="55" r="4" fill="#d73a49"/>
+  <circle cx="760" cy="47" r="4" fill="#d73a49"/>
+
+  <text x="70" y="450" text-anchor="middle" font-family="monospace" font-size="14">1</text>
+  <text x="760" y="450" text-anchor="middle" font-family="monospace" font-size="14">101</text>
+  <text x="55" y="435" text-anchor="end" font-family="monospace" font-size="14">0</text>
+  <text x="55" y="45" text-anchor="end" font-family="monospace" font-size="14">234</text>
+
+</svg>

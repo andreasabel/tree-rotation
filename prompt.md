@@ -211,3 +211,46 @@ I also verified:
  - default mode writes rows like 1,0,"0.00",3,"ct" and prints winners starting at N=1
  - --full still reproduces the old search/output style starting at N=3
  - --plot works with the shared CSV format n,score,ratio,iterations,moves
+
+
+2026-05-26
+==========
+
+We introduce two new approximate searches for the highscore, for the new game:
+
+1. Option `--random=NNN`.  This will for each `N` play `NNN` random games from the starting position and keep the winner.
+   A random game is simply a game where a random move is chosen from the possible moves each time.
+   The `NNN` argument defaults to 100000.
+   Module: `Random`.
+
+2. Option `--mcts=NNN`.  This will for each `N` play a game using Monte Carlo Tree Search (mcts) with random rollout.
+   Each time the next move will be chosen after NNN mcts simulations (phases selection, expansion, rollout, backpropagation).
+   The random rollout (use random game play from the given position from module `Random`, see above) determines the score
+   of a new game tree leaf by the score obtained in the final position of the random rollout.
+   The final "winner" is simply the game played by the mcts.
+   Module: `MCTS`.
+
+Answer
+------
+
+Added the two reduced-game approximate searches and wired them into the CLI.
+
+ - Random: --random or --random=NNN runs repeated random playouts from each start board and
+keeps the best result. Bare --random defaults to 100000 samples.
+ - MCTS: --mcts or --mcts=NNN plays one reduced-game using Monte Carlo Tree Search, with NNN
+simulations before each real move and random rollout from Random. Bare --mcts defaults to
+100000 simulations per move.
+
+The new modules are:
+
+ - app/Random.hs
+ - app/MCTS.hs
+
+Main now routes reduced-game solving through:
+
+ - exact search (Search) by default
+ - Random with --random
+ - MCTS with --mcts
+
+--full still runs the old game via Full.Game and Full.Search, and --full is rejected if
+combined with --random or --mcts. The CSV and SVG plotting flow stays unchanged.

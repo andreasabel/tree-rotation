@@ -1,8 +1,12 @@
+{-# LANGUAGE DerivingStrategies #-}
+
 module Main (main) where
 
 import Full.Search qualified as FullSearch
+import MCTS qualified
 import Options.Applicative
 import Plot (printScorePlot)
+import Random qualified
 import Search qualified
 
 -- | Number of initial moves or leaves for one game, depending on the mode.
@@ -23,7 +27,19 @@ data CommandLineOptions = CommandLineOptions
     -- ^ Print an SVG plot from the CSV file instead of running the solver.
   , optionsFull :: Bool
     -- ^ Run the original full game when 'True'.
+  , optionsReducedSearch :: ReducedSearchMode
+    -- ^ Search algorithm used for the reduced game.
   }
+
+-- | Search algorithm available for the reduced default game.
+data ReducedSearchMode
+  = ExactSearch
+  -- ^ Explore the full game graph exactly.
+  | RandomSearch Random.SimulationCount
+  -- ^ Sample many random games and keep the best.
+  | MctsSearch MCTS.SimulationCount
+  -- ^ Use Monte Carlo Tree Search to choose each move.
+  deriving stock (Eq, Show)
 
 -- | Parse command line options and either solve games or print a plot.
 main :: IO ()
@@ -31,7 +47,9 @@ main = do
   options <- execParser commandLineParserInfo
   if optionsPlot options
     then printScorePlot (optionsOutputPath options)
-    else mapM_ (runSingleGame options) [resolvedStart options ..]
+    else do
+      rejectIncompatibleOptions options
+      mapM_ (runSingleGame options) [resolvedStart options ..]
 
 -- | Run one game, print its winner, and append the result to CSV.
 --
@@ -48,12 +66,28 @@ runSingleGame options leafCount = do
       putStrLn ("winner " <> FullSearch.formatWinnerSummary leafCount winner)
       FullSearch.appendWinnerCsv (optionsOutputPath options) leafCount winner
     else do
-      winner <-
-        Search.solveGame
-          Search.SearchOptions {Search.searchVerbose = optionsVerbose options}
-          leafCount
+      winner <- solveReducedGame options leafCount
       putStrLn ("winner " <> Search.formatWinnerSummary leafCount winner)
       Search.appendWinnerCsv (optionsOutputPath options) leafCount winner
+
+-- | Solve one reduced-game instance with the configured search method.
+solveReducedGame :: CommandLineOptions -> LeafCount -> IO Search.Winner
+solveReducedGame options leafCount =
+  case optionsReducedSearch options of
+    ExactSearch ->
+      Search.solveGame
+        Search.SearchOptions {Search.searchVerbose = optionsVerbose options}
+        leafCount
+    RandomSearch sampleCount ->
+      Random.solveGame
+        Search.SearchOptions {Search.searchVerbose = optionsVerbose options}
+        sampleCount
+        leafCount
+    MctsSearch simulationCount ->
+      MCTS.solveGame
+        Search.SearchOptions {Search.searchVerbose = optionsVerbose options}
+        simulationCount
+        leafCount
 
 -- | Resolve the default starting value for the selected game mode.
 resolvedStart :: CommandLineOptions -> LeafCount
@@ -63,6 +97,17 @@ resolvedStart options =
     Nothing
       | optionsFull options -> 3
       | otherwise -> 1
+
+-- | Reject combinations that are not supported by the solver.
+rejectIncompatibleOptions :: CommandLineOptions -> IO ()
+rejectIncompatibleOptions options
+  | optionsFull options
+      && optionsReducedSearch options /= ExactSearch =
+      ioError
+        ( userError
+            "--random and --mcts are only available for the reduced default game."
+        )
+  | otherwise = pure ()
 
 -- | Parser for all supported command line options.
 commandLineParser :: Parser CommandLineOptions
@@ -95,6 +140,41 @@ commandLineParser =
       ( long "full"
           <> help "Run the original full game with indexed board moves."
       )
+    <*> reducedSearchParser
+
+-- | Parser for the reduced-game search method.
+reducedSearchParser :: Parser ReducedSearchMode
+reducedSearchParser =
+  randomParser <|> mctsParser <|> pure ExactSearch
+  where
+    randomParser =
+      flag'
+        (RandomSearch Random.defaultRandomGames)
+        ( long "random"
+            <> help
+              "Use repeated random playouts for the reduced game; defaults to 100000 samples."
+        )
+        <|> ( RandomSearch
+                <$> option auto
+                  ( long "random"
+                      <> metavar "NNN"
+                      <> help "Use repeated random playouts with NNN samples."
+                  )
+            )
+    mctsParser =
+      flag'
+        (MctsSearch MCTS.defaultMctsSimulations)
+        ( long "mcts"
+            <> help
+              "Use Monte Carlo Tree Search for the reduced game; defaults to 100000 simulations per move."
+        )
+        <|> ( MctsSearch
+                <$> option auto
+                  ( long "mcts"
+                      <> metavar "NNN"
+                      <> help "Use Monte Carlo Tree Search with NNN simulations per move."
+                  )
+            )
 
 -- | Parser metadata used by 'execParser'.
 commandLineParserInfo :: ParserInfo CommandLineOptions
@@ -103,5 +183,5 @@ commandLineParserInfo =
     (commandLineParser <**> helper)
     ( fullDesc
         <> progDesc
-          "Compute puzzle highscores for the reduced game by default, use --full for the original game, or render a score plot."
+          "Compute puzzle highscores for the reduced game by default, use --random or --mcts for approximate reduced-game searches, use --full for the original game, or render a score plot."
     )
