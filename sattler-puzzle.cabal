@@ -1,0 +1,16 @@
+cabal-version: 3.0
+name: sattler-puzzle
+version: 0.1.0.0
+build-type: Simple
+
+executable sattler-puzzle
+  main-is: Main.hs
+  hs-source-dirs: app
+  default-language: GHC2021
+  ghc-options: -Wall
+  build-depends:
+      base >= 4.21 && < 5
+    , directory >= 1.3
+    , hashable >= 1.4
+    , optparse-applicative >= 0.18
+    , unordered-containers >= 0.2
