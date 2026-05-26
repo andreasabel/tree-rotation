@@ -319,3 +319,24 @@ iterative-deepening depth-first search, prints the best winner after each depth,
 prefers the lexicographically smaller move trail on equal score.
 
 --help now includes --dfs, and the project builds cleanly.
+
+
+2026-05-26 IV
+=============
+
+module DFS: remove the `depthLimit` and the whole logic around it.
+A separate depth limitation is not needed since the overall depth is implicitly restricted by the `leafCount` the board is initialized with.
+`depthLimitedSearch` should be renamed to just `search`.
+`solveGame` can be simplified considerably since it does not need a loop to increase the depth.  It can simply call `search` with the initial board and parameters and then handle the result.
+
+Answer
+------
+
+Done. DFS is now a plain recursive search:
+
+ - removed depthLimit and all cutoff logic
+ - renamed depthLimitedSearch to search
+ - simplified solveGame to call search once on the initial board and wrap the result
+
+--dfs now behaves as a straightforward DFS over the reduced game, with no iterative-deepening
+loop.
