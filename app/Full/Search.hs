@@ -37,37 +37,37 @@ type IterationCount = Int
 
 -- | Reporting options that affect the search process.
 data SearchOptions = SearchOptions
-  { searchVerbose :: Bool
+  { searchVerbose :: !Bool
     -- ^ Print each improving leader when 'True'.
   }
 
 -- | Search metadata attached to a board in the frontier.
 data PositionInfo = PositionInfo
-  { positionMovesRev :: MoveTrail
+  { positionMovesRev :: !MoveTrail
     -- ^ Move trail stored in reverse order for cheap extension.
-  , positionScore :: RotationScore
+  , positionScore :: !RotationScore
     -- ^ Number of rotation moves contained in 'positionMovesRev'.
   }
 
 -- | Best completed result found so far for one start size.
 data Winner = Winner
-  { winnerScore :: RotationScore
+  { winnerScore :: !RotationScore
     -- ^ Highest number of rotations seen on a completed game.
-  , winnerIterations :: IterationCount
+  , winnerIterations :: !IterationCount
     -- ^ Number of search-loop calls used to establish the final answer.
-  , winnerMoves :: MoveTrail
+  , winnerMoves :: !MoveTrail
     -- ^ Move trail that achieves 'winnerScore'.
   }
 
 -- | Mutable search state threaded through the graph exploration.
 data SearchState = SearchState
-  { searchFrontier :: HashMap.HashMap Board PositionInfo
+  { searchFrontier :: !(HashMap.HashMap Board PositionInfo)
     -- ^ Unexplored positions keyed by their normalized board.
-  , searchBestScores :: HashMap.HashMap Board RotationScore
+  , searchBestScores :: !(HashMap.HashMap Board RotationScore)
     -- ^ Best score ever seen for each board, used for dominance pruning.
-  , searchWinner :: Maybe Winner
+  , searchWinner :: !(Maybe Winner)
     -- ^ Best terminal result found so far, if any.
-  , searchIterations :: IterationCount
+  , searchIterations :: !IterationCount
     -- ^ Number of completed calls to the main search loop.
   }
 

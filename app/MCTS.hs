@@ -26,15 +26,15 @@ defaultMctsSimulations = 100000
 
 -- | One MCTS node for a single reduced-game board.
 data MctsNode = MctsNode
-  { nodeBoard :: Board
+  { nodeBoard :: !Board
     -- ^ Board represented by this node.
-  , nodeVisits :: Int
+  , nodeVisits :: !Int
     -- ^ Number of simulations that passed through this node.
-  , nodeTotalReward :: Double
+  , nodeTotalReward :: !Double
     -- ^ Sum of rollout rewards from this node to terminal positions.
-  , nodeUntriedMoves :: [Move]
+  , nodeUntriedMoves :: ![Move]
     -- ^ Legal moves that have not yet been expanded.
-  , nodeChildren :: [(Move, MctsNode)]
+  , nodeChildren :: ![(Move, MctsNode)]
     -- ^ Expanded children keyed by the move from this node.
   }
 
@@ -65,7 +65,7 @@ solveGame _ requestedSimulations leafCount =
               go
                 nextBoard
                 (chosenMove : movesRev)
-                (rotationScore + moveScore chosenMove)
+                (rotationScore + Search.moveScore chosenMove)
                 (totalSimulations + simulationsPerMove)
             Nothing ->
               ioError (userError "Internal error: MCTS selected an illegal move.")
@@ -110,7 +110,7 @@ simulateNode node
                   { nodeVisits = 1
                   , nodeTotalReward = fromIntegral rolloutScore
                   }
-              totalReward = moveScore chosenMove + rolloutScore
+              totalReward = Search.moveScore chosenMove + rolloutScore
               updatedNode =
                 node
                   { nodeVisits = nodeVisits node + 1
@@ -126,7 +126,7 @@ simulateNode node
           chosenIndex = selectChildIndex parentVisits (nodeChildren node)
           (chosenMove, chosenChild) = nodeChildren node !! chosenIndex
       (childReward, updatedChild) <- simulateNode chosenChild
-      let totalReward = moveScore chosenMove + childReward
+      let totalReward = Search.moveScore chosenMove + childReward
           updatedNode =
             node
               { nodeVisits = nodeVisits node + 1
@@ -198,7 +198,7 @@ ucbScore :: Int -> (Move, MctsNode) -> Double
 ucbScore parentVisits (edgeMove, childNode) =
   immediateReward + averageReward + explorationBonus
   where
-    immediateReward = fromIntegral (moveScore edgeMove)
+    immediateReward = fromIntegral (Search.moveScore edgeMove)
     averageReward
       | nodeVisits childNode == 0 = 0
       | otherwise = nodeTotalReward childNode / fromIntegral (nodeVisits childNode)
@@ -235,9 +235,3 @@ chooseRandomMove :: [Move] -> IO Move
 chooseRandomMove moves = do
   chosenIndex <- randomRIO (0, length moves - 1)
   pure (moves !! chosenIndex)
-
--- | Score contribution of one move.
-moveScore :: Move -> Search.RotationScore
-moveScore Rotate = 1
-moveScore Concat = 0
-moveScore Tail = 0

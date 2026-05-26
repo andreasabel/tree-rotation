@@ -7,9 +7,9 @@ import Text.Read (readMaybe)
 
 -- | Score row extracted from the CSV file.
 data ScorePoint = ScorePoint
-  { pointLeafCount :: Int
+  { pointLeafCount :: !Int
     -- ^ Starting number of leaves.
-  , pointScore :: Int
+  , pointScore :: !Int
     -- ^ High-score found for that start size.
   }
 

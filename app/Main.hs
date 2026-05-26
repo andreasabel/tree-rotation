@@ -18,17 +18,17 @@ type OutputPath = FilePath
 
 -- | Command line options that control program execution.
 data CommandLineOptions = CommandLineOptions
-  { optionsVerbose :: Bool
+  { optionsVerbose :: !Bool
     -- ^ Print improving leaders when 'True'.
-  , optionsOutputPath :: OutputPath
+  , optionsOutputPath :: !OutputPath
     -- ^ CSV file used for winner output and plot input.
-  , optionsStart :: Maybe LeafCount
+  , optionsStart :: !(Maybe LeafCount)
     -- ^ Optional starting value of @N@ for the infinite solving loop.
-  , optionsPlot :: Bool
+  , optionsPlot :: !Bool
     -- ^ Print an SVG plot from the CSV file instead of running the solver.
-  , optionsFull :: Bool
+  , optionsFull :: !Bool
     -- ^ Run the original full game when 'True'.
-  , optionsReducedSearch :: ReducedSearchMode
+  , optionsReducedSearch :: !ReducedSearchMode
     -- ^ Search algorithm used for the reduced game.
   }
 
@@ -37,7 +37,7 @@ data ReducedSearchMode
   = ExactSearch
   -- ^ Explore the full game graph exactly.
   | DfsSearch
-  -- ^ Explore the reduced game with iterative-deepening DFS.
+  -- ^ Explore the reduced game with plain depth-first search.
   | RandomSearch Random.SimulationCount
   -- ^ Sample many random games and keep the best.
   | MctsSearch MCTS.SimulationCount
@@ -158,7 +158,7 @@ reducedSearchParser =
       flag'
         DfsSearch
         ( long "dfs"
-            <> help "Use iterative-deepening depth-first search for the reduced game."
+            <> help "Use plain depth-first search for the reduced game."
         )
     randomParser =
       flag'

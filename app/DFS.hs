@@ -1,3 +1,5 @@
+{-# LANGUAGE BangPatterns #-}
+
 module DFS
   ( solveGame
   ) where
@@ -5,7 +7,6 @@ module DFS
 import Game
   ( Board
   , LeafCount
-  , Move (..)
   , MoveTrail
   , isTerminalBoard
   , legalMoves
@@ -21,83 +22,62 @@ import Search qualified
 -- board.
 solveGame :: Search.SearchOptions -> LeafCount -> IO Search.Winner
 solveGame _ leafCount =
-  case search initialBoard [] 0 Nothing of
-    (Just winner, totalIterations) ->
-      pure winner {Search.winnerIterations = totalIterations}
-    (Nothing, totalIterations) ->
-      pure
-        Search.Winner
-          { Search.winnerScore = 0
-          , Search.winnerIterations = totalIterations
-          , Search.winnerMoves = []
-          }
+  let SearchResult winner totalIterations = search initialBoard []
+   in pure winner {Search.winnerIterations = totalIterations}
   where
     initialBoard = startBoard leafCount
 
--- | Perform one DFS and return the best winner seen so far.
+-- | Result of one DFS traversal, including the best winner and the number of
+-- recursive calls performed.
+data SearchResult = SearchResult !Search.Winner !Search.IterationCount
+
+-- | Combine two DFS results by keeping the better winner and summing the
+-- iteration counts.
+instance Semigroup SearchResult where
+  SearchResult leftWinner leftIterations <> SearchResult rightWinner rightIterations =
+    SearchResult bestWinner totalIterations
+    where
+      !bestWinner
+        | Search.winnerBeats leftWinner rightWinner = leftWinner
+        | otherwise = rightWinner
+      !totalIterations = leftIterations + rightIterations
+
+-- | Perform one DFS and return the best winner reachable from the current
+-- board.
 --
 -- Postcondition: the returned iteration count is the number of recursive calls
 -- made during this traversal.
 search ::
   Board ->
   MoveTrail ->
-  Search.RotationScore ->
-  Maybe Search.Winner ->
-  (Maybe Search.Winner, Search.IterationCount)
-search board movesRev rotationScore currentWinner
+  SearchResult
+search board movesRev
   | isTerminalBoard board =
-      (updateWinner rotationScore movesRev currentWinner, 1)
+      SearchResult terminalWinner 1
   | otherwise =
-      foldl
-        step
-        (currentWinner, 1)
-        (legalMoves board)
+      SearchResult bestWinner (childIterations + 1)
   where
-    step (bestWinner, totalIterations) chosenMove =
-      case move chosenMove board of
-        Just nextBoard ->
-          let (nextWinner, nextIterations) =
-                search
-                  nextBoard
-                  (chosenMove : movesRev)
-                  (rotationScore + moveScore chosenMove)
-                  bestWinner
-           in (nextWinner, totalIterations + nextIterations)
-        Nothing -> (bestWinner, totalIterations)
-
--- | Update the best winner with a newly reached terminal trail.
---
--- Postcondition: higher score wins, and equal scores are broken by the
--- lexicographically smaller move trail.
-updateWinner ::
-  Search.RotationScore ->
-  MoveTrail ->
-  Maybe Search.Winner ->
-  Maybe Search.Winner
-updateWinner rotationScore movesRev currentWinner =
-  case currentWinner of
-    Nothing -> Just candidateWinner
-    Just winner
-      | winnerBeats candidateWinner winner -> Just candidateWinner
-      | otherwise -> currentWinner
-  where
-    candidateWinner =
+    terminalWinner =
       Search.Winner
-        { Search.winnerScore = rotationScore
+        { Search.winnerScore = scoreMoveTrail moveTrail
         , Search.winnerIterations = 0
-        , Search.winnerMoves = reverse movesRev
+        , Search.winnerMoves = moveTrail
         }
+    !moveTrail = reverse movesRev
+    SearchResult bestWinner childIterations =
+      case childResults of
+        firstResult : remainingResults ->
+          foldl' (<>) firstResult remainingResults
+        [] ->
+          SearchResult terminalWinner 0
+    childResults =
+      [ search nextBoard (chosenMove : movesRev)
+      | chosenMove <- legalMoves board
+      , Just nextBoard <- [move chosenMove board]
+      ]
 
--- | Compare two winners using score first and lexicographic move order second.
-winnerBeats :: Search.Winner -> Search.Winner -> Bool
-winnerBeats candidateWinner currentWinner =
-  Search.winnerScore candidateWinner > Search.winnerScore currentWinner
-    || ( Search.winnerScore candidateWinner == Search.winnerScore currentWinner
-           && Search.winnerMoves candidateWinner < Search.winnerMoves currentWinner
-       )
-
--- | Score contribution of one move.
-moveScore :: Move -> Search.RotationScore
-moveScore Rotate = 1
-moveScore Concat = 0
-moveScore Tail = 0
+-- | Compute the score of a complete move trail.
+scoreMoveTrail :: MoveTrail -> Search.RotationScore
+scoreMoveTrail = foldl' step 0
+  where
+    step !score chosenMove = score + Search.moveScore chosenMove

@@ -36,9 +36,9 @@ type MoveTrail = [Move]
 -- | Search position for the reduced game: one tree and the number of remaining
 -- concat-with-leaf moves.
 data Board = Board
-  { boardTree :: Tree
+  { boardTree :: !Tree
     -- ^ Current tree manipulated by rotate and tail moves.
-  , boardRemainingConcats :: Int
+  , boardRemainingConcats :: !Int
     -- ^ Number of concat-with-leaf moves still available.
   }
   deriving stock (Eq, Show, Generic)

@@ -340,3 +340,43 @@ Done. DFS is now a plain recursive search:
 
 --dfs now behaves as a straightforward DFS over the reduced game, with no iterative-deepening
 loop.
+
+2026-05-26 V
+============
+
+Rework DFS `search` function to this type:
+```haskell
+search ::
+  Board ->
+  MoveTrail ->
+  SearchResult
+
+data SearchResult = SearchResult !Search.Winner !Search.IterationCount
+```
+In a terminal position, this just returns the winner constructed from the `MoveTrail` (computing the score from the moves) and `1` as iteration count.
+In other positions, it lauches recursive calls for all the possible moves and then combines the returned winners into the best winner and adds the iteration counts.  This combination of `SearchResult`s should be implemented as `Semigroup` instance.
+Use strictness to avoid space leaks.
+Refactor all records in this project to have strict fields.
+
+`moveScore` is implemented 4 times, please keep it only in `Search` and import it from there in the other 3 modules (DFS, MCTS, Random).
+Also remove the clones of `winnerBeats` in DFS and Random and use Search.winnerBeats (but make sure these were actually clones).
+
+Answer
+------
+
+Done: the refactor now builds cleanly, DFS.search has the requested Board -> MoveTrail ->
+SearchResult shape, and the reduced-game helper duplication is removed.
+
+The meaningful changes are:
+
+ - DFS now returns SearchResult !Search.Winner !Search.IterationCount, computes terminal
+score from the MoveTrail, and combines branches via a strict Semigroup.
+ - Search.moveScore and Search.winnerBeats are now shared by DFS, Random, and MCTS; the only
+remaining separate moveScore is in Full.Search, which needs its own because it uses the old
+game’s different Move type.
+ - Record fields were made strict across the project where applicable (Search, Game, Main,
+MCTS, Plot, Full.Search).
+ - A stale DFS help string was updated to say plain depth-first search.
+
+I also rebuilt and smoke-checked --dfs, --random=20, and --mcts=20; they all run and keep
+appending CSV results as expected.
