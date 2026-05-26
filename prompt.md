@@ -254,3 +254,41 @@ Main now routes reduced-game solving through:
 
 --full still runs the old game via Full.Game and Full.Search, and --full is rejected if
 combined with --random or --mcts. The CSV and SVG plotting flow stays unchanged.
+
+
+2026-05-26 II
+=============
+
+Make me an interactive webpage (new folder `play/`, entry `play/index.html`) that simulates/visualizes the tree game.
+The layout has 3 zones, arranged vertically.
+
+The top zone (10%) displays counts of number of C, T, and R moves, and the ratio R/C (unless C is zero) with 2 decimal digits.  Make sure these numbers are right-aligned and do not shift position when they are changed (so each number needs its own cell that is fixed horizontally).
+
+The middle zone (80%) displays the tree, only showing the `Node` part (`Leaf` omitted).  The root should be on top, nodes should be solid balls, and the lines should have some thickness. The picture of the tree should be zoomed to fill the middle zone (up to some margins).
+
+The lower zone (10%) has a text input field that contains the string of moves e.g. "ccrtcr".
+The focus should be on the text input, so that when the page is loaded one can directly type into the text input.
+If its content changes in any way (e.g. by pressing c, r, or t, or backspacing, or pasting a new string there), the tree should be updated to be as computed from the move sequence in the text input, and the stats (C, T, R, ratio) in the top zone should be updated.
+More precisely: the game status (tree, stats) should be determined by the move string up to the cursor position in the text field.  Characters after the cursor should be ignored.  This allows to go back and forward in the move sequence and see the tree changing without having to delete characters from the move sequence.
+
+The horizontal alignment of the three zones should be centered.
+
+It the move sequence is illegal, the middle zone should display a big red X and the stats should also display red Xs.
+
+A second task: Change the Haskell program (modules `Search`, `Random`, `MCTS`) so that when a terminal position is reached with the same score as the current winner, the move sequence is kept that is smaller in the lexicographic order (standard `Ord` for the list of moves (`MoveTrail`)).
+
+Answer
+------
+
+Added play/index.html: a self-contained interactive playground with the requested 3-zone
+layout, fixed-width right-aligned stats, cursor-aware move parsing, SVG tree rendering,
+autofocus on the move input, and red X feedback for illegal prefixes.
+
+On the Haskell side, the reduced-game tie-break is updated so equal scores prefer the
+lexicographically smaller move trail:
+
+ - Search and Random now compare equal-score winners by MoveTrail.
+ - Game.Move now derives Ord to support trail ordering.
+ - MCTS now breaks equal reduced-game move-choice ties lexicographically.
+
+The project still builds cleanly.

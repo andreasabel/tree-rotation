@@ -52,7 +52,7 @@ data Move
   -- ^ Rotate the current tree if it matches the rotation shape.
   | Tail
   -- ^ Drop a leading 'Leaf' from the current tree when possible.
-  deriving stock (Eq, Show)
+  deriving stock (Eq, Ord, Show)
 
 -- | Create the initial reduced-game board.
 --

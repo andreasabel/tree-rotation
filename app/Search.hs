@@ -209,7 +209,18 @@ updateWinnerIfBetter searchOptions leafCount board positionInfo searchState
     isBetter =
       case searchWinner searchState of
         Nothing -> True
-        Just currentWinner -> winnerScore candidateWinner > winnerScore currentWinner
+        Just currentWinner -> winnerBeats candidateWinner currentWinner
+
+-- | Decide whether the first winner is better than the second one.
+--
+-- Postcondition: higher score wins, and equal scores are broken by the
+-- lexicographically smaller move trail.
+winnerBeats :: Winner -> Winner -> Bool
+winnerBeats candidateWinner currentWinner =
+  winnerScore candidateWinner > winnerScore currentWinner
+    || ( winnerScore candidateWinner == winnerScore currentWinner
+           && winnerMoves candidateWinner < winnerMoves currentWinner
+       )
 
 -- | Format one winner line for terminal output.
 formatWinnerSummary :: LeafCount -> Winner -> String

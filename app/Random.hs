@@ -78,7 +78,7 @@ solveGame searchOptions requestedSamples leafCount = do
                 case bestWinner of
                   Nothing -> Just candidateWinner
                   Just currentWinner
-                    | Search.winnerScore candidateWinner > Search.winnerScore currentWinner ->
+                   | winnerBeats candidateWinner currentWinner ->
                         Just candidateWinner
                     | otherwise -> bestWinner
 
@@ -94,7 +94,18 @@ solveGame searchOptions requestedSamples leafCount = do
 
     searchImproved Nothing _ = True
     searchImproved (Just currentWinner) candidateWinner =
-      Search.winnerScore candidateWinner > Search.winnerScore currentWinner
+      winnerBeats candidateWinner currentWinner
+
+-- | Decide whether the first winner is better than the second one.
+--
+-- Postcondition: higher score wins, and equal scores are broken by the
+-- lexicographically smaller move trail.
+winnerBeats :: Search.Winner -> Search.Winner -> Bool
+winnerBeats candidateWinner currentWinner =
+  Search.winnerScore candidateWinner > Search.winnerScore currentWinner
+    || ( Search.winnerScore candidateWinner == Search.winnerScore currentWinner
+           && Search.winnerMoves candidateWinner < Search.winnerMoves currentWinner
+       )
 
 -- | Score contribution of one move.
 moveScore :: Move -> Search.RotationScore

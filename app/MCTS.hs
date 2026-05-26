@@ -156,6 +156,10 @@ bestVisitedChild (firstChild : remainingChildren) =
       | childVisits challenger == childVisits currentBest
           && childAverage challenger > childAverage currentBest =
           challenger
+      | childVisits challenger == childVisits currentBest
+          && childAverage challenger == childAverage currentBest
+          && fst challenger < fst currentBest =
+          challenger
       | otherwise = currentBest
 
     childVisits (_, childNode) = nodeVisits childNode
@@ -169,18 +173,25 @@ selectChildIndex :: Int -> [(Move, MctsNode)] -> Int
 selectChildIndex parentVisits children =
   case scoredChildren of
     firstScoredChild : remainingScoredChildren ->
-      snd (foldl chooseBetterChild firstScoredChild remainingScoredChildren)
+      thirdOf (foldl chooseBetterChild firstScoredChild remainingScoredChildren)
     [] -> 0
   where
     scoredChildren =
       zipWith
-        (\childIndex child -> (ucbScore parentVisits child, childIndex))
+        (\childIndex child -> (ucbScore parentVisits child, fst child, childIndex))
         [0 ..]
         children
 
     chooseBetterChild bestChild challenger
-      | fst challenger > fst bestChild = challenger
+      | scoreOf challenger > scoreOf bestChild = challenger
+      | scoreOf challenger == scoreOf bestChild
+          && moveOf challenger < moveOf bestChild =
+          challenger
       | otherwise = bestChild
+
+    scoreOf (score, _, _) = score
+    moveOf (_, chosenMove, _) = chosenMove
+    thirdOf (_, _, childIndex) = childIndex
 
 -- | Compute the UCB1 score for one child edge.
 ucbScore :: Int -> (Move, MctsNode) -> Double
