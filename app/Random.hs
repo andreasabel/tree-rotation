@@ -42,7 +42,7 @@ randomRollout board
         Nothing ->
           ioError (userError "Internal error: legalMoves produced an illegal move.")
 
--- | Estimate the best reduced-game result by sampling many random playouts.
+-- | Estimate the best game result by sampling many random playouts.
 --
 -- Precondition: the start count is non-negative.
 -- Postcondition: the returned winner is the best score seen among all sampled

@@ -75,7 +75,7 @@ move = \case
 
 -- | Remove two trees and insert their concatenation.
 --
--- Precondition: both indices refer to the boards described in the original
+-- Precondition: both indices refer to the boards described in the multi-tree
 -- rules: the second index is interpreted on the board after removing the first
 -- tree.
 -- Postcondition: the returned board is sorted.
@@ -165,7 +165,7 @@ isTerminalBoard (Board [Leaf]) = True
 isTerminalBoard (Board []) = True
 isTerminalBoard _ = False
 
--- | Render a move in the original textual syntax.
+-- | Render a move in the textual syntax.
 renderMove :: Move -> String
 renderMove = \case
   Concat firstIndex secondIndex -> show firstIndex <> "&" <> show secondIndex

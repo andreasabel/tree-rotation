@@ -22,9 +22,9 @@ type SimulationCount = Int
 
 -- | Default number of MCTS simulations used before choosing each move.
 defaultMctsSimulations :: SimulationCount
-defaultMctsSimulations = 100000
+defaultMctsSimulations = 500
 
--- | One MCTS node for a single reduced-game board.
+-- | One MCTS node for a single board.
 data MctsNode = MctsNode
   { nodeBoard :: !Board
     -- ^ Board represented by this node.
@@ -38,7 +38,7 @@ data MctsNode = MctsNode
     -- ^ Expanded children keyed by the move from this node.
   }
 
--- | Play one reduced-game using MCTS to choose each real move.
+-- | Play one single-tree game using MCTS to choose each real move.
 --
 -- Precondition: the start count is non-negative.
 -- Postcondition: the returned winner is the actual game played by MCTS, and its

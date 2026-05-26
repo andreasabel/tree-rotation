@@ -1,11 +1,14 @@
-# tree-rotation
+tree-rotation
+=============
 
-Tools for exploring the tree-rotation puzzle from <https://github.com/koengit/puzzle2026>.
+Some simple tools to test hypotheses about amortized tree operations.
+
+Initiated by the puzzle at: https://github.com/koengit/puzzle2026
 
 This repository contains two main components:
 
-1. A browser playground for interactively stepping through move strings and visualizing the current tree.
-2. A Haskell program, `tree-rotation`, for exact and approximate high-score search, CSV output, and SVG plotting.
+1. A [browser playground](play/index.html) for interactively stepping through move sequences and visualizing the resulting tree.
+2. A Haskell program, `tree-rotation`, for exact and approximate high-score (rotations/constructors) search and plotting.
 
 The project is licensed under the **BSD 3-clause license**; see [LICENSE](LICENSE).
 
@@ -13,27 +16,29 @@ The project is licensed under the **BSD 3-clause license**; see [LICENSE](LICENS
 
 The interactive page lives at [play/index.html](play/index.html).
 
-It is a self-contained visualization of the reduced tree game. The page shows:
+It is a self-contained visualization of the tree-rotation game. The page shows:
 
-- the current counts of `C`, `T`, and `R` moves and the ratio `R/C`,
-- an SVG rendering of the current tree, omitting `Leaf` nodes,
-- a move-input field that drives the whole display.
+- the current counts of concatenation (`C`), tail (`T`), and rotation (`R`) moves and the ratio `R/C`,
+- an SVG rendering of the current tree, omitting leaf nodes,
+- a input field for the move sequence that drives the whole display.
 
 ### How to play
 
 Open `play/index.html` in a browser, then type a move string such as `ccrtt` into the input field.
 
-- `c` appends a `Leaf` on the right, consuming one available concatenation move,
+- `c` appends a leaf on the right, consuming one available concatenation move,
 - `r` performs a tree rotation when the current tree has the right shape,
-- `t` takes the tail when the current tree has the form `Node Leaf t`.
+- `t` takes the tail when the left subtree of the current tree is a leaf (displayed as absent).
 
-The page evaluates only the prefix up to the current cursor position, so you can move the caret backward and forward through a longer sequence and inspect intermediate states without deleting text. If the prefix is illegal, the tree pane shows a large red `X` and the statistics are marked invalid as well.
+The displayed tree and score is determined by the moves up to the current cursor position.
+Thus, you can step backward and forward through a longer sequence and inspect intermediate states without deleting text.
+If the move sequence is illegal, the tree pane shows a large red `X`.
 
-## Haskell program
+## Command-line solver
 
-The command-line solver is the executable **`tree-rotation`**.
+The executable **`tree-rotation`** solves the game by exhaustive exploration of the game tree.
 
-By default it solves the reduced game, starting at `N = 1`, and keeps running for `N, N+1, N+2, ...` until interrupted. For each solved `N`, it prints the final winner and appends a CSV row with
+By default it solves the game for the number `N` of concatenation moves, starting at `N = 1`, and keeps running for `N, N+1, N+2, ...` until interrupted. For each solved `N`, it prints the winner, i.e., the move sequence with the most rotations, and appends a CSV row with
 
 ```text
 n,score,ratio,iterations,moves
@@ -43,11 +48,11 @@ where `score` is the number of rotations, `ratio` is `score / n`, `iterations` i
 
 ### Search modes
 
-- **Exact search** (default): hash-map based graph search for the reduced game.
-- **`--dfs`**: plain depth-first search for the reduced game.
-- **`--random[=NNN]`**: best of many random playouts, defaulting to `100000`.
-- **`--mcts[=NNN]`**: Monte Carlo Tree Search with random rollouts, defaulting to `100000` simulations per real move.
-- **`--full`**: switch to the original indexed multi-tree game instead of the reduced game.
+- **Exact search** (default): hash-map based graph search. (Very memory hungry.)
+- **`--dfs`**: plain depth-first search. (Much slower, but uses little memory.)
+- **`--random[=NNN]`**: best of `NNN`many random playouts, defaulting to `100000`.
+- **`--mcts[=NNN]`**: Monte Carlo Tree Search with random rollouts, defaulting to `500` simulations per real move.
+- **`--full`**: An extended game where a list of trees is maintained and concatenation can be applied to selected trees.
 
 ### Command-line options
 
@@ -58,10 +63,10 @@ tree-rotation [--verbose] [-o|--output FILE] [--start N] [--plot] [--full]
 
 - `--verbose` prints improving leaders during the search; quiet mode is the default.
 - `--output FILE` selects the CSV file to append to, or the CSV file to read when plotting.
-- `--start N` chooses the first `N`; the defaults are `1` for the reduced game and `3` with `--full`.
+- `--start N` chooses the first `N`; the defaults are `1` for the standard game and `3` with `--full`.
 - `--plot` reads the CSV file and prints an SVG plot of `N` versus high-score.
-- `--full` uses the original board-of-trees game with indexed moves.
-- `--dfs`, `--random`, and `--mcts` choose alternative search strategies for the reduced game.
+- `--full` analyses the multi-tree game.
+- `--dfs`, `--random`, and `--mcts` choose alternative search strategies for the standard game.
 
 ### Build and run
 
@@ -77,12 +82,3 @@ To locate the built executable directly:
 ```bash
 cabal list-bin tree-rotation
 ```
-
-The code is written in **GHC2021** and currently depends on:
-
-- `base`
-- `directory`
-- `hashable`
-- `optparse-applicative`
-- `random`
-- `unordered-containers`

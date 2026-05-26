@@ -15,7 +15,7 @@ import Game
   )
 import Search qualified
 
--- | Explore the reduced game with plain depth-first search.
+-- | Explore the single-tree game with plain depth-first search.
 --
 -- Precondition: the start count is non-negative.
 -- Postcondition: returns the best terminal winner reachable from the start

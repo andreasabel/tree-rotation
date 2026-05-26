@@ -27,17 +27,17 @@ data CommandLineOptions = CommandLineOptions
   , optionsPlot :: !Bool
     -- ^ Print an SVG plot from the CSV file instead of running the solver.
   , optionsFull :: !Bool
-    -- ^ Run the original full game when 'True'.
-  , optionsReducedSearch :: !ReducedSearchMode
-    -- ^ Search algorithm used for the reduced game.
+    -- ^ Run the multi-tree game when 'True'.
+  , optionsSingleTreeSearch :: !SingleTreeSearchMode
+    -- ^ Search algorithm used for the single-tree game.
   }
 
--- | Search algorithm available for the reduced default game.
-data ReducedSearchMode
+-- | Search algorithm available for the single-tree game.
+data SingleTreeSearchMode
   = ExactSearch
   -- ^ Explore the full game graph exactly.
   | DfsSearch
-  -- ^ Explore the reduced game with plain depth-first search.
+  -- ^ Explore the game with plain depth-first search.
   | RandomSearch Random.SimulationCount
   -- ^ Sample many random games and keep the best.
   | MctsSearch MCTS.SimulationCount
@@ -69,14 +69,14 @@ runSingleGame options leafCount = do
       putStrLn ("winner " <> FullSearch.formatWinnerSummary leafCount winner)
       FullSearch.appendWinnerCsv (optionsOutputPath options) leafCount winner
     else do
-      winner <- solveReducedGame options leafCount
+      winner <- solveSingleTreeGame options leafCount
       putStrLn ("winner " <> Search.formatWinnerSummary leafCount winner)
       Search.appendWinnerCsv (optionsOutputPath options) leafCount winner
 
--- | Solve one reduced-game instance with the configured search method.
-solveReducedGame :: CommandLineOptions -> LeafCount -> IO Search.Winner
-solveReducedGame options leafCount =
-  case optionsReducedSearch options of
+-- | Solve one single-tree game instance with the configured search method.
+solveSingleTreeGame :: CommandLineOptions -> LeafCount -> IO Search.Winner
+solveSingleTreeGame options leafCount =
+  case optionsSingleTreeSearch options of
     ExactSearch ->
       Search.solveGame
         Search.SearchOptions {Search.searchVerbose = optionsVerbose options}
@@ -109,10 +109,10 @@ resolvedStart options =
 rejectIncompatibleOptions :: CommandLineOptions -> IO ()
 rejectIncompatibleOptions options
   | optionsFull options
-      && optionsReducedSearch options /= ExactSearch =
+      && optionsSingleTreeSearch options /= ExactSearch =
       ioError
         ( userError
-            "--dfs, --random, and --mcts are only available for the reduced default game."
+            "--dfs, --random, and --mcts are only available for the default game."
         )
   | otherwise = pure ()
 
@@ -122,7 +122,7 @@ commandLineParser =
   CommandLineOptions
     <$> switch
       ( long "verbose"
-          <> help "Print each improving leader during the search."
+          <> help "Print each new highscore during the search, in addition to the final winner."
       )
     <*> strOption
       ( long "output"
@@ -145,27 +145,27 @@ commandLineParser =
       )
     <*> switch
       ( long "full"
-          <> help "Run the original full game with indexed board moves."
+          <> help "Run the multi-tree game."
       )
-    <*> reducedSearchParser
+    <*> singleTreeSearchParser
 
--- | Parser for the reduced-game search method.
-reducedSearchParser :: Parser ReducedSearchMode
-reducedSearchParser =
+-- | Parser for the single-tree game search method.
+singleTreeSearchParser :: Parser SingleTreeSearchMode
+singleTreeSearchParser =
   dfsParser <|> randomParser <|> mctsParser <|> pure ExactSearch
   where
     dfsParser =
       flag'
         DfsSearch
         ( long "dfs"
-            <> help "Use plain depth-first search for the reduced game."
+            <> help "Use plain depth-first search."
         )
     randomParser =
       flag'
         (RandomSearch Random.defaultRandomGames)
         ( long "random"
             <> help
-              "Use repeated random playouts for the reduced game; defaults to 100000 samples."
+              (unwords ["Use repeated random playouts; defaults to", show Random.defaultRandomGames, "samples."])
         )
         <|> ( RandomSearch
                 <$> option auto
@@ -179,7 +179,7 @@ reducedSearchParser =
         (MctsSearch MCTS.defaultMctsSimulations)
         ( long "mcts"
             <> help
-              "Use Monte Carlo Tree Search for the reduced game; defaults to 100000 simulations per move."
+              ( unwords ["Use Monte Carlo Tree Search for the single-tree game; defaults to", show MCTS.defaultMctsSimulations, "simulations per move."])
         )
         <|> ( MctsSearch
                 <$> option auto
@@ -196,5 +196,5 @@ commandLineParserInfo =
     (commandLineParser <**> helper)
     ( fullDesc
         <> progDesc
-          "Compute puzzle highscores for the reduced game by default, use --dfs, --random, or --mcts for alternative reduced-game searches, use --full for the original game, or render a score plot."
+          "Compute puzzle highscores by breadth-first search; use --dfs, --random, or --mcts for alternative search modes, use --full for the extended multi-tree game, or render a score plot."
     )

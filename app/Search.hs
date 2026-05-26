@@ -74,7 +74,7 @@ data SearchState = SearchState
     -- ^ Number of completed calls to the main search loop.
   }
 
--- | Explore the full reduced-game graph for the given start size.
+-- | Explore the full single-tree game graph for the given start size.
 --
 -- Precondition: the start count is non-negative.
 -- Postcondition: returns the highest-scoring completed game reachable from the

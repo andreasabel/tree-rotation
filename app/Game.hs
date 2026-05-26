@@ -27,13 +27,13 @@ import Tree
   , tailTree
   )
 
--- | Number of initial concat-with-leaf moves available in one reduced game.
+-- | Number of initial concat-with-leaf moves available in one single-tree game.
 type LeafCount = Int
 
 -- | Path of moves from the start position to the current position.
 type MoveTrail = [Move]
 
--- | Search position for the reduced game: one tree and the number of remaining
+-- | Search position for the single-tree game: one tree and the number of remaining
 -- concat-with-leaf moves.
 data Board = Board
   { boardTree :: !Tree
@@ -44,7 +44,7 @@ data Board = Board
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Hashable)
 
--- | Player action applicable to the reduced game.
+-- | Player action applicable to the single-tree game.
 data Move
   = Concat
   -- ^ Replace the current tree @t@ with @Node t Leaf@ and consume one concat.
@@ -54,7 +54,7 @@ data Move
   -- ^ Drop a leading 'Leaf' from the current tree when possible.
   deriving stock (Eq, Ord, Show)
 
--- | Create the initial reduced-game board.
+-- | Create the initial single-tree game board.
 --
 -- Precondition: the count is non-negative.
 -- Postcondition: the returned board has a single 'Leaf' and the requested
@@ -107,7 +107,7 @@ moveTail board@(Board tree _) = do
   tailedTree <- tailTree tree
   pure board {boardTree = tailedTree}
 
--- | Enumerate every legal move from the reduced game position.
+-- | Enumerate every legal move from the game position.
 --
 -- Postcondition: every move in the result satisfies the corresponding move
 -- precondition.
