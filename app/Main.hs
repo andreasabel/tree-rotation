@@ -2,6 +2,7 @@
 
 module Main (main) where
 
+import DFS qualified
 import Full.Search qualified as FullSearch
 import MCTS qualified
 import Options.Applicative
@@ -35,6 +36,8 @@ data CommandLineOptions = CommandLineOptions
 data ReducedSearchMode
   = ExactSearch
   -- ^ Explore the full game graph exactly.
+  | DfsSearch
+  -- ^ Explore the reduced game with iterative-deepening DFS.
   | RandomSearch Random.SimulationCount
   -- ^ Sample many random games and keep the best.
   | MctsSearch MCTS.SimulationCount
@@ -78,6 +81,10 @@ solveReducedGame options leafCount =
       Search.solveGame
         Search.SearchOptions {Search.searchVerbose = optionsVerbose options}
         leafCount
+    DfsSearch ->
+      DFS.solveGame
+        Search.SearchOptions {Search.searchVerbose = optionsVerbose options}
+        leafCount
     RandomSearch sampleCount ->
       Random.solveGame
         Search.SearchOptions {Search.searchVerbose = optionsVerbose options}
@@ -105,7 +112,7 @@ rejectIncompatibleOptions options
       && optionsReducedSearch options /= ExactSearch =
       ioError
         ( userError
-            "--random and --mcts are only available for the reduced default game."
+            "--dfs, --random, and --mcts are only available for the reduced default game."
         )
   | otherwise = pure ()
 
@@ -145,8 +152,14 @@ commandLineParser =
 -- | Parser for the reduced-game search method.
 reducedSearchParser :: Parser ReducedSearchMode
 reducedSearchParser =
-  randomParser <|> mctsParser <|> pure ExactSearch
+  dfsParser <|> randomParser <|> mctsParser <|> pure ExactSearch
   where
+    dfsParser =
+      flag'
+        DfsSearch
+        ( long "dfs"
+            <> help "Use iterative-deepening depth-first search for the reduced game."
+        )
     randomParser =
       flag'
         (RandomSearch Random.defaultRandomGames)
@@ -183,5 +196,5 @@ commandLineParserInfo =
     (commandLineParser <**> helper)
     ( fullDesc
         <> progDesc
-          "Compute puzzle highscores for the reduced game by default, use --random or --mcts for approximate reduced-game searches, use --full for the original game, or render a score plot."
+          "Compute puzzle highscores for the reduced game by default, use --dfs, --random, or --mcts for alternative reduced-game searches, use --full for the original game, or render a score plot."
     )

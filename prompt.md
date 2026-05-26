@@ -292,3 +292,30 @@ lexicographically smaller move trail:
  - MCTS now breaks equal reduced-game move-choice ties lexicographically.
 
 The project still builds cleanly.
+
+
+2026-05-26 III
+==============
+
+For the web page, make the following changes:
+- The zones should be 10%,80%,10% of the frame height and change when the user resizes the window.  They should not grow with their content, rather their content should be fit into the zones.
+- The top zone currently displays e.g. "C 3 T 0 R 1 R/C 0.33" but I want "3 C 0 T 1 R 0.33 R/C".
+
+For the Haskell program, add a module `DFS` and option `--dfs` that implements depth-first search (rather than the breadth-first search we have in `Search`).
+(This is a simple recursive function without any state beyond the current winner. No caching/hashing of visited position is needed.)
+(The basic search logic remains the same: do iterative deepening, printing the winner for each depth, until the user kills the program.)
+
+Answer
+------
+
+Done.
+
+ - Web page: play/index.html now keeps the three zones at 10% / 80% / 10% of the viewport
+height on resize, with content fitted inside those zones. The top stats are reordered to 3 C
+0 T 1 R
+  0.33 R/C with fixed-width right-aligned number cells.
+ - Haskell: added app/DFS.hs and wired --dfs into the reduced-game CLI. It runs
+iterative-deepening depth-first search, prints the best winner after each depth, and still
+prefers the lexicographically smaller move trail on equal score.
+
+--help now includes --dfs, and the project builds cleanly.
