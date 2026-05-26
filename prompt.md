@@ -380,3 +380,32 @@ MCTS, Plot, Full.Search).
 
 I also rebuilt and smoke-checked --dfs, --random=20, and --mcts=20; they all run and keep
 appending CSV results as expected.
+
+
+2026-05-26 VI
+=============
+
+Place the project under the BSD 3-clause license.
+
+Extend the README with this information:
+
+1. Link to webpage, explanation of the component, and instruction how to "play".
+
+2. Description of the Haskell-program (now named `tree-rotation`), its functionality, options, and build info.
+
+Answer
+------
+Done: the project is now under the BSD 3-clause license, and the README has been expanded
+with the webpage and tree-rotation program documentation.
+
+The changes are:
+
+ - Added LICENSE with the BSD 3-clause text.
+ - Updated tree-rotation.cabal with license: BSD-3-Clause, license-file: LICENSE, and a
+synopsis.
+ - Replaced the stub README.md with:
+  - a link to play/index.html (play/index.html),
+  - an explanation of the browser playground and how to use it,
+  - a description of the tree-rotation executable,
+  - its search modes and command-line options,
+  - build and run instructions.

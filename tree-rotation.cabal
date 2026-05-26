@@ -2,6 +2,9 @@ cabal-version: 3.0
 name: tree-rotation
 version: 0.1.0.0
 build-type: Simple
+license: BSD-3-Clause
+license-file: LICENSE
+synopsis: Tree-rotation puzzle solvers and playground
 
 executable tree-rotation
   main-is: Main.hs
