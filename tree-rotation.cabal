@@ -1,9 +1,9 @@
 cabal-version: 3.0
-name: sattler-puzzle
+name: tree-rotation
 version: 0.1.0.0
 build-type: Simple
 
-executable sattler-puzzle
+executable tree-rotation
   main-is: Main.hs
   hs-source-dirs: app
   other-modules:
