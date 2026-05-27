@@ -409,3 +409,31 @@ synopsis.
   - a description of the tree-rotation executable,
   - its search modes and command-line options,
   - build and run instructions.
+
+
+2026-05-27
+==========
+
+Add a new option `--init=MOVES` to start the single-tree game (formerly known as the "reduced game") search (all variants, ie. standard, DFS, Random, MCTS) with the given move sequence MOVES, e.g. `--init=ccrcrtrcr`.
+If the move sequence is illegal, the program should exit with an error message.
+
+Answer
+------
+
+Done: tree-rotation now supports --init=MOVES for the single-tree game in exact, DFS, random,
+and MCTS modes.
+
+Key changes:
+
+ - Added --init MOVES to the CLI.
+ - Parsed compact move strings (c, r, t) in Game, and applied them to the initial single-tree
+ board before search starts.
+ - If the prefix is syntactically invalid or illegal for the chosen N, the program now exits
+cleanly with an error like:
+ Illegal --init move sequence for N=1: "rt"
+ - Threaded the initialized board and prefix trail through all single-tree solvers so:
+  - scoring includes rotations already present in the prefix,
+  - printed / CSV move trails include the prefix,
+  - exact, DFS, random, and MCTS all start from the same initialized state.
+ - Rejected --init together with --full.
+ - Updated --help and the README option summary.

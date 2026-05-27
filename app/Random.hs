@@ -3,6 +3,7 @@ module Random
   , defaultRandomGames
   , randomRollout
   , solveGame
+  , solveFrom
   ) where
 
 import Control.Monad (when)
@@ -48,12 +49,18 @@ randomRollout board
 -- Postcondition: the returned winner is the best score seen among all sampled
 -- playouts, and its iteration count equals the number of sampled games.
 solveGame :: Search.SearchOptions -> SimulationCount -> LeafCount -> IO Search.Winner
-solveGame searchOptions requestedSamples leafCount = do
+solveGame searchOptions requestedSamples leafCount =
+  solveFrom searchOptions requestedSamples leafCount (startBoard leafCount) []
+
+-- | Estimate the best game result by sampling many random playouts from an
+-- already initialized single-tree board.
+solveFrom :: Search.SearchOptions -> SimulationCount -> LeafCount -> Board -> MoveTrail -> IO Search.Winner
+solveFrom searchOptions requestedSamples leafCount initialBoard initialMoves = do
   winner <- go 1 Nothing
   pure winner {Search.winnerIterations = sampleCount}
   where
     sampleCount = max 1 requestedSamples
-    initialBoard = startBoard leafCount
+    initialScore = sum (map Search.moveScore initialMoves)
 
     go sampleIndex bestWinner
       | sampleIndex > sampleCount =
@@ -62,17 +69,17 @@ solveGame searchOptions requestedSamples leafCount = do
               Just winner -> winner
               Nothing ->
                 Search.Winner
-                  { Search.winnerScore = 0
+                  { Search.winnerScore = initialScore
                   , Search.winnerIterations = sampleCount
-                  , Search.winnerMoves = []
+                  , Search.winnerMoves = initialMoves
                   }
       | otherwise = do
           (moveTrail, rotationScore) <- randomRollout initialBoard
           let candidateWinner =
                 Search.Winner
-                  { Search.winnerScore = rotationScore
+                  { Search.winnerScore = initialScore + rotationScore
                   , Search.winnerIterations = sampleIndex
-                  , Search.winnerMoves = moveTrail
+                  , Search.winnerMoves = initialMoves <> moveTrail
                   }
               improvedWinner =
                 case bestWinner of

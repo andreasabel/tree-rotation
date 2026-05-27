@@ -9,6 +9,7 @@ module Search
   , moveScore
   , winnerBeats
   , solveGame
+  , solveFrom
   , formatWinnerSummary
   , appendWinnerCsv
   ) where
@@ -80,15 +81,22 @@ data SearchState = SearchState
 -- Postcondition: returns the highest-scoring completed game reachable from the
 -- start board.
 solveGame :: SearchOptions -> LeafCount -> IO Winner
-solveGame searchOptions leafCount = searchLoop initialState
+solveGame searchOptions leafCount =
+  solveFrom searchOptions leafCount (startBoard leafCount) []
+
+-- | Explore the full single-tree game graph from an already initialized board.
+--
+-- Postcondition: returns the highest-scoring completed game reachable from the
+-- given board, with the winning trail including the provided initial moves.
+solveFrom :: SearchOptions -> LeafCount -> Board -> MoveTrail -> IO Winner
+solveFrom searchOptions leafCount initialBoard initialMoves = searchLoop initialState
   where
-    initialBoard = startBoard leafCount
-    initialPosition = PositionInfo [] 0
+    initialPosition = PositionInfo (reverse initialMoves) (scoreMoveTrail initialMoves)
 
     initialState =
       SearchState
         { searchFrontier = HashMap.singleton initialBoard initialPosition
-        , searchBestScores = HashMap.singleton initialBoard 0
+        , searchBestScores = HashMap.singleton initialBoard (positionScore initialPosition)
         , searchWinner = Nothing
         , searchIterations = 0
         }
@@ -102,9 +110,9 @@ solveGame searchOptions leafCount = searchLoop initialState
                   Just winner -> winner
                   Nothing ->
                     Winner
-                      { winnerScore = 0
+                      { winnerScore = positionScore initialPosition
                       , winnerIterations = searchIterations searchState
-                      , winnerMoves = []
+                      , winnerMoves = initialMoves
                       }
             Just ((board, positionInfo), remainingFrontier) -> do
               let baseState = searchState {searchFrontier = remainingFrontier}
@@ -148,6 +156,10 @@ moveScore :: Move -> RotationScore
 moveScore Rotate = 1
 moveScore Concat = 0
 moveScore Tail = 0
+
+-- | Score a full move trail by counting its rotation moves.
+scoreMoveTrail :: MoveTrail -> RotationScore
+scoreMoveTrail = sum . map moveScore
 
 -- | Remove one arbitrary entry from the frontier hashmap.
 --

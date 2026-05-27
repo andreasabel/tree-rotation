@@ -57,13 +57,14 @@ where `score` is the number of rotations, `ratio` is `score / n`, `iterations` i
 ### Command-line options
 
 ```text
-tree-rotation [--verbose] [-o|--output FILE] [--start N] [--plot] [--full]
+tree-rotation [--verbose] [-o|--output FILE] [--start N] [--init MOVES] [--plot] [--full]
               [--dfs | --random | --random NNN | --mcts | --mcts NNN]
 ```
 
 - `--verbose` prints improving leaders during the search; quiet mode is the default.
 - `--output FILE` selects the CSV file to append to, or the CSV file to read when plotting.
 - `--start N` chooses the first `N`; the defaults are `1` for the standard game and `3` with `--full`.
+- `--init MOVES` starts the single-tree search from the position reached by applying the compact move string to the usual initial board; invalid or illegal prefixes are rejected.
 - `--plot` reads the CSV file and prints an SVG plot of `N` versus high-score.
 - `--full` analyses the multi-tree game.
 - `--dfs`, `--random`, and `--mcts` choose alternative search strategies for the standard game.

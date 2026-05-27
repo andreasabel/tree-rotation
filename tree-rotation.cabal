@@ -15,6 +15,7 @@ executable tree-rotation
     , Full.Search
     , Game
     , MCTS
+    , OEIS
     , Plot
     , Random
     , Search

@@ -4,14 +4,20 @@ module Main (main) where
 
 import DFS qualified
 import Full.Search qualified as FullSearch
+import Game
+  ( Board
+  , LeafCount
+  , MoveTrail
+  , applyMoveTrail
+  , parseMoveTrail
+  , startBoard
+  )
 import MCTS qualified
 import Options.Applicative
 import Plot (printScorePlot)
 import Random qualified
 import Search qualified
-
--- | Number of initial moves or leaves for one game, depending on the mode.
-type LeafCount = Int
+import System.Exit (die)
 
 -- | Output CSV file path.
 type OutputPath = FilePath
@@ -24,6 +30,8 @@ data CommandLineOptions = CommandLineOptions
     -- ^ CSV file used for winner output and plot input.
   , optionsStart :: !(Maybe LeafCount)
     -- ^ Optional starting value of @N@ for the infinite solving loop.
+  , optionsInit :: !(Maybe String)
+    -- ^ Optional single-tree move prefix applied before the search starts.
   , optionsPlot :: !Bool
     -- ^ Print an SVG plot from the CSV file instead of running the solver.
   , optionsFull :: !Bool
@@ -75,26 +83,59 @@ runSingleGame options leafCount = do
 
 -- | Solve one single-tree game instance with the configured search method.
 solveSingleTreeGame :: CommandLineOptions -> LeafCount -> IO Search.Winner
-solveSingleTreeGame options leafCount =
+solveSingleTreeGame options leafCount = do
+  (initialBoard, initialMoves) <- resolveSingleTreeStart options leafCount
   case optionsSingleTreeSearch options of
     ExactSearch ->
-      Search.solveGame
+      Search.solveFrom
         Search.SearchOptions {Search.searchVerbose = optionsVerbose options}
         leafCount
+        initialBoard
+        initialMoves
     DfsSearch ->
-      DFS.solveGame
+      DFS.solveFrom
         Search.SearchOptions {Search.searchVerbose = optionsVerbose options}
         leafCount
+        initialBoard
+        initialMoves
     RandomSearch sampleCount ->
-      Random.solveGame
+      Random.solveFrom
         Search.SearchOptions {Search.searchVerbose = optionsVerbose options}
         sampleCount
         leafCount
+        initialBoard
+        initialMoves
     MctsSearch simulationCount ->
-      MCTS.solveGame
+      MCTS.solveFrom
         Search.SearchOptions {Search.searchVerbose = optionsVerbose options}
         simulationCount
         leafCount
+        initialBoard
+        initialMoves
+
+-- | Resolve the actual single-tree board and move trail used to start one run.
+--
+-- Postcondition: throws a user-facing error when the requested initial move
+-- sequence is syntactically invalid or illegal for the chosen @N@.
+resolveSingleTreeStart :: CommandLineOptions -> LeafCount -> IO (Board, MoveTrail)
+resolveSingleTreeStart options leafCount =
+  case optionsInit options of
+    Nothing -> pure (startBoard leafCount, [])
+    Just movesText ->
+      case parseMoveTrail movesText of
+        Nothing ->
+          die ("Invalid --init move sequence: " <> show movesText)
+        Just moveTrail ->
+          case applyMoveTrail moveTrail (startBoard leafCount) of
+            Nothing ->
+              die
+                ( "Illegal --init move sequence for N="
+                    <> show leafCount
+                    <> ": "
+                    <> show movesText
+                )
+            Just initialBoard ->
+              pure (initialBoard, moveTrail)
 
 -- | Resolve the default starting value for the selected game mode.
 resolvedStart :: CommandLineOptions -> LeafCount
@@ -110,10 +151,10 @@ rejectIncompatibleOptions :: CommandLineOptions -> IO ()
 rejectIncompatibleOptions options
   | optionsFull options
       && optionsSingleTreeSearch options /= ExactSearch =
-      ioError
-        ( userError
-            "--dfs, --random, and --mcts are only available for the default game."
-        )
+      die "--dfs, --random, and --mcts are only available for the default game."
+  | optionsFull options
+      && optionsInit options /= Nothing =
+      die "--init is only available for the single-tree game."
   | otherwise = pure ()
 
 -- | Parser for all supported command line options.
@@ -137,6 +178,13 @@ commandLineParser =
           ( long "start"
               <> metavar "N"
               <> help "Start solving at N. Defaults to 1, or 3 with --full."
+          )
+      )
+    <*> optional
+      ( strOption
+          ( long "init"
+              <> metavar "MOVES"
+              <> help "Start the single-tree game search from the given move prefix."
           )
       )
     <*> switch
@@ -196,5 +244,5 @@ commandLineParserInfo =
     (commandLineParser <**> helper)
     ( fullDesc
         <> progDesc
-          "Compute puzzle highscores by breadth-first search; use --dfs, --random, or --mcts for alternative search modes, use --full for the extended multi-tree game, or render a score plot."
+         "Compute puzzle highscores by breadth-first search; use --init for a single-tree move prefix, --dfs, --random, or --mcts for alternative search modes, use --full for the extended multi-tree game, or render a score plot."
     )

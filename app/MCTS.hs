@@ -2,12 +2,14 @@ module MCTS
   ( SimulationCount
   , defaultMctsSimulations
   , solveGame
+  , solveFrom
   ) where
 
 import Game
   ( Board
   , LeafCount
   , Move (..)
+  , MoveTrail
   , isTerminalBoard
   , legalMoves
   , move
@@ -44,10 +46,17 @@ data MctsNode = MctsNode
 -- Postcondition: the returned winner is the actual game played by MCTS, and its
 -- iteration count equals the total number of simulations performed.
 solveGame :: Search.SearchOptions -> SimulationCount -> LeafCount -> IO Search.Winner
-solveGame _ requestedSimulations leafCount =
-  go (startBoard leafCount) [] 0 0
+solveGame searchOptions requestedSimulations leafCount =
+  solveFrom searchOptions requestedSimulations leafCount (startBoard leafCount) []
+
+-- | Play one single-tree game using MCTS to choose each real move from an
+-- already initialized board.
+solveFrom :: Search.SearchOptions -> SimulationCount -> LeafCount -> Board -> MoveTrail -> IO Search.Winner
+solveFrom _ requestedSimulations _ initialBoard initialMoves =
+  go initialBoard (reverse initialMoves) initialScore 0
   where
     simulationsPerMove = max 1 requestedSimulations
+    initialScore = sum (map Search.moveScore initialMoves)
 
     go board movesRev rotationScore totalSimulations
       | isTerminalBoard board =

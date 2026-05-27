@@ -9,6 +9,8 @@ module Game
   , Board (..)
   , Move (..)
   , startBoard
+  , parseMoveTrail
+  , applyMoveTrail
   , move
   , legalMoves
   , isTerminalBoard
@@ -75,6 +77,23 @@ move = \case
   Rotate -> moveRotate
   Tail -> moveTail
 
+-- | Parse a compact move trail such as @\"ccrtt\"@.
+--
+-- Postcondition: returns 'Nothing' exactly when the input contains a character
+-- other than @c@, @r@, or @t@.
+parseMoveTrail :: String -> Maybe MoveTrail
+parseMoveTrail = traverse parseMove
+
+-- | Apply a complete move trail to a starting board.
+--
+-- Postcondition: returns 'Nothing' exactly when at least one move in the trail
+-- is illegal for the current board.
+applyMoveTrail :: MoveTrail -> Board -> Maybe Board
+applyMoveTrail [] board = Just board
+applyMoveTrail (chosenMove : remainingMoves) board = do
+  nextBoard <- move chosenMove board
+  applyMoveTrail remainingMoves nextBoard
+
 -- | Replace the current tree @t@ with @Node t Leaf@ and decrease the remaining
 -- concat count.
 --
@@ -135,3 +154,10 @@ renderMove = \case
 -- | Render a move trail as a compact string.
 renderMoveTrail :: MoveTrail -> String
 renderMoveTrail = concatMap renderMove
+
+-- | Parse one move character from the compact syntax.
+parseMove :: Char -> Maybe Move
+parseMove 'c' = Just Concat
+parseMove 'r' = Just Rotate
+parseMove 't' = Just Tail
+parseMove _ = Nothing

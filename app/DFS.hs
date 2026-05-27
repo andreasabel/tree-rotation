@@ -2,6 +2,7 @@
 
 module DFS
   ( solveGame
+  , solveFrom
   ) where
 
 import Game
@@ -21,11 +22,20 @@ import Search qualified
 -- Postcondition: returns the best terminal winner reachable from the start
 -- board.
 solveGame :: Search.SearchOptions -> LeafCount -> IO Search.Winner
-solveGame _ leafCount =
+solveGame searchOptions leafCount =
+  solveFrom searchOptions leafCount (startBoard leafCount) []
+
+-- | Explore the single-tree game with plain depth-first search from an already
+-- initialized board.
+solveFrom :: Search.SearchOptions -> LeafCount -> Board -> MoveTrail -> IO Search.Winner
+solveFrom _ _ initialBoard initialMoves =
   let SearchResult winner totalIterations = search initialBoard []
-   in pure winner {Search.winnerIterations = totalIterations}
-  where
-    initialBoard = startBoard leafCount
+   in pure
+        winner
+          { Search.winnerIterations = totalIterations
+          , Search.winnerMoves = initialMoves <> Search.winnerMoves winner
+          , Search.winnerScore = scoreMoveTrail initialMoves + Search.winnerScore winner
+          }
 
 -- | Result of one DFS traversal, including the best winner and the number of
 -- recursive calls performed.
