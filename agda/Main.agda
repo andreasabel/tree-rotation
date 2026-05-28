@@ -1,50 +1,25 @@
+-- {-# OPTIONS --safe #-}  -- Turn this on once the proof is complete!
+
 module Main where
 
 open import Data.Maybe
 open import Data.Nat
 open import Data.Nat.Properties
 open import Relation.Binary.PropositionalEquality
-open ≡-Reasoning
 
-data Tree : Set where
-  ε   : Tree
-  _∙_ : (t₁ t₂ : Tree) → Tree
+open import Tree
 
-variable
-  l r t t' t₁ t₂ : Tree
+kₐ : ℕ
+kₐ = {!!}
 
-rotate : Tree → Maybe Tree
-rotate ((t₁ ∙ t₂) ∙ t₃) = just (t₁ ∙ (t₂ ∙ t₃))
-rotate _ = nothing
+kₜ : ℕ
+kₜ = {!!}
 
-tail : Tree → Maybe Tree
-tail (ε ∙ t) = just t
-tail _       = nothing
+amor-append : 1 + Φ l + Φ r ≤ kₐ + Φ (l ∙ r)
+amor-append {l = l} {r = r} = {!!}
 
-Φᵣ : Tree → ℕ
-Φᵣ ε = 0
-Φᵣ (l ∙ r) = suc (Φᵣ l) ⊔ pred (Φᵣ r)
+amor-tail : tail t ≡ just t' → 1 + Φ t ≤ kₜ + Φ t'
+amor-tail {t = ε ∙ t} refl = {!!}
 
-Φₗ : Tree → ℕ
-Φₗ ε = 0
-Φₗ (l ∙ r) = suc (Φₗ l) ⊔ Φᵣ r
-
-Φ : Tree → ℕ
-Φ ε = 0
-Φ (l ∙ r) = suc (Φₗ l) ⊔ pred (Φᵣ r)
-
-mutual
-  kₐ : ℕ
-  kₐ = {!!}
-
-  kₜ : ℕ
-  kₜ = {!!}
-
-  amor-append : 1 + Φ l + Φ r ≤ kₐ + Φ (l ∙ r)
-  amor-append {l = l} {r = r} = {!!}
-
-  amor-tail : tail t ≡ just t' → 1 + Φ t ≤ kₜ + Φ t'
-  amor-tail {t = t} eq = {!!}
-
-  amor-rotate : rotate t ≡ just t' → 1 + Φ t ≤ Φ t'
-  amor-rotate {t = t} eq = {!t!}
+amor-rotate : rotate t ≡ just t' → 1 + Φ t ≤ Φ t'
+amor-rotate {t = (t₁ ∙ t₂) ∙ t₃} refl = {!!}
