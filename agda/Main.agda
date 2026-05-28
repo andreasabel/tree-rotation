@@ -15,11 +15,11 @@ kₐ = {!!}
 kₜ : ℕ
 kₜ = {!!}
 
-amor-append : 1 + Φ l + Φ r ≤ kₐ + Φ (l ∙ r)
+amor-append : kₐ + Φ l + Φ r ≥ 1 + Φ (l ∙ r)
 amor-append {l = l} {r = r} = {!!}
 
-amor-tail : tail t ≡ just t' → 1 + Φ t ≤ kₜ + Φ t'
+amor-tail : tail t ≡ just t' → kₜ + Φ t ≥ 1 + Φ t'
 amor-tail {t = ε ∙ t} refl = {!!}
 
-amor-rotate : rotate t ≡ just t' → 1 + Φ t ≤ Φ t'
+amor-rotate : rotate t ≡ just t' → Φ t ≥ 1 + Φ t'
 amor-rotate {t = (t₁ ∙ t₂) ∙ t₃} refl = {!!}
