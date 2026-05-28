@@ -18,8 +18,8 @@ kₐ = 3
 kₜ : ℕ
 kₜ = 3
 
-amortization
-  : (                     kₐ + Φ t + Φ t' ≥ 1 + Φ (t ∙ t'))
+amortization : ∀ {t t'}
+  → (                     kₐ + Φ t + Φ t' ≥ 1 + Φ (t ∙ t'))
   × (tail t   ≡ just t' → kₜ + Φ t        ≥ 1 + Φ t')
   × (rotate t ≡ just t' → Φ t             ≥ 1 + Φ t')
 

@@ -51,3 +51,23 @@ Answer
 Main.agda is now complete and --safe is enabled.
 
 I filled all goals with proofs, keeping Tree.agda and the amor-* statements unchanged, and the minimal constants are kₐ = 3 and kₜ = 3. The solution adds a small set of helper lemmas about Φ, Φₗ, and Φᵣ, uses preorder reasoning for the amortized inequalities, and a compact arithmetic lemma for amor-rotate.
+
+Prompt 3
+========
+
+I restructured the Main module and added Game.agda.
+This defines 3 moves C (concat), T (tail) and R (rotate) to manipulate a tree
+and aims to define a move sequence where the ratio R/C asymptotically approximates 4.
+There are a few goals to be proven, which likely need additional lemmata about how certain fragments of the move sequence manipulate intermediate trees.
+The move sequence definition (seq m n) follows the following informal description:
+```
+  ccr(cr)ⁿtrⁿ : right-spine of length n
+  [start loop]
+  cr          : crook
+  (crtrr)ⁿ    : top two left-spiny
+  crtr        : top one left-spiny
+  trⁿ         : back to right spine of length n
+  [end loop]
+  cr          : crook
+  (tr)ⁿtt     : unravel
+```
