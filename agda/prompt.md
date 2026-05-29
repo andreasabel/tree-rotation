@@ -98,3 +98,15 @@ If you need to prove inequation by chains, likewise use the "preorder reasoning"
 
 In the end, the goals should be proven completely, without remaining postulates or termination pragmas.
 Thus, in the end, activate option `--safe` in the file.
+
+Answer
+------
+
+thm-rmoves is now proven in ResourcedGame.agda, and --safe is enabled.
+
+I proved it by induction on Moves, with:
+
+ - small helper lemmas for the C, T, and R resource bounds,
+ - a compose-legal lemma to compose the legality inequalities across sequential moves,
+ - explicit handling of the impossible R case at zero resources,
+ - preorder-reasoning chains for the numeric inequalities.
