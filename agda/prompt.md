@@ -119,3 +119,17 @@ To this end, formulate lemmata how pieces of the move sequence (seq m n) alter t
 roughly following the structure of lemmata in Game.agda (that help establish the legality of pieces of the total move sequence).
 The final counts given in `module CountsSeq` are believed to be correct.
 If you find that they are incorrect, fix them and explain the reason behind the fix.
+
+Answer
+------
+
+Done. Counting.agda is fully proved, and thm-counts-seq now typechecks.
+
+I corrected the published count formulas in module CountsSeq to
+
+ - c# = t# = m
+  * (n + 2) + n + 3
+ - r# = m
+  * (4 * n + 3) + 3 * n + 2
+
+The reason is that each loop contributes n + 2 C-moves and T-moves, not n + 5; the previous c#/t# formulas overcounted by 3m. I also fixed CountsSeq.Thm to compare counts (seq m n ε) zero-counts against the target record, since counts (seq m n ε) is a transformer MoveCounts → MoveCounts, not a MoveCounts value by itself.
