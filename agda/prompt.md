@@ -110,3 +110,12 @@ I proved it by induction on Moves, with:
  - a compose-legal lemma to compose the legality inequalities across sequential moves,
  - explicit handling of the impossible R case at zero resources,
  - preorder-reasoning chains for the numeric inequalities.
+
+Prompt 5 2026-05-29
+===================
+
+Prove thm-counts-seq in new file Counting.agda.
+To this end, formulate lemmata how pieces of the move sequence (seq m n) alter the move counts,
+roughly following the structure of lemmata in Game.agda (that help establish the legality of pieces of the total move sequence).
+The final counts given in `module CountsSeq` are believed to be correct.
+If you find that they are incorrect, fix them and explain the reason behind the fix.
