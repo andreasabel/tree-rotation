@@ -1,17 +1,20 @@
 {-# OPTIONS --safe #-}
 
+-- Move execution with resource tracking
+
+module ResourcedGame where
+
+open import Data.Maybe using (Maybe; nothing; just; map)
 open import Data.Nat using (ℕ; zero; suc; _+_; _≤_; _≥_)
-open import Data.Nat.Properties
-
-module ResourcedGame where -- (kₐ kₜ : ℕ) where
-
-open import Function using (id; _∘_)
-open import Data.Maybe
+open import Data.Nat.Properties using
+  ( +-identityʳ; +-suc; +-assoc; +-comm
+  ; ≤-refl; ≤-trans; ≤-pred; +-monoˡ-≤; +-monoʳ-≤; +-cancelʳ-≤; module ≤-Reasoning)
 open import Data.Product using (∃; _×_; _,_)
-open import Relation.Binary.PropositionalEquality
+open import Relation.Binary.PropositionalEquality using (_≡_; refl; sym; subst; cong)
 
 open import Tree using (Tree; ε; _∙_; tail; rotate; Φ)
-open import Game
+open import Game using (Moves; C; R; T; ε; _∙_; moves)
+open import Game using (_>=>_)
 
 open import UpperBound using (amor-append; amor-tail; amor-rotate)
 
@@ -24,14 +27,15 @@ record Resourced (A : Set) : Set where
     resources : ℕ
     payload   : A
 
-rmap : {A : Set} → (ℕ → ℕ) → Resourced A → Resourced A
-rmap f (n ⨮ a) = f n ⨮ a
-
 RT = Resourced Tree
 
-rtmap : {A : Set} → (ℕ → ℕ) → Maybe RT → Maybe RT
-rtmap f nothing = nothing
-rtmap f (just (n ⨮ a)) = just (f n ⨮ a)
+-- -- Updating the resources
+-- rmap : {A : Set} → (ℕ → ℕ) → Resourced A → Resourced A
+-- rmap f (n ⨮ a) = f n ⨮ a
+
+-- rtmap : {A : Set} → (ℕ → ℕ) → Maybe RT → Maybe RT
+-- rtmap f nothing = nothing
+-- rtmap f (just (n ⨮ a)) = just (f n ⨮ a)
 
 rmoves : Moves → RT → Maybe RT
 rmoves C (n     ⨮ t) = just (2 + n ⨮ t ∙ ε)
@@ -50,57 +54,20 @@ Legal m rt@(n ⨮ t) rt'@(n' ⨮ t')
   = rmoves m rt ≡ just rt'
   × n' + Φ t ≥ n + Φ t'
 
--- Prove by induction on ms:
-thm-rmoves
-  : ∀ (ms : Moves) (t t' : Tree) → moves ms t ≡ just t'
+-- Goal is to prove this theorem by induction on the moves ms:
+
+Thm-RMoves
+  = ∀ (ms : Moves) (t t' : Tree) → moves ms t ≡ just t'
   → ∀ n → n ≥ Φ t
   → ∃ λ n' → (n' ≥ Φ t') × Legal ms (n ⨮ t) (n' ⨮ t')
 
-compose-legal
-  : ∀ {n n₁ n₂ a b c}
-  → n₁ + a ≥ n + b
-  → n₂ + b ≥ n₁ + c
-  → n₂ + a ≥ n + c
-compose-legal {n = n} {n₁} {n₂} {a} {b} {c} n₁+a≥n+b n₂+b≥n₁+c =
-  let proof =
-        begin
-          (n + c) + b
-        ≡⟨ +-assoc n c b ⟩
-          n + (c + b)
-        ≡⟨ cong (n +_) (+-comm c b) ⟩
-          n + (b + c)
-        ≡⟨ sym (+-assoc n b c) ⟩
-          (n + b) + c
-        ≤⟨ +-monoˡ-≤ c n₁+a≥n+b ⟩
-          (n₁ + a) + c
-        ≡⟨ +-assoc n₁ a c ⟩
-          n₁ + (a + c)
-        ≡⟨ cong (n₁ +_) (+-comm a c) ⟩
-          n₁ + (c + a)
-        ≡⟨ sym (+-assoc n₁ c a) ⟩
-          (n₁ + c) + a
-        ≤⟨ +-monoˡ-≤ a n₂+b≥n₁+c ⟩
-          (n₂ + b) + a
-        ≡⟨ +-assoc n₂ b a ⟩
-          n₂ + (b + a)
-        ≡⟨ cong (n₂ +_) (+-comm b a) ⟩
-          n₂ + (a + b)
-        ≡⟨ sym (+-assoc n₂ a b) ⟩
-          (n₂ + a) + b
-        ∎
-  in +-cancelʳ-≤ b (n + c) (n₂ + a) proof
-
-Φε≡0 : Φ ε ≡ 0
-Φε≡0 = refl
-
-Φ+ε≡Φ : ∀ t → Φ t + Φ ε ≡ Φ t
-Φ+ε≡Φ t rewrite Φε≡0 = +-identityʳ (Φ t)
+-- These are the assumptions about Φ that are used in the proof:
 
 append-budget : ∀ t → 2 + Φ t ≥ Φ (t ∙ ε)
 append-budget t =
   ≤-pred
     (subst (suc (Φ (t ∙ ε)) ≤_)
-      (cong (3 +_) (Φ+ε≡Φ t))
+      (cong (3 +_) (+-identityʳ (Φ t)))
       (amor-append {l = t} {r = ε}))
 
 tail-budget : ∀ {t t'} → tail t ≡ just t' → 2 + Φ t ≥ Φ t'
@@ -109,6 +76,11 @@ tail-budget p = ≤-pred (amor-tail p)
 rotate-budget : ∀ {t t'} → rotate t ≡ just t' → Φ t ≥ 1 + Φ t'
 rotate-budget = amor-rotate
 
+-- Theorem: legal move sequences are resource-correct.
+-- Prove by induction on ms:
+thm-rmoves : Thm-RMoves
+
+-- Case move C
 thm-rmoves C t .(t ∙ ε) refl n n≥Φt =
   2 + n , (
     ≤-trans
@@ -125,6 +97,7 @@ thm-rmoves C t .(t ∙ ε) refl n n≥Φt =
         (2 + n) + Φ t
       ∎) ))
 
+-- Case move T
 thm-rmoves T (ε ∙ t') .t' refl n n≥Φt =
   2 + n , (
     ≤-trans
@@ -141,6 +114,7 @@ thm-rmoves T (ε ∙ t') .t' refl n n≥Φt =
         (2 + n) + Φ (ε ∙ t')
       ∎) ))
 
+-- Case move R
 thm-rmoves R ((t₁ ∙ t₂) ∙ t₃) .(t₁ ∙ (t₂ ∙ t₃)) refl zero n≥Φt
   with ≤-trans (rotate-budget {t = (t₁ ∙ t₂) ∙ t₃} {t' = t₁ ∙ (t₂ ∙ t₃)} refl) n≥Φt
 ... | ()
@@ -158,9 +132,11 @@ thm-rmoves R ((t₁ ∙ t₂) ∙ t₃) .(t₁ ∙ (t₂ ∙ t₃)) refl (suc n)
         n + Φ ((t₁ ∙ t₂) ∙ t₃)
       ∎) ))
 
+-- Case empty move sequence
 thm-rmoves ε t .t refl n n≥Φt =
   n , (n≥Φt , (refl , ≤-refl))
 
+-- Case move sequence concatenation
 thm-rmoves (m ∙ m') t t' p n n≥Φt with moves m t in pm | p
 ... | nothing | ()
 ... | just u | p' with thm-rmoves m t u pm n n≥Φt
@@ -168,4 +144,38 @@ thm-rmoves (m ∙ m') t t' p n n≥Φt with moves m t in pm | p
 ... | n₂ , (n₂≥Φt' , (rm' , legal₂)) rewrite rm | rm' =
   n₂ , ( n₂≥Φt'
        , ( refl
-         , compose-legal {n = n} {n₁ = n₁} {n₂ = n₂} {a = Φ t} {b = Φ u} {c = Φ t'} legal₁ legal₂ ))
+         , compose-sum-inequalities {n = n} {n₁ = n₁} {n₂ = n₂} {a = Φ t} {b = Φ u} {c = Φ t'} legal₁ legal₂ ))
+  where
+    compose-sum-inequalities
+      : ∀ {n n₁ n₂ a b c}
+      → n₁ + a ≥ n + b
+      → n₂ + b ≥ n₁ + c
+      → n₂ + a ≥ n + c
+    compose-sum-inequalities {n = n} {n₁} {n₂} {a} {b} {c} n₁+a≥n+b n₂+b≥n₁+c =
+      let proof =
+            begin
+              (n + c) + b
+            ≡⟨ +-assoc n c b ⟩
+              n + (c + b)
+            ≡⟨ cong (n +_) (+-comm c b) ⟩
+              n + (b + c)
+            ≡⟨ sym (+-assoc n b c) ⟩
+              (n + b) + c
+            ≤⟨ +-monoˡ-≤ c n₁+a≥n+b ⟩
+              (n₁ + a) + c
+            ≡⟨ +-assoc n₁ a c ⟩
+              n₁ + (a + c)
+            ≡⟨ cong (n₁ +_) (+-comm a c) ⟩
+              n₁ + (c + a)
+            ≡⟨ sym (+-assoc n₁ c a) ⟩
+              (n₁ + c) + a
+            ≤⟨ +-monoˡ-≤ a n₂+b≥n₁+c ⟩
+              (n₂ + b) + a
+            ≡⟨ +-assoc n₂ b a ⟩
+              n₂ + (b + a)
+            ≡⟨ cong (n₂ +_) (+-comm b a) ⟩
+              n₂ + (a + b)
+            ≡⟨ sym (+-assoc n₂ a b) ⟩
+              (n₂ + a) + b
+            ∎
+      in +-cancelʳ-≤ b (n + c) (n₂ + a) proof
