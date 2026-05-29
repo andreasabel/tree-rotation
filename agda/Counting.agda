@@ -18,6 +18,9 @@ record MoveCounts : Set where
   field
     c# t# r# : ℕ
 
+zero-counts : MoveCounts
+zero-counts = C: 0 T: 0 R: 0
+
 incC : MoveCounts → MoveCounts
 incC (C: c# T: t# R: r#) = (C: suc c# T: t# R: r#)
 
@@ -34,8 +37,17 @@ counts R = incR
 counts ε = id
 counts (m ∙ m₁) = counts m ∘ counts m₁
 
-zero-counts : MoveCounts
-zero-counts = C: 0 T: 0 R: 0
+count : Moves → MoveCounts
+count m = counts m zero-counts
+
+module CountsSeq (m n : ℕ) where
+  c# = m * (n + 2) + n + 3
+  t# = c#
+  r# = m * (4 * n + 3) + 3 * n + 2
+
+  Thm = count (seq m n ε) ≡ (C: c# T: c# R: r#)
+
+-- Proof
 
 add : ℕ → ℕ → ℕ → MoveCounts → MoveCounts
 add c t r (C: c# T: t# R: r#) = C: (c + c#) T: (t + t#) R: (r + r#)
@@ -266,14 +278,6 @@ lem-unravel-suf n ms cs =
   ≡⟨ cong (λ k → add 1 (n + 2) k (counts ms cs)) (+-comm 1 n) ⟩
     add 1 (n + 2) (n + 1) (counts ms cs)
   ∎
-
-module CountsSeq (m n : ℕ) where
-  c# = m * (n + 2) + n + 3
-  t# = c#
-  r# = m * (4 * n + 3) + 3 * n + 2
-
-  Thm = counts (seq m n ε) zero-counts ≡ (C: c# T: c# R: r#)
-
 
 ct-total : ∀ m n → (n + 2) + (m * (n + 2) + 1) ≡ m * (n + 2) + n + 3
 ct-total m n =
