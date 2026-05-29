@@ -82,3 +82,19 @@ I added suffix-aware lemmas for the key fragments (cr, crtrr, crtr, tr), used eq
 thm-start, thm-loop, thm-loop-m, thm-unravel, and thm-seq.
 
 I also introduced small move-fragment abbreviations (cr, tr, crtr, crtrr) to make the intermediate-tree proofs readable, without changing the intended sequence. Main.agda and Game.agda now both check cleanly under --safe.
+
+
+Prompt 4 2026-05-29
+===================
+
+Prove thm-rmoves in the new file ResourcedGame.agda.
+
+Do not modify the definitions nor the statement of the theorem.
+If you think there is an error in the definitions or statement, please alert me and suggest a fix, but do not change them by yourself.
+
+If you need to prove equations by equation chains,
+use the "equational reasoning" style (module ≡-Reasoning) to generate readable equational proofs.
+If you need to prove inequation by chains, likewise use the "preorder reasoning" style.
+
+In the end, the goals should be proven completely, without remaining postulates or termination pragmas.
+Thus, in the end, activate option `--safe` in the file.
