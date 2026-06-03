@@ -6,7 +6,7 @@ module ResourcedGame where
 
 open import Library
 open import Data.Nat.Properties using
-  ( +-assoc; +-comm; +-identityʳ
+  ( +-assoc; +-comm; +-identityʳ; *-distribʳ-+
   ; ≤-refl; ≤-trans; +-monoˡ-≤; +-monoʳ-≤; module ≤-Reasoning)
 
 open import Tree using (Tree; ε; _∙_; tail; rotate; Φ)
@@ -42,22 +42,6 @@ module RMoves (kₐ kₜ : ℕ) where
   rmoves R (zero  ⨮ t) = nothing
   rmoves ε = just
   rmoves (m ∙ m') = rmoves m >=> rmoves m'
-
-  mul-sum : ∀ a b k → a * k + b * k ≡ (a + b) * k
-  mul-sum zero    b k = refl
-  mul-sum (suc a) b k = let open ≡-Reasoning in
-    begin
-      suc a * k + b * k
-    ≡⟨ +-assoc k (a * k) (b * k) ⟩
-      k + (a * k + b * k)
-    ≡⟨ cong (k +_) (mul-sum a b k) ⟩
-      k + ((a + b) * k)
-    ≡⟨ refl ⟩
-      (suc a + b) * k
-    ∎
-
-  lem-one-mul : ∀ k → 1 * k ≡ k
-  lem-one-mul k = +-identityʳ k
 
   counts-add : ∀ m cs c t r → count m ≡ (C: c T: t R: r) → counts m cs ≡ add c t r cs
   counts-add C cs c t r refl = refl
@@ -136,9 +120,9 @@ module RMoves (kₐ kₜ : ℕ) where
       (c₁ * kₐ + c₂ * kₐ) + ((t₂ * kₜ + t₁ * kₜ) + n)
     ≡⟨ cong (λ k → (c₁ * kₐ + c₂ * kₐ) + (k + n)) (+-comm (t₂ * kₜ) (t₁ * kₜ)) ⟩
       (c₁ * kₐ + c₂ * kₐ) + ((t₁ * kₜ + t₂ * kₜ) + n)
-    ≡⟨ cong (λ k → k + ((t₁ * kₜ + t₂ * kₜ) + n)) (mul-sum c₁ c₂ kₐ) ⟩
+    ≡⟨ cong (λ k → k + ((t₁ * kₜ + t₂ * kₜ) + n)) (sym (*-distribʳ-+ kₐ c₁ c₂)) ⟩
       (c₁ + c₂) * kₐ + ((t₁ * kₜ + t₂ * kₜ) + n)
-    ≡⟨ cong (λ k → (c₁ + c₂) * kₐ + (k + n)) (mul-sum t₁ t₂ kₜ) ⟩
+    ≡⟨ cong (λ k → (c₁ + c₂) * kₐ + (k + n)) (sym (*-distribʳ-+ kₜ t₁ t₂)) ⟩
       (c₁ + c₂) * kₐ + (((t₁ + t₂) * kₜ) + n)
     ∎
 
@@ -148,8 +132,8 @@ module RMoves (kₐ kₜ : ℕ) where
     : ∀ m n t {n' t'} (let (C: c# T: t# R: r#) = count m)
     → rmoves m (n ⨮ t) ≡ just (n' ⨮ t')
     → r# + n' ≤ c# * kₐ + (t# * kₜ + n)
-  thm-counts C n t refl rewrite lem-one-mul kₐ = ≤-refl
-  thm-counts T n (ε ∙ t) refl rewrite lem-one-mul kₜ = ≤-refl
+  thm-counts C n t refl rewrite +-identityʳ kₐ = ≤-refl
+  thm-counts T n (ε ∙ t) refl rewrite +-identityʳ kₜ = ≤-refl
   thm-counts R (suc n) ((t₁ ∙ t₂) ∙ t₃) refl = ≤-refl
   thm-counts ε n t refl = ≤-refl
   thm-counts (m ∙ m') n t {n'} {t'} eq with rmoves m (n ⨮ t) in rm | eq
