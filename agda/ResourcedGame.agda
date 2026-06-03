@@ -8,6 +8,7 @@ open import Library
 open import Data.Nat.Properties using
   ( +-assoc; +-comm; +-identityʳ; *-distribʳ-+
   ; ≤-refl; ≤-trans; +-monoˡ-≤; +-monoʳ-≤; module ≤-Reasoning)
+import Data.Nat.Solver as Nat
 
 open import Tree using (Tree; ε; _∙_; tail; rotate; Φ)
 open import Game using (Moves; C; R; T; ε; _∙_)
@@ -197,6 +198,9 @@ module RMoves (kₐ kₜ : ℕ) where
   thm-counts' m n t {n'} {t'} eq = let (C: c# T: t# R: r#) = count m in begin
       n' + r#                 ≡⟨ +-comm n' r# ⟩
       r# + n'                 ≤⟨ thm-counts m n t eq  ⟩
-      c# * kₐ + (t# * kₜ + n)  ≡⟨ {!!} ⟩
+      c# * kₐ + (t# * kₜ + n)  ≡⟨ (let open Nat.+-*-Solver in
+                                         solve 5 (λ c t n kₐ kₜ →
+                                           c :* kₐ :+ (t :* kₜ :+ n) := n :+ (kₐ :* c :+ kₜ :* t))
+                                         refl c# t# n kₐ kₜ) ⟩
       n + (kₐ * c# + kₜ * t#)  ∎
    where open ≤-Reasoning

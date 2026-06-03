@@ -169,3 +169,11 @@ Prompt 7 2026-06-03
 
 Fill the open goal in ResourcedGame by an invokation of the ring solver of Agda's standard library.
 Do not change anything else, keep the exact proof structure and layout.
+
+Answer
+------
+
+Done. I filled the only open goal in ResourcedGame.agda with an invocation of Agda stdlib’s Nat ring solver and left the proof structure intact.
+
+The added step uses Data.Nat.Solver.+-*-Solver.solve to prove
+c# * kₐ + (t# * kₜ + n) ≡ n + (kₐ * c# + kₜ * t#).
