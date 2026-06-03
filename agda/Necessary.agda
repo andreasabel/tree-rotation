@@ -49,109 +49,48 @@ module Necessary
       c# * kₐ + t# * kₜ
     ∎
 
-  big : (kₐ + kₜ) * 27 ≥ 82
-  big = begin
-    82                ≤⟨ lem ⟩
-    27 * kₐ + 27 * kₜ  ≡⟨ {!!} ⟩
-    27 * (kₐ + kₜ)     ≡⟨ {!!} ⟩
-    (kₐ + kₜ) * 27     ∎
-
   thm-op : kₐ + kₜ ≤ 3 → 82 ≤ 81
   thm-op h = begin
     82                ≤⟨ lem ⟩
     27 * kₐ + 27 * kₜ  ≡⟨ {!!} ⟩
-    27 * (kₐ + kₜ)     ≤⟨ ? ⟩
+    27 * (kₐ + kₜ)     ≤⟨ {!!} ⟩
     27 * 3            ∎
 
   foo : ∀ k → ¬ (k ≥ 4) → k ≤ 3
-  foo 0 _ = refl
-  foo 1 _ = refl
-  foo 2 _ = refl
-  foo 3 _ = refl
-  foo (suc (suc (suc (suc k)))) h = h refl
+  foo 0 _ = z≤n
+  foo 1 _ = s≤s z≤n
+  foo 2 _ = s≤s (s≤s z≤n)
+  foo 3 _ = ≤-refl
+  foo (suc (suc (suc (suc k)))) h with h (s≤s (s≤s (s≤s (s≤s z≤n))))
+  ... | ()
 
+  -- TODO: imports for decidability
   thm : kₐ + kₜ ≥ 4
   thm with 4 ≤? kₐ + kₜ
   thm | yes p = p
   thm | no ¬p with thm-op (foo (kₐ + kₜ) ¬p)
-  ... | ()
+  ... |
+   (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s
+   (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s
+   (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s
+   (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s
+   (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s
+   (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s
+   (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s
+   (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s
+   (s≤s ())
+   ))))))))))
+   ))))))))))
+   ))))))))))
+   ))))))))))
+   ))))))))))
+   ))))))))))
+   ))))))))))
+   ))))))))))
 
-{-
-  thm' : ∀ k → k ≡ kₐ + kₜ → ¬(k ≤ 3)
-  thm' zero eq rewrite eq with big
-  ... | ()
-  thm' (suc k) eq = {!!}
-
-
-
-  thm' : ∀ k → k ≡ kₐ + kₜ → k ≥ 4
-  thm' zero eq rewrite eq with big
-  ... | ()
-  thm' (suc k) eq = {!!}
-
-
-  thm : kₐ + kₜ ≥ 4
-  thm with kₐ + kₜ in eq
-  ... | zero rewrite eq with big = ?
-  ... | suc zero rewrite eq with big = ?
-  ... | ()
-  ... | suc (suc zero) rewrite eq with big
-  ... | ()
-  ... | suc (suc (suc zero)) rewrite eq with big
-  ... | ()
-  ... | suc (suc (suc (suc n))) = s≤s (s≤s (s≤s (s≤s z≤n)))
-
-
-
-  sum27 : 27 * kₐ + 27 * kₜ ≡ (kₐ + kₜ) * 27
-  sum27 =
-    trans
-      (cong (_+ (27 * kₜ)) (*-comm 27 kₐ))
-      (trans
-        (cong (kₐ * 27 +_) (*-comm 27 kₜ))
-        (mul-sum kₐ kₜ 27))
-
-  thm' : ∀ k → k ≡ kₐ + kₜ → k ≥ 4
-  thm' zero eq = {!!}
-  thm' (suc k) eq = {!!}
-
-  thm : kₐ + kₜ ≥ 4
-  thm = thm' (kₐ + kₜ) refl
--}
-
-{-
-  big : (kₐ + kₜ) * 27 ≥ 82
-  big rewrite sum27 = ?
-
-  big : (kₐ + kₜ) * 27 ≥ 82
-  big rewrite thm-counts-seq 1 11 | sum27 = lem  -- OOM
-
-  thm : kₐ + kₜ ≥ 4
-  thm with kₐ + kₜ in eq
-  ... | k = ?
-
-  thm : kₐ + kₜ ≥ 4
-  thm with kₐ + kₜ in eq
-  ... | zero rewrite eq with big
-  ... | ()
-  ... | suc zero rewrite eq with big
-  ... | ()
-  ... | suc (suc zero) rewrite eq with big
-  ... | ()
-  ... | suc (suc (suc zero)) rewrite eq with big
-  ... | ()
-  ... | suc (suc (suc (suc n))) = s≤s (s≤s (s≤s (s≤s z≤n)))
-
-  thm-op : ¬(kₐ + kₜ ≤ 3)
-  thm-op h with kₐ + kₜ in eq
-  ... | zero with thm
-  ... | ()
-  ... | suc zero with thm
-  ... | ()
-  ... | suc (suc zero) with thm
-  ... | ()
-  ... | suc (suc (suc zero)) with thm
-  ... | ()
-  ... | suc (suc (suc (suc n))) with h
-  ... | ()
--- -}
+  -- big : (kₐ + kₜ) * 27 ≥ 82
+  -- big = begin
+  --   82                ≤⟨ lem ⟩
+  --   27 * kₐ + 27 * kₜ  ≡⟨ {!!} ⟩
+  --   27 * (kₐ + kₜ)     ≡⟨ {!!} ⟩
+  --   (kₐ + kₜ) * 27     ∎
