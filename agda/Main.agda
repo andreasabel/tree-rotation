@@ -59,8 +59,6 @@ counting = thm-counts-seq
 
 -- If any possible move sequence is also executable with resource constraints,
 -- then kₐ + kₜ ≥ 4.
--- This should be a consequence of the theorems thm-seq and thm-counts-seq.
--- However, we need to provide suitable m and n for the sequence.
 
 necessary
   : ∀ kₐ kₜ
