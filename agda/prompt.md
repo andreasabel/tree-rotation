@@ -147,3 +147,19 @@ If you need to prove inequation by chains, likewise use the "preorder reasoning"
 
 In the end, the goals should be proven completely, without remaining postulates or termination pragmas.
 Thus, in the end, activate option `--safe` in the file.
+
+Answer
+------
+
+(I had to interrupt Copilot since Agda was OOM.  Copilot tried "rewrite" with large expressions.)
+
+Prompt 6 2026-06-03
+===================
+
+Fill the open goals in modules Necessary with the correct lemmata applications.
+Do not change anything else, keep the exact proof structure and layout.
+
+Answer
+------
+
+(I had to interrupt Copilot since Agda was OOM)

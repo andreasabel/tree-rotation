@@ -1,7 +1,7 @@
 {-# OPTIONS --safe #-}
 
 open import Library
-open import Data.Nat.Properties using (+-identityʳ; *-comm; ≤-refl; module ≤-Reasoning)
+open import Data.Nat.Properties using (+-identityʳ; *-comm; *-monoʳ-≤; ≤-refl; *-distribˡ-+; module ≤-Reasoning)
 open import Tree
 open import Game using (move; moves)
 open import Sequence using (seq; thm-seq)
@@ -52,8 +52,8 @@ module Necessary
   thm-op : kₐ + kₜ ≤ 3 → 82 ≤ 81
   thm-op h = begin
     82                ≤⟨ lem ⟩
-    27 * kₐ + 27 * kₜ  ≡⟨ {!!} ⟩
-    27 * (kₐ + kₜ)     ≤⟨ {!!} ⟩
+    27 * kₐ + 27 * kₜ  ≡⟨ {! sym (*-distribˡ-+ 27 kₐ kₜ) !}  ⟩   -- This step takes forever
+    27 * (kₐ + kₜ)     ≤⟨ *-monoʳ-≤ 27 h ⟩
     27 * 3            ∎
 
   foo : ∀ k → ¬ (k ≥ 4) → k ≤ 3
@@ -64,7 +64,6 @@ module Necessary
   foo (suc (suc (suc (suc k)))) h with h (s≤s (s≤s (s≤s (s≤s z≤n))))
   ... | ()
 
-  -- TODO: imports for decidability
   thm : kₐ + kₜ ≥ 4
   thm with 4 ≤? kₐ + kₜ
   thm | yes p = p
