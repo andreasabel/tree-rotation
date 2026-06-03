@@ -1,7 +1,9 @@
 {-# OPTIONS --safe #-}
 
 open import Library
-open import Data.Nat.Properties using (+-identityʳ; *-comm; *-monoʳ-≤; ≤-refl; *-distribˡ-+; module ≤-Reasoning)
+open import Data.Nat.Properties using
+  ( +-identityʳ; *-comm
+  ;  *-monoˡ-≤ ; *-monoʳ-≤; ≤-refl; *-distribˡ-+; *-distribʳ-+; m≤n+m; <-irrefl; module ≤-Reasoning)
 open import Tree
 open import Game using (move; moves)
 open import Sequence using (seq; thm-seq)
@@ -34,27 +36,23 @@ module Necessary
   hmv : ∃ λ leftover → RMoves.rmoves kₐ kₜ mv rempty ≡ just (leftover ⨮ ε)
   hmv = hyp mv ε (thm-seq 1 11)
 
-  -- Move count relation ship
-  -- Prove lem with help of (thm-counts mv 0 ε) from hmv
-  lem : c# * kₐ + t# * kₜ ≥ r#  -- 27 * (kₐ + kₜ) ≥ 82
-  lem with hmv
+  counts-seq-1-11 : kₐ * c# + kₜ * t# ≥ r#  -- (kₐ + kₜ) * 27 ≥ 82
+  counts-seq-1-11 with hmv
   ... | leftover , run =
     begin
       r#
-    ≤⟨ ≤-add-right r# leftover ⟩
-      r# + leftover
-    ≤⟨ thm-counts mv 0 ε run ⟩
-      c# * kₐ + (t# * kₜ + 0)
-    ≡⟨ cong (c# * kₐ +_) (+-identityʳ (t# * kₜ)) ⟩
-      c# * kₐ + t# * kₜ
+    ≤⟨ m≤n+m r# leftover ⟩
+      leftover + r#
+    ≤⟨ thm-counts' mv 0 ε run ⟩
+       kₐ * c# + kₜ * t#
     ∎
 
   thm-op : kₐ + kₜ ≤ 3 → 82 ≤ 81
   thm-op h = begin
-    82                ≤⟨ lem ⟩
-    27 * kₐ + 27 * kₜ  ≡⟨ {! sym (*-distribˡ-+ 27 kₐ kₜ) !}  ⟩   -- This step takes forever
-    27 * (kₐ + kₜ)     ≤⟨ *-monoʳ-≤ 27 h ⟩
-    27 * 3            ∎
+    82                ≤⟨ counts-seq-1-11 ⟩
+    kₐ * 27 + kₜ * 27  ≡⟨ sym (*-distribʳ-+ 27 kₐ kₜ) ⟩
+    (kₐ + kₜ) * 27     ≤⟨ *-monoˡ-≤ 27 h ⟩
+    3 * 27            ∎
 
   foo : ∀ k → ¬ (k ≥ 4) → k ≤ 3
   foo 0 _ = z≤n
@@ -64,6 +62,38 @@ module Necessary
   foo (suc (suc (suc (suc k)))) h with h (s≤s (s≤s (s≤s (s≤s z≤n))))
   ... | ()
 
+  thm-op' : ¬(kₐ + kₜ ≤ 3)
+  thm-op' h = <-irrefl refl (thm-op h)
+
+  thm : kₐ + kₜ ≥ 4
+  thm with 4 ≤? kₐ + kₜ
+  thm | yes p = p
+  thm | no ¬p = ⊥-elim (thm-op' (foo (kₐ + kₜ) ¬p))
+
+{- OOM
+  thm-op' : ¬(kₐ + kₜ ≤ 3)
+  thm-op' h with thm-op h
+  ... |
+   (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s
+   (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s
+   (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s
+   (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s
+   (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s
+   (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s
+   (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s
+   (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s
+   (s≤s ())
+   ))))))))))
+   ))))))))))
+   ))))))))))
+   ))))))))))
+   ))))))))))
+   ))))))))))
+   ))))))))))
+   ))))))))))
+-}
+
+{-
   thm : kₐ + kₜ ≥ 4
   thm with 4 ≤? kₐ + kₜ
   thm | yes p = p
@@ -93,3 +123,5 @@ module Necessary
   --   27 * kₐ + 27 * kₜ  ≡⟨ {!!} ⟩
   --   27 * (kₐ + kₜ)     ≡⟨ {!!} ⟩
   --   (kₐ + kₜ) * 27     ∎
+
+-- -}

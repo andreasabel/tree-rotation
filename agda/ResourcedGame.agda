@@ -189,3 +189,14 @@ module RMoves (kₐ kₜ : ℕ) where
       (count m .Counting.MoveCounts.c# + count m' .Counting.MoveCounts.c#) * kₐ
         + ((count m .Counting.MoveCounts.t# + count m' .Counting.MoveCounts.t#) * kₜ + n)
     ∎
+
+  thm-counts'
+    : ∀ m n t {n' t'} (let (C: c# T: t# R: r#) = count m)
+    → rmoves m (n ⨮ t) ≡ just (n' ⨮ t')
+    → n' + r# ≤ n + (kₐ * c# + kₜ * t#)
+  thm-counts' m n t {n'} {t'} eq = let (C: c# T: t# R: r#) = count m in begin
+      n' + r#                 ≡⟨ +-comm n' r# ⟩
+      r# + n'                 ≤⟨ thm-counts m n t eq  ⟩
+      c# * kₐ + (t# * kₜ + n)  ≡⟨ {!!} ⟩
+      n + (kₐ * c# + kₜ * t#)  ∎
+   where open ≤-Reasoning

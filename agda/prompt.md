@@ -163,3 +163,9 @@ Answer
 ------
 
 (I had to interrupt Copilot since Agda was OOM)
+
+Prompt 7 2026-06-03
+===================
+
+Fill the open goal in ResourcedGame by an invokation of the ring solver of Agda's standard library.
+Do not change anything else, keep the exact proof structure and layout.
