@@ -33,13 +33,17 @@ RT = Resourced Tree
 -- rtmap f nothing = nothing
 -- rtmap f (just (n ⨮ a)) = just (f n ⨮ a)
 
-rmoves : Moves → RT → Maybe RT
-rmoves C (n     ⨮ t) = just (2 + n ⨮ t ∙ ε)
-rmoves T (n     ⨮ t) = Maybe.map (2 + n ⨮_) (tail t)
-rmoves R (suc n ⨮ t) = Maybe.map (n ⨮_) (rotate t)
-rmoves R (zero  ⨮ t) = nothing
-rmoves ε = just
-rmoves (m ∙ m') = rmoves m >=> rmoves m'
+module RMoves (kₐ kₜ : ℕ) where
+
+  rmoves : Moves → RT → Maybe RT
+  rmoves C (n     ⨮ t) = just (kₐ + n ⨮ t ∙ ε)
+  rmoves T (n     ⨮ t) = Maybe.map (kₜ + n ⨮_) (tail t)
+  rmoves R (suc n ⨮ t) = Maybe.map (n ⨮_) (rotate t)
+  rmoves R (zero  ⨮ t) = nothing
+  rmoves ε = just
+  rmoves (m ∙ m') = rmoves m >=> rmoves m'
+
+open RMoves 2 2
 
 -- Legal moves
 -- n - n' ≤ Φ t - Φ t'  so  n + Φ t' ≤ n' + Φ t
@@ -61,13 +65,12 @@ Thm-RMoves
 
 append-budget : ∀ t → 2 + Φ t ≥ Φ (t ∙ ε)
 append-budget t =
-  ≤-pred
-    (subst (suc (Φ (t ∙ ε)) ≤_)
-      (cong (3 +_) (+-identityʳ (Φ t)))
-      (amor-append {l = t} {r = ε}))
+    subst (Φ (t ∙ ε) ≤_)
+      (cong (2 +_) (+-identityʳ (Φ t)))
+      (amor-append {l = t} {r = ε})
 
 tail-budget : ∀ {t t'} → tail t ≡ just t' → 2 + Φ t ≥ Φ t'
-tail-budget p = ≤-pred (amor-tail p)
+tail-budget p = amor-tail p
 
 rotate-budget : ∀ {t t'} → rotate t ≡ just t' → Φ t ≥ 1 + Φ t'
 rotate-budget = amor-rotate

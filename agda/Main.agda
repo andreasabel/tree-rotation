@@ -15,14 +15,14 @@ open import Counting using (count; C:_T:_R:_; thm-counts-seq)
 -- Amortization theorem: pay 3 for each append and tail, then the rotations are also paid for.
 
 kₐ : ℕ
-kₐ = 3
+kₐ = 2
 
 kₜ : ℕ
-kₜ = 3
+kₜ = 2
 
 amortization : ∀ {t t'}
-  → (                     kₐ + Φ t + Φ t' ≥ 1 + Φ (t ∙ t'))
-  × (tail t   ≡ just t' → kₜ + Φ t        ≥ 1 + Φ t')
+  → (                     kₐ + Φ t + Φ t' ≥ Φ (t ∙ t'))
+  × (tail t   ≡ just t' → kₜ + Φ t        ≥ Φ t')
   × (rotate t ≡ just t' → Φ t             ≥ 1 + Φ t')
 
 amortization {t = t} {t' = t'} =

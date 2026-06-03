@@ -68,28 +68,26 @@ open ≤-Reasoning
 
 -- Amortization theorem: pay 3 for each append and tail, then the rotations are also paid for.
 
-amor-append : 3 + Φ l + Φ r ≥ 1 + Φ (l ∙ r)
+amor-append : 2 + Φ l + Φ r ≥ Φ (l ∙ r)
 amor-append {l = l} {r = r} =
   begin
-    1 + Φ (l ∙ r)
-  ≤⟨ +-monoʳ-≤ 1 (m⊔n≤m+n (suc (Φₗ l)) (pred (Φᵣ r))) ⟩
-    1 + (suc (Φₗ l) + pred (Φᵣ r))
-  ≤⟨ +-monoʳ-≤ 1 (+-mono-≤ (s≤s (Φₗ≤1+Φ l)) (≤-trans pred[n]≤n (Φᵣ≤Φ r))) ⟩
-    1 + ((2 + Φ l) + Φ r)
-  ≡⟨⟩
-    3 + Φ l + Φ r
+    Φ (l ∙ r)
+  ≤⟨ m⊔n≤m+n (suc (Φₗ l)) (pred (Φᵣ r)) ⟩
+    suc (Φₗ l) + pred (Φᵣ r)
+  ≤⟨ +-mono-≤ (s≤s (Φₗ≤1+Φ l)) (≤-trans pred[n]≤n (Φᵣ≤Φ r)) ⟩
+    2 + Φ l + Φ r
   ∎
 
-amor-tail : tail t ≡ just t' → 3 + Φ t ≥ 1 + Φ t'
+amor-tail : tail t ≡ just t' → 2 + Φ t ≥ Φ t'
 amor-tail {t = ε ∙ t} refl =
   begin
-    1 + Φ t
-  ≤⟨ +-monoʳ-≤ 1 (Φ≤1+Φᵣ t) ⟩
-    2 + Φᵣ t
-  ≤⟨ +-monoʳ-≤ 2 (≤1+pred (Φᵣ t)) ⟩
-    3 + pred (Φᵣ t)
-  ≤⟨ +-monoʳ-≤ 3 (m≤n⊔m 1 (pred (Φᵣ t))) ⟩
-    3 + Φ (ε ∙ t)
+    Φ t
+  ≤⟨ Φ≤1+Φᵣ t ⟩
+    1 + Φᵣ t
+  ≤⟨ +-monoʳ-≤ 1 (≤1+pred (Φᵣ t)) ⟩
+    2 + pred (Φᵣ t)
+  ≤⟨ +-monoʳ-≤ 2 (m≤n⊔m 1 (pred (Φᵣ t))) ⟩
+    2 + Φ (ε ∙ t)
   ∎
 
 amor-rotate : rotate t ≡ just t' → Φ t ≥ 1 + Φ t'
