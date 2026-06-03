@@ -8,10 +8,6 @@ open import Tree
 
 open ≤-Reasoning
 
-≤1+pred : ∀ n → n ≤ 1 + pred n
-≤1+pred zero    = z≤n
-≤1+pred (suc n) = ≤-refl
-
 -- Φₗ sandwiched by Φᵣ:  Φᵣ ≤ Φₗ ≤ 1 + Φᵣ
 
 Φᵣ≤Φₗ : ∀ t → Φᵣ t ≤ Φₗ t
