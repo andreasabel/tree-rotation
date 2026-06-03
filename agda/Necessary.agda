@@ -3,7 +3,7 @@
 open import Library
 open import Data.Nat.Properties using
   ( +-identityʳ; *-comm
-  ;  *-monoˡ-≤ ; *-monoʳ-≤; ≤-refl; *-distribˡ-+; *-distribʳ-+; m≤n+m; <-irrefl; module ≤-Reasoning)
+  ;  *-monoˡ-≤ ; *-monoʳ-≤; ≤-refl; *-distribˡ-+; *-distribʳ-+; m≤n+m; <-irrefl; ≮⇒≥; module ≤-Reasoning)
 open import Tree
 open import Game using (move; moves)
 open import Sequence using (seq; thm-seq)
@@ -24,12 +24,6 @@ module Necessary
 
   open RMoves kₐ kₜ
   open ≤-Reasoning
-
-  ≤-add-right : ∀ a b → a ≤ a + b
-  ≤-add-right zero    b = z≤n
-  ≤-add-right (suc a) b = s≤s (≤-add-right a b)
-
-  -- open CountsSeq 1 11
 
   -- The move sequence mv ought to be executable.
   -- Prove from hyp
@@ -54,21 +48,13 @@ module Necessary
     (kₐ + kₜ) * 27     ≤⟨ *-monoˡ-≤ 27 h ⟩
     3 * 27            ∎
 
-  foo : ∀ k → ¬ (k ≥ 4) → k ≤ 3
-  foo 0 _ = z≤n
-  foo 1 _ = s≤s z≤n
-  foo 2 _ = s≤s (s≤s z≤n)
-  foo 3 _ = ≤-refl
-  foo (suc (suc (suc (suc k)))) h with h (s≤s (s≤s (s≤s (s≤s z≤n))))
-  ... | ()
-
   thm-op' : ¬(kₐ + kₜ ≤ 3)
   thm-op' h = <-irrefl refl (thm-op h)
 
   thm : kₐ + kₜ ≥ 4
   thm with 4 ≤? kₐ + kₜ
   thm | yes p = p
-  thm | no ¬p = ⊥-elim (thm-op' (foo (kₐ + kₜ) ¬p))
+  thm | no ¬p = ⊥-elim (thm-op' (≮⇒≥ ¬p))
 
 {- OOM
   thm-op' : ¬(kₐ + kₜ ≤ 3)

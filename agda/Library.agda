@@ -5,7 +5,7 @@ module Library where
 open import Function            public using (id; _∘_)
 open import Data.Empty          public using (⊥; ⊥-elim)
 open import Data.Maybe          public using (Maybe; nothing; just; _>>=_) hiding (module Maybe)
-open import Data.Nat            public using (ℕ; zero; suc; pred; _+_; _*_; _⊔_; _≤_; _≥_; z≤n; s≤s)
+open import Data.Nat            public using (ℕ; zero; suc; pred; _+_; _*_; _⊔_; _≤_; _≥_; _<_; _≮_; z≤n; s≤s)
 open import Data.Product        public using (∃; _×_; _,_)
 open import Relation.Nullary    public using (¬_; yes; no)
 
