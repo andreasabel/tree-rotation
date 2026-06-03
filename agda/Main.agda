@@ -9,7 +9,8 @@ open import Tree
 open import UpperBound using (amor-append; amor-tail; amor-rotate)
 open import Game using (move)
 open import Sequence using (seq; thm-seq)
-open import ResourcedGame using (Legal; thm-rmoves; _⨮_)
+open import ResourcedGame using (_⨮_)
+open import Sufficient using (Legal; thm-rmoves)
 open import Counting using (count; C:_T:_R:_; thm-counts-seq)
 
 -- Amortization theorem: pay 3 for each append and tail, then the rotations are also paid for.
