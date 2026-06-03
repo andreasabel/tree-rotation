@@ -4,14 +4,11 @@
 
 module Main where
 
-open import Data.Maybe
-open import Data.Nat
-open import Data.Product
-open import Relation.Binary.PropositionalEquality
-
+open import Library
 open import Tree
 open import UpperBound using (amor-append; amor-tail; amor-rotate)
-open import Game using (move; seq; thm-seq)
+open import Game using (move)
+open import Sequence using (seq; thm-seq)
 open import ResourcedGame using (Legal; thm-rmoves; _⨮_)
 open import Counting using (count; C:_T:_R:_; thm-counts-seq)
 

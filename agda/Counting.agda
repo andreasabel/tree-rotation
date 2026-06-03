@@ -2,15 +2,13 @@
 
 module Counting where
 
-open import Function using (id; _∘_)
-open import Data.Nat using (ℕ; zero; suc; _+_; _*_; _≤_; _≥_)
+open import Library
 open import Data.Nat.Properties using
   ( +-identityʳ; +-suc; +-assoc; +-comm; *-suc
   ; module ≤-Reasoning)
-open import Relation.Binary.PropositionalEquality using (_≡_; refl; sym; cong; module ≡-Reasoning)
 
-open import Game using (Moves; C; R; T; ε; _∙_; _^_; cr; tr; crtrr; start; loop; unravel; seq)
-
+open import Game using (Moves; C; R; T; ε; _∙_)
+open import Sequence using (cr; tr; crtr; crtrr; start; loop; unravel; seq)
 open ≡-Reasoning
 
 record MoveCounts : Set where
@@ -139,7 +137,7 @@ lem-loop-r n =
     4 * n + 3
   ∎
 
-lem-crtr-suf : ∀ ms cs → counts (Game.crtr ms) cs ≡ add 1 1 2 (counts ms cs)
+lem-crtr-suf : ∀ ms cs → counts (crtr ms) cs ≡ add 1 1 2 (counts ms cs)
 lem-crtr-suf ms cs = refl
 
 lem-one-mul : ∀ n → 1 * n ≡ n
@@ -195,9 +193,9 @@ lem-loop-suf n ms cs =
   begin
     counts (loop n ms) cs
   ≡⟨ refl ⟩
-    add 1 0 1 (counts ((crtrr ^ n) (Game.crtr (T ∙ ((Game.r ^ n) ms))) ) cs)
-  ≡⟨ cong (add 1 0 1) (lem-crtrr-suf n (Game.crtr (T ∙ ((Game.r ^ n) ms))) cs) ⟩
-    add 1 0 1 (add n n (3 * n) (counts (Game.crtr (T ∙ ((Game.r ^ n) ms))) cs))
+    add 1 0 1 (counts ((crtrr ^ n) (crtr (T ∙ ((Game.r ^ n) ms))) ) cs)
+  ≡⟨ cong (add 1 0 1) (lem-crtrr-suf n (crtr (T ∙ ((Game.r ^ n) ms))) cs) ⟩
+    add 1 0 1 (add n n (3 * n) (counts (crtr (T ∙ ((Game.r ^ n) ms))) cs))
   ≡⟨ cong (add 1 0 1) (cong (add n n (3 * n)) (lem-crtr-suf (T ∙ ((Game.r ^ n) ms)) cs)) ⟩
     add 1 0 1 (add n n (3 * n) (add 1 1 2 (counts (T ∙ ((Game.r ^ n) ms)) cs)))
   ≡⟨ cong (add 1 0 1) (cong (add n n (3 * n)) refl) ⟩

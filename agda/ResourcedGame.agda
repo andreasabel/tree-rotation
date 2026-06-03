@@ -4,17 +4,13 @@
 
 module ResourcedGame where
 
-open import Data.Maybe using (Maybe; nothing; just; map)
-open import Data.Nat using (ℕ; zero; suc; _+_; _≤_; _≥_)
+open import Library
 open import Data.Nat.Properties using
   ( +-identityʳ; +-suc; +-assoc; +-comm
   ; ≤-refl; ≤-trans; ≤-pred; +-monoˡ-≤; +-monoʳ-≤; +-cancelʳ-≤; module ≤-Reasoning)
-open import Data.Product using (∃; _×_; _,_)
-open import Relation.Binary.PropositionalEquality using (_≡_; refl; sym; subst; cong)
 
 open import Tree using (Tree; ε; _∙_; tail; rotate; Φ)
 open import Game using (Moves; C; R; T; ε; _∙_; moves)
-open import Game using (_>=>_)
 
 open import UpperBound using (amor-append; amor-tail; amor-rotate)
 
@@ -39,8 +35,8 @@ RT = Resourced Tree
 
 rmoves : Moves → RT → Maybe RT
 rmoves C (n     ⨮ t) = just (2 + n ⨮ t ∙ ε)
-rmoves T (n     ⨮ t) = map (2 + n ⨮_) (tail t)
-rmoves R (suc n ⨮ t) = map (n ⨮_) (rotate t)
+rmoves T (n     ⨮ t) = Maybe.map (2 + n ⨮_) (tail t)
+rmoves R (suc n ⨮ t) = Maybe.map (n ⨮_) (rotate t)
 rmoves R (zero  ⨮ t) = nothing
 rmoves ε = just
 rmoves (m ∙ m') = rmoves m >=> rmoves m'

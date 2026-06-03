@@ -2,11 +2,8 @@
 
 module UpperBound where
 
-open import Data.Maybe
-open import Data.Nat
+open import Library
 open import Data.Nat.Properties
-open import Relation.Binary.PropositionalEquality
-
 open import Tree
 
 open ≤-Reasoning
