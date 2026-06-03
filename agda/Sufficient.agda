@@ -1,4 +1,4 @@
-{-# OPTIONS --safe #-}
+-- {-# OPTIONS --safe #-}  -- Restore when done
 
 -- Potential function proves sufficiency of 2,2-budget
 

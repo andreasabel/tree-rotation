@@ -133,3 +133,17 @@ I corrected the published count formulas in module CountsSeq to
   * (4 * n + 3) + 3 * n + 2
 
 The reason is that each loop contributes n + 2 C-moves and T-moves, not n + 5; the previous c#/t# formulas overcounted by 3m. I also fixed CountsSeq.Thm to compare counts (seq m n ε) zero-counts against the target record, since counts (seq m n ε) is a transformer MoveCounts → MoveCounts, not a MoveCounts value by itself.
+
+Prompt 6 2026-06-03
+===================
+
+Prove the open goals in modules Necessary (new) and ResourcedGame.
+
+Do not modify the definitions nor the statement of the theorem.
+If you think there is an error in the definitions or statement, please alert me and suggest a fix, but do not change them by yourself.
+
+If you need to prove equations by equation chains, use the "equational reasoning" style (module ≡-Reasoning) to generate readable equational proofs.
+If you need to prove inequation by chains, likewise use the "preorder reasoning" style.
+
+In the end, the goals should be proven completely, without remaining postulates or termination pragmas.
+Thus, in the end, activate option `--safe` in the file.

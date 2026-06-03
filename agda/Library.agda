@@ -6,6 +6,7 @@ open import Function            public using (id; _∘_)
 open import Data.Maybe          public using (Maybe; nothing; just; _>>=_) hiding (module Maybe)
 open import Data.Nat            public using (ℕ; zero; suc; pred; _+_; _*_; _⊔_; _≤_; _≥_; z≤n; s≤s)
 open import Data.Product        public using (∃; _×_; _,_)
+open import Relation.Nullary    public using (¬_)
 
 open import Relation.Binary.PropositionalEquality public
   using (_≡_; refl; sym; trans; cong; subst; module ≡-Reasoning)

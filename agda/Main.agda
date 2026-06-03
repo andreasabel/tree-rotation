@@ -1,4 +1,4 @@
-{-# OPTIONS --safe #-}
+-- {-# OPTIONS --safe #-}  -- Restore when done
 
 -- Agda proofs on optimal constant-time amortization theorem for catenable queues.
 
@@ -7,11 +7,12 @@ module Main where
 open import Library
 open import Tree
 open import UpperBound using (amor-append; amor-tail; amor-rotate)
-open import Game using (move)
+open import Game using (move; moves)
 open import Sequence using (seq; thm-seq)
-open import ResourcedGame using (_⨮_)
+open import ResourcedGame using (_⨮_; rempty; module RMoves)
 open import Sufficient using (Legal; thm-rmoves)
 open import Counting using (count; C:_T:_R:_; thm-counts-seq)
+import Necessary
 
 -- Amortization theorem: pay 3 for each append and tail, then the rotations are also paid for.
 
@@ -41,7 +42,7 @@ move-sequence = thm-seq
 -- (Intuitively, if we replace C and T by +2 and R by -1 we stay non-negative throughout execution.)
 
 -- We start with the empty tree an no resources and end up with the empty tree and some leftover resources.
-resourced : ∀ m n → ∃ λ leftover → Legal (seq m n Game.ε) (0 ⨮ ε) (leftover ⨮ ε)
+resourced : ∀ m n → ∃ λ leftover → Legal (seq m n Game.ε) rempty (leftover ⨮ ε)
 resourced m n with thm-rmoves (seq m n Game.ε) ε ε (move-sequence m n) 0 z≤n
 ... | leftover , _ , legal = leftover , legal
 
@@ -55,3 +56,16 @@ counting : ∀ m n → let
      r# = m * (4 * n + 3) + 3 * n + 2
   in count (seq m n Game.ε) ≡ (C: c# T: c# R: r#)
 counting = thm-counts-seq
+
+-- If any possible move sequence is also executable with resource constraints,
+-- then kₐ + kₜ ≥ 4.
+-- This should be a consequence of the theorems thm-seq and thm-counts-seq.
+-- However, we need to provide suitable m and n for the sequence.
+
+necessary
+  : ∀ kₐ kₜ
+  → (∀ ms t
+     → moves ms ε ≡ just t
+     → ∃ λ leftover → RMoves.rmoves kₐ kₜ ms rempty ≡ just (leftover ⨮ t))
+  → kₐ + kₜ ≥ 4
+necessary = Necessary.thm
