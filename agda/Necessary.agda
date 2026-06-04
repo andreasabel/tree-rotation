@@ -3,7 +3,7 @@
 open import Library
 open import Data.Nat.Properties using
   ( +-identityʳ; *-comm
-  ;  *-monoˡ-≤ ; *-monoʳ-≤; ≤-refl; *-distribˡ-+; *-distribʳ-+; m≤n+m; <-irrefl; ≮⇒≥; module ≤-Reasoning)
+  ;  *-monoˡ-≤ ; *-monoʳ-≤; ≤-refl; *-distribˡ-+; *-distribʳ-+; m≤n+m; n≮n; ≮⇒≥; module ≤-Reasoning)
 open import Tree
 open import Game using (move; moves)
 open import Sequence using (seq; thm-seq)
@@ -48,13 +48,10 @@ module Necessary
     (kₐ + kₜ) * 27     ≤⟨ *-monoˡ-≤ 27 h ⟩
     3 * 27            ∎
 
-  thm-op' : ¬(kₐ + kₜ ≤ 3)
-  thm-op' h = <-irrefl refl (thm-op h)
-
   thm : kₐ + kₜ ≥ 4
   thm with 4 ≤? kₐ + kₜ
   thm | yes p = p
-  thm | no ¬p = ⊥-elim (thm-op' (≮⇒≥ ¬p))
+  thm | no ¬p = ⊥-elim (n≮n 81 (thm-op (≮⇒≥ ¬p)))
 
 {- OOM
   thm-op' : ¬(kₐ + kₜ ≤ 3)
