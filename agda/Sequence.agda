@@ -6,7 +6,7 @@ open import Library
 open import Data.Nat.Properties using (+-suc; +-comm; +-identityʳ)
 
 open import Tree using (Tree; ε; _∙_; tail; rotate)
-open import Game
+open import SingleTreeGame
 
 open ≡-Reasoning
 

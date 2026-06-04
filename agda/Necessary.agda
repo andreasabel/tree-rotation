@@ -4,9 +4,9 @@
 
 open import Library
 open import Tree using (ε)
-open import Game using (moves)
+open import SingleTreeGame as Game using (moves)
 open import Sequence using (seq; thm-seq)
-open import ResourcedGame using (_⨮_; rempty; module RMoves)
+open import ResourcedSingleTreeGame using (_⨮_; rempty; module RMoves)
 open import Counting using (count; C:_T:_R:_)
 
 module Necessary

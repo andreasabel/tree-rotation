@@ -10,10 +10,10 @@ open import Data.Nat.Properties using
   ; ≤-refl; ≤-trans; ≤-pred; +-monoˡ-≤; +-monoʳ-≤; +-cancelʳ-≤; module ≤-Reasoning)
 
 open import Tree using (Tree; ε; _∙_; tail; rotate; Φ)
-open import Game using (Moves; C; R; T; ε; _∙_; moves)
+open import SingleTreeGame using (Moves; C; R; T; ε; _∙_; moves)
 
 open import UpperBound using (amor-append; amor-tail; amor-rotate)
-open import ResourcedGame
+open import ResourcedSingleTreeGame
 
 open ≤-Reasoning
 

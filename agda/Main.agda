@@ -7,9 +7,9 @@ module Main where
 open import Library
 open import Tree
 open import UpperBound using (amor-append; amor-tail; amor-rotate)
-open import Game using (move; moves)
+open import SingleTreeGame using (ε; move; moves)
 open import Sequence using (seq; thm-seq)
-open import ResourcedGame using (_⨮_; rempty; module RMoves)
+open import ResourcedSingleTreeGame using (_⨮_; rempty; module RMoves)
 open import Sufficient using (Legal; thm-rmoves)
 open import Counting using (count; C:_T:_R:_; thm-counts-seq)
 import Necessary
@@ -42,8 +42,8 @@ move-sequence = thm-seq
 -- (Intuitively, if we replace C and T by +2 and R by -1 we stay non-negative throughout execution.)
 
 -- We start with the empty tree an no resources and end up with the empty tree and some leftover resources.
-resourced : ∀ m n → ∃ λ leftover → Legal (seq m n Game.ε) rempty (leftover ⨮ ε)
-resourced m n with thm-rmoves (seq m n Game.ε) ε ε (move-sequence m n) 0 z≤n
+resourced : ∀ m n → ∃ λ leftover → Legal (seq m n ε) rempty (leftover ⨮ ε)
+resourced m n with thm-rmoves (seq m n ε) ε ε (move-sequence m n) 0 z≤n
 ... | leftover , _ , legal = leftover , legal
 
 -- I calculated the leftover budget to 5m + n + 10 over a total allocation of Rs of 4nm + 10m + 4n + 12.
@@ -54,7 +54,7 @@ resourced m n with thm-rmoves (seq m n Game.ε) ε ε (move-sequence m n) 0 z≤
 counting : ∀ m n → let
      c# = m * (n + 2) + n + 3
      r# = m * (4 * n + 3) + 3 * n + 2
-  in count (seq m n Game.ε) ≡ (C: c# T: c# R: r#)
+  in count (seq m n ε) ≡ (C: c# T: c# R: r#)
 counting = thm-counts-seq
 
 -- If any possible move sequence is also executable with resource constraints,

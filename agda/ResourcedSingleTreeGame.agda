@@ -2,11 +2,11 @@
 
 -- Move execution with resource tracking.
 
-module ResourcedGame where
+module ResourcedSingleTreeGame where
 
 open import Library
 open import Tree using (Tree; ε; _∙_; tail; rotate; Φ)
-open import Game using (Moves; C; R; T; ε; _∙_)
+open import SingleTreeGame using (Moves; C; R; T; ε; _∙_)
 open import Counting using (count; count-compose; C:_T:_R:_)
 
 open import Data.Nat.Properties using

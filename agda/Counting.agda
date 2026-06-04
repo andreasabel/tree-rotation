@@ -8,7 +8,7 @@ open import Data.Nat.Properties using
   ; module ≤-Reasoning)
 import Data.Nat.Tactic.RingSolver as Nat
 
-open import Game using (Moves; C; R; T; ε; _∙_)
+open import SingleTreeGame as Game using (Moves; C; R; T; ε; _∙_)
 open import Sequence using (cr; tr; crtr; crtrr; start; loop; unravel; seq)
 open ≡-Reasoning
 

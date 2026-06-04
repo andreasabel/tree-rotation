@@ -1,6 +1,6 @@
 {-# OPTIONS --safe #-}
 
-module Game where
+module SingleTreeGame where
 
 open import Library
 open import Tree using (Tree; ε; _∙_; tail; rotate)
