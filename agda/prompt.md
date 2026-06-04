@@ -205,3 +205,21 @@ Agent instructions for this project:
    - `Data.Nat.Properties`
    - `Data.Nat.Solver`
    - `Relation.Binary.PropositionalEquality`
+
+Prompt 9 2026-06-04
+===================
+
+Prove the open goals in Approx.agda, using the hints in the comments.
+
+Answer
+------
+
+Done. Approx.agda is fully proved.
+
+I filled:
+
+ - fraction with a ≤-Reasoning chain plus one Nat ring-solver step
+ - lem from hmv via thm-counts
+ - thm using the counted sequence instance, a derived arithmetic lemma lem', and two solver-backed equality steps
+
+Approx.agda now typechecks cleanly.
