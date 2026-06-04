@@ -8,7 +8,7 @@ open import Data.Fin            public using (Fin; zero; suc)
 open import Data.List           public using (List; []; _∷_)
 open import Data.Maybe          public using (Maybe; nothing; just; _>>=_) hiding (module Maybe)
 open import Data.Nat            public using (ℕ; zero; suc; pred; _+_; _*_; _⊔_; _≤_; _≥_; _<_; _≮_; z≤n; s≤s)
-open import Data.Product        public using (∃; _×_; _,_)
+open import Data.Product        public using (∃; _×_; _,_; proj₁; proj₂)
 open import Data.Vec            public using (Vec; []; _∷_)
 open import Relation.Nullary    public using (¬_; yes; no)
 
