@@ -1,39 +1,41 @@
 {-# OPTIONS --safe #-}
 
--- Move execution with resource tracking
+-- Move execution with resource tracking.
 
 module ResourcedGame where
 
 open import Library
+open import Tree using (Tree; ε; _∙_; tail; rotate; Φ)
+open import Game using (Moves; C; R; T; ε; _∙_)
+open import Counting using (count; count-compose; C:_T:_R:_)
+
 open import Data.Nat.Properties using
   ( +-assoc; +-comm; +-identityʳ; *-distribʳ-+
   ; ≤-refl; ≤-trans; +-monoˡ-≤; +-monoʳ-≤; module ≤-Reasoning)
 import Data.Nat.Solver as Nat
 import Data.Nat.Tactic.RingSolver as Nat
 
-open import Tree using (Tree; ε; _∙_; tail; rotate; Φ)
-open import Game using (Moves; C; R; T; ε; _∙_)
-open import Counting using (count; count-compose; C:_T:_R:_)
+-- Pair something with a resource (in ℕ).
 
-infixl 4  _⨮_
 record Resourced (A : Set) : Set where
   constructor _⨮_  -- C-x 8 RET 2a2e
   field
     resources : ℕ
     payload   : A
+infixl 4  _⨮_
+
+-- A tree with a "bank account".
 
 RT = Resourced Tree
+
+-- Initial position: empty tree, empty account.
 
 rempty : RT
 rempty = 0 ⨮ ε
 
--- -- Updating the resources
--- rmap : {A : Set} → (ℕ → ℕ) → Resourced A → Resourced A
--- rmap f (n ⨮ a) = f n ⨮ a
-
--- rtmap : {A : Set} → (ℕ → ℕ) → Maybe RT → Maybe RT
--- rtmap f nothing = nothing
--- rtmap f (just (n ⨮ a)) = just (f n ⨮ a)
+-- Execute moves on resourced trees if possible,
+-- for the given budget kₐ for concat and kₜ for tail.
+-- A rotation costs 1 and is thus only executable if the bank account is non-empty.
 
 module RMoves (kₐ kₜ : ℕ) where
 
@@ -45,7 +47,8 @@ module RMoves (kₐ kₜ : ℕ) where
   rmoves ε = just
   rmoves (m ∙ m') = rmoves m >=> rmoves m'
 
-  -- The number of R moves is bounded by the number of C + T moves based on resources.
+  -- For resourced runs,
+  -- the number of R moves is bounded by the number of C + T moves based on budgets.
 
   thm-counts
     : ∀ m n t {n' t'} (let (C: c# T: t# R: r#) = count m)
@@ -97,3 +100,13 @@ module RMoves (kₐ kₜ : ℕ) where
                                  refl c# t# n kₐ kₜ ⟩
       n + (kₐ * c# + kₜ * t#)  ∎
    where open ≤-Reasoning; open Nat.+-*-Solver
+
+-- TRASH
+
+-- -- Updating the resources
+-- rmap : {A : Set} → (ℕ → ℕ) → Resourced A → Resourced A
+-- rmap f (n ⨮ a) = f n ⨮ a
+
+-- rtmap : {A : Set} → (ℕ → ℕ) → Maybe RT → Maybe RT
+-- rtmap f nothing = nothing
+-- rtmap f (just (n ⨮ a)) = just (f n ⨮ a)
