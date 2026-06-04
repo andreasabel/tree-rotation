@@ -53,7 +53,7 @@ module Necessary
   thm | yes p = p
   thm | no ¬p = ⊥-elim (n≮n 81 (thm-op (≮⇒≥ ¬p)))
 
-{- OOM
+-- {- OOM
   thm-op' : ¬(kₐ + kₜ ≤ 3)
   thm-op' h with thm-op h
   ... |
@@ -74,7 +74,7 @@ module Necessary
    ))))))))))
    ))))))))))
    ))))))))))
--}
+-- -}
 
 {-
   thm : kₐ + kₜ ≥ 4
