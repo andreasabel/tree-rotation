@@ -13,6 +13,7 @@ open import ResourcedSingleTreeGame using (_⨮_; rempty; module RMoves)
 open import Sufficient using (Legal; thm-rmoves)
 open import Counting using (count; C:_T:_R:_; thm-counts-seq)
 import Necessary
+import MultiTreeGame
 
 -- Amortization theorem: pay 3 for each append and tail, then the rotations are also paid for.
 
