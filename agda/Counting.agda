@@ -38,14 +38,7 @@ counts (m ∙ m₁) = counts m ∘ counts m₁
 count : Moves → MoveCounts
 count m = counts m zero-counts
 
-module CountsSeq (m n : ℕ) where
-  c# = m * (n + 2) + n + 3
-  t# = c#
-  r# = m * (4 * n + 3) + 3 * n + 2
-
-  Thm = count (seq m n ε) ≡ (C: c# T: c# R: r#)
-
--- Proof
+-- Copilot-generated lemmata about counting
 
 add : ℕ → ℕ → ℕ → MoveCounts → MoveCounts
 add c t r (C: c# T: t# R: r#) = C: (c + c#) T: (t + t#) R: (r + r#)
@@ -59,6 +52,47 @@ add-compose a t r a' t' r' (C: c# T: t#₀ R: r#₀)
         | sym (+-assoc t t' t#₀)
         | sym (+-assoc r r' r#₀)
   = refl
+
+counts-add : ∀ m cs c t r → count m ≡ (C: c T: t R: r) → counts m cs ≡ add c t r cs
+counts-add C cs c t r refl = refl
+counts-add T cs c t r refl = refl
+counts-add R cs c t r refl = refl
+counts-add ε cs c t r refl = refl
+counts-add (m ∙ m') cs c t r eq
+  with count m in cm | count m' in cm'
+... | (C: c₁ T: t₁ R: r₁) | (C: c₂ T: t₂ R: r₂)
+  with trans (sym eq) ( counts-add m (C: c₂ T: t₂ R: r₂) c₁ t₁ r₁ cm )
+... | refl
+  rewrite counts-add m' cs c₂ t₂ r₂ cm'
+        | counts-add m (add c₂ t₂ r₂ cs) c₁ t₁ r₁ cm
+        | add-compose c₁ t₁ r₁ c₂ t₂ r₂ cs
+  = refl
+
+count-compose
+  : ∀ m m'
+  → let (C: c₁ T: t₁ R: r₁) = count m ;
+         (C: c₂ T: t₂ R: r₂) = count m'
+     in count (m ∙ m') ≡ (C: (c₁ + c₂) T: (t₁ + t₂) R: (r₁ + r₂))
+count-compose m m' with count m in cm | count m' in cm'
+... | (C: c₁ T: t₁ R: r₁) | (C: c₂ T: t₂ R: r₂) = let open ≡-Reasoning in
+  begin
+    counts m (C: c₂ T: t₂ R: r₂)
+  ≡⟨ counts-add m (C: c₂ T: t₂ R: r₂) c₁ t₁ r₁ cm ⟩
+    add c₁ t₁ r₁ (C: c₂ T: t₂ R: r₂)
+  ≡⟨ refl ⟩
+    (C: (c₁ + c₂) T: (t₁ + t₂) R: (r₁ + r₂))
+  ∎
+
+-- Theorem: move counts in the move sequence (generic in m, n)
+
+module CountsSeq (m n : ℕ) where
+  c# = m * (n + 2) + n + 3
+  t# = c#
+  r# = m * (4 * n + 3) + 3 * n + 2
+
+  Thm = count (seq m n ε) ≡ (C: c# T: c# R: r#)
+
+-- Proof
 
 lem-cr-suf : ∀ n ms cs → counts ((cr ^ n) ms) cs ≡ add n 0 n (counts ms cs)
 lem-cr-suf zero    ms cs = refl
