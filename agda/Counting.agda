@@ -6,6 +6,7 @@ open import Library
 open import Data.Nat.Properties using
   ( +-identityʳ; +-suc; +-assoc; +-comm; *-suc
   ; module ≤-Reasoning)
+import Data.Nat.Tactic.RingSolver as Nat
 
 open import Game using (Moves; C; R; T; ε; _∙_)
 open import Sequence using (cr; tr; crtr; crtrr; start; loop; unravel; seq)
@@ -99,13 +100,13 @@ lem-cr-suf zero    ms cs = refl
 lem-cr-suf (suc n) ms cs =
   begin
     counts ((cr ^ suc n) ms) cs
-  ≡⟨ refl ⟩
+  ≡⟨⟩
     add 1 0 1 (counts ((cr ^ n) ms) cs)
   ≡⟨ cong (add 1 0 1) (lem-cr-suf n ms cs) ⟩
     add 1 0 1 (add n 0 n (counts ms cs))
   ≡⟨ add-compose 1 0 1 n 0 n (counts ms cs) ⟩
     add (1 + n) 0 (1 + n) (counts ms cs)
-  ≡⟨ refl ⟩
+  ≡⟨⟩
     add (suc n) 0 (suc n) (counts ms cs)
   ∎
 
@@ -114,13 +115,13 @@ lem-r-suf zero    ms cs = refl
 lem-r-suf (suc n) ms cs =
   begin
     counts ((Game.r ^ suc n) ms) cs
-  ≡⟨ refl ⟩
+  ≡⟨⟩
     add 0 0 1 (counts ((Game.r ^ n) ms) cs)
   ≡⟨ cong (add 0 0 1) (lem-r-suf n ms cs) ⟩
     add 0 0 1 (add 0 0 n (counts ms cs))
   ≡⟨ add-compose 0 0 1 0 0 n (counts ms cs) ⟩
     add 0 0 (1 + n) (counts ms cs)
-  ≡⟨ refl ⟩
+  ≡⟨⟩
     add 0 0 (suc n) (counts ms cs)
   ∎
 
@@ -132,7 +133,7 @@ lem-crtrr-suf zero    ms cs = refl
 lem-crtrr-suf (suc n) ms cs =
   begin
     counts ((crtrr ^ suc n) ms) cs
-  ≡⟨ refl ⟩
+  ≡⟨⟩
     add 1 1 3 (counts ((crtrr ^ n) ms) cs)
   ≡⟨ cong (add 1 1 3) (lem-crtrr-suf n ms cs) ⟩
     add 1 1 3 (add n n (3 * n) (counts ms cs))
@@ -140,7 +141,7 @@ lem-crtrr-suf (suc n) ms cs =
     add (1 + n) (1 + n) (3 + 3 * n) (counts ms cs)
   ≡⟨ cong (λ k → add (1 + n) (1 + n) k (counts ms cs)) (lem-crtrr-r n) ⟩
     add (1 + n) (1 + n) (3 * suc n) (counts ms cs)
-  ≡⟨ refl ⟩
+  ≡⟨⟩
     add (suc n) (suc n) (3 * suc n) (counts ms cs)
   ∎
 
@@ -149,46 +150,15 @@ lem-tr-suf zero    ms cs = refl
 lem-tr-suf (suc n) ms cs =
   begin
     counts ((tr ^ suc n) ms) cs
-  ≡⟨ refl ⟩
+  ≡⟨⟩
     add 0 1 1 (counts ((tr ^ n) ms) cs)
   ≡⟨ cong (add 0 1 1) (lem-tr-suf n ms cs) ⟩
     add 0 1 1 (add 0 n n (counts ms cs))
   ≡⟨ add-compose 0 1 1 0 n n (counts ms cs) ⟩
     add 0 (1 + n) (1 + n) (counts ms cs)
-  ≡⟨ refl ⟩
+  ≡⟨⟩
     add 0 (suc n) (suc n) (counts ms cs)
   ∎
-
-lem-loop-r : ∀ n → 3 * n + (n + 3) ≡ 4 * n + 3
-lem-loop-r n =
-  begin
-    3 * n + (n + 3)
-  ≡⟨ sym (+-assoc (3 * n) n 3) ⟩
-    (3 * n + n) + 3
-  ≡⟨ cong (_+ 3) (+-comm (3 * n) n) ⟩
-    (n + 3 * n) + 3
-  ≡⟨ refl ⟩
-    4 * n + 3
-  ∎
-
-lem-crtr-suf : ∀ ms cs → counts (crtr ms) cs ≡ add 1 1 2 (counts ms cs)
-lem-crtr-suf ms cs = refl
-
-lem-one-mul : ∀ n → 1 * n ≡ n
-lem-one-mul n = +-identityʳ n
-
-lem-two-mul : ∀ n → 2 * n ≡ n + n
-lem-two-mul n =
-  begin
-    2 * n
-  ≡⟨ refl ⟩
-    n + 1 * n
-  ≡⟨ cong (n +_) (lem-one-mul n) ⟩
-    n + n
-  ∎
-
-lem-mul-step : ∀ m k → k + m * k ≡ suc m * k
-lem-mul-step m k = refl
 
 lem-start-suf : ∀ n ms cs → counts (start n ms) cs ≡ add (n + 2) 1 ((n + n) + 1) (counts ms cs)
 lem-start-suf n ms cs =
@@ -226,11 +196,11 @@ lem-loop-suf : ∀ n ms cs → counts (loop n ms) cs ≡ add (n + 2) (n + 2) (4 
 lem-loop-suf n ms cs =
   begin
     counts (loop n ms) cs
-  ≡⟨ refl ⟩
+  ≡⟨⟩
     add 1 0 1 (counts ((crtrr ^ n) (crtr (T ∙ ((Game.r ^ n) ms))) ) cs)
   ≡⟨ cong (add 1 0 1) (lem-crtrr-suf n (crtr (T ∙ ((Game.r ^ n) ms))) cs) ⟩
     add 1 0 1 (add n n (3 * n) (counts (crtr (T ∙ ((Game.r ^ n) ms))) cs))
-  ≡⟨ cong (add 1 0 1) (cong (add n n (3 * n)) (lem-crtr-suf (T ∙ ((Game.r ^ n) ms)) cs)) ⟩
+  ≡⟨⟩
     add 1 0 1 (add n n (3 * n) (add 1 1 2 (counts (T ∙ ((Game.r ^ n) ms)) cs)))
   ≡⟨ cong (add 1 0 1) (cong (add n n (3 * n)) refl) ⟩
     add 1 0 1 (add n n (3 * n) (add 1 1 2 (add 0 1 0 (counts ((Game.r ^ n) ms) cs))))
@@ -247,29 +217,16 @@ lem-loop-suf n ms cs =
     add 1 0 1 (add (n + 1) (n + 2) (3 * n + (n + 2)) (counts ms cs))
   ≡⟨ add-compose 1 0 1 (n + 1) (n + 2) (3 * n + (n + 2)) (counts ms cs) ⟩
     add (1 + (n + 1)) (n + 2) (1 + (3 * n + (n + 2))) (counts ms cs)
-  ≡⟨ cong (λ k → add (1 + (n + 1)) (n + 2) k (counts ms cs))
-       (begin
-          1 + (3 * n + (n + 2))
-        ≡⟨ refl ⟩
-          suc (3 * n + (n + 2))
-        ≡⟨ sym (+-suc (3 * n) (n + 2)) ⟩
-          3 * n + suc (n + 2)
-        ≡⟨ cong (3 * n +_) (sym (+-suc n 2)) ⟩
-          3 * n + (n + 3)
-        ≡⟨ lem-loop-r n ⟩
-          4 * n + 3
-        ∎) ⟩
+  ≡⟨ cong (λ k → add (1 + (n + 1)) (n + 2) k (counts ms cs)) (step₁ n) ⟩
     add (1 + (n + 1)) (n + 2) (4 * n + 3) (counts ms cs)
-  ≡⟨ cong (λ k → add k (n + 2) (4 * n + 3) (counts ms cs))
-       (begin
-          1 + (n + 1)
-        ≡⟨ cong (1 +_) (+-comm n 1) ⟩
-          2 + n
-        ≡⟨ +-comm 2 n ⟩
-          n + 2
-        ∎) ⟩
+  ≡⟨ cong (λ k → add k (n + 2) (4 * n + 3) (counts ms cs)) (step₂ n) ⟩
     add (n + 2) (n + 2) (4 * n + 3) (counts ms cs)
   ∎
+  where
+  step₁ : ∀ n → 1 + (3 * n + (n + 2)) ≡ 4 * n + 3
+  step₁ = Nat.solve-∀
+  step₂ : ∀ n → 1 + (n + 1) ≡ n + 2
+  step₂ = Nat.solve-∀
 
 lem-loop-m-suf : ∀ m n ms cs → counts (((loop n) ^ m) ms) cs ≡ add (m * (n + 2)) (m * (n + 2)) (m * (4 * n + 3)) (counts ms cs)
 lem-loop-m-suf zero    n ms cs = refl
@@ -282,11 +239,7 @@ lem-loop-m-suf (suc m) n ms cs =
     add (n + 2) (n + 2) (4 * n + 3) (add (m * (n + 2)) (m * (n + 2)) (m * (4 * n + 3)) (counts ms cs))
   ≡⟨ add-compose (n + 2) (n + 2) (4 * n + 3) (m * (n + 2)) (m * (n + 2)) (m * (4 * n + 3)) (counts ms cs) ⟩
     add ((n + 2) + m * (n + 2)) ((n + 2) + m * (n + 2)) ((4 * n + 3) + m * (4 * n + 3)) (counts ms cs)
-  ≡⟨ cong (λ k → add k ((n + 2) + m * (n + 2)) ((4 * n + 3) + m * (4 * n + 3)) (counts ms cs)) (lem-mul-step m (n + 2)) ⟩
-    add (suc m * (n + 2)) ((n + 2) + m * (n + 2)) ((4 * n + 3) + m * (4 * n + 3)) (counts ms cs)
-  ≡⟨ cong (λ k → add (suc m * (n + 2)) k ((4 * n + 3) + m * (4 * n + 3)) (counts ms cs)) (lem-mul-step m (n + 2)) ⟩
-    add (suc m * (n + 2)) (suc m * (n + 2)) ((4 * n + 3) + m * (4 * n + 3)) (counts ms cs)
-  ≡⟨ cong (λ k → add (suc m * (n + 2)) (suc m * (n + 2)) k (counts ms cs)) (lem-mul-step m (4 * n + 3)) ⟩
+  ≡⟨⟩
     add (suc m * (n + 2)) (suc m * (n + 2)) (suc m * (4 * n + 3)) (counts ms cs)
   ∎
 
@@ -294,11 +247,11 @@ lem-unravel-suf : ∀ n ms cs → counts (unravel n ms) cs ≡ add 1 (n + 2) (n 
 lem-unravel-suf n ms cs =
   begin
     counts (unravel n ms) cs
-  ≡⟨ refl ⟩
+  ≡⟨⟩
     add 1 0 1 (counts ((tr ^ n) (T ∙ (T ∙ ms))) cs)
   ≡⟨ cong (add 1 0 1) (lem-tr-suf n (T ∙ (T ∙ ms)) cs) ⟩
     add 1 0 1 (add 0 n n (counts (T ∙ (T ∙ ms)) cs))
-  ≡⟨ cong (add 1 0 1) refl ⟩
+  ≡⟨⟩
     add 1 0 1 (add 0 n n (add 0 2 0 (counts ms cs)))
   ≡⟨ cong (add 1 0 1) (add-compose 0 n n 0 2 0 (counts ms cs)) ⟩
     add 1 0 1 (add 0 (n + 2) (n + 0) (counts ms cs))
@@ -309,70 +262,6 @@ lem-unravel-suf n ms cs =
     add 1 (n + 2) (1 + n) (counts ms cs)
   ≡⟨ cong (λ k → add 1 (n + 2) k (counts ms cs)) (+-comm 1 n) ⟩
     add 1 (n + 2) (n + 1) (counts ms cs)
-  ∎
-
-ct-total : ∀ m n → (n + 2) + (m * (n + 2) + 1) ≡ m * (n + 2) + n + 3
-ct-total m n =
-  begin
-    (n + 2) + (m * (n + 2) + 1)
-  ≡⟨ sym (+-assoc (n + 2) (m * (n + 2)) 1) ⟩
-    ((n + 2) + m * (n + 2)) + 1
-  ≡⟨ cong (_+ 1) (+-comm (n + 2) (m * (n + 2))) ⟩
-    (m * (n + 2) + (n + 2)) + 1
-  ≡⟨ +-assoc (m * (n + 2)) (n + 2) 1 ⟩
-    m * (n + 2) + ((n + 2) + 1)
-  ≡⟨ cong (m * (n + 2) +_) (begin
-        (n + 2) + 1
-      ≡⟨ +-assoc n 2 1 ⟩
-        n + (2 + 1)
-      ≡⟨ refl ⟩
-        n + 3
-      ∎) ⟩
-    m * (n + 2) + (n + 3)
-  ≡⟨ sym (+-assoc (m * (n + 2)) n 3) ⟩
-    m * (n + 2) + n + 3
-  ∎
-
-r-total : ∀ m n → ((n + n) + 1) + (m * (4 * n + 3) + (n + 1)) ≡ m * (4 * n + 3) + 3 * n + 2
-r-total m n =
-  begin
-    ((n + n) + 1) + (m * (4 * n + 3) + (n + 1))
-  ≡⟨ sym (+-assoc ((n + n) + 1) (m * (4 * n + 3)) (n + 1)) ⟩
-    (((n + n) + 1) + m * (4 * n + 3)) + (n + 1)
-  ≡⟨ cong (_+ (n + 1)) (+-comm ((n + n) + 1) (m * (4 * n + 3))) ⟩
-    (m * (4 * n + 3) + ((n + n) + 1)) + (n + 1)
-  ≡⟨ +-assoc (m * (4 * n + 3)) ((n + n) + 1) (n + 1) ⟩
-    m * (4 * n + 3) + (((n + n) + 1) + (n + 1))
-  ≡⟨ cong (m * (4 * n + 3) +_) (begin
-        ((n + n) + 1) + (n + 1)
-  ≡⟨ +-assoc (n + n) 1 (n + 1) ⟩
-        (n + n) + (1 + (n + 1))
-      ≡⟨ cong ((n + n) +_) (begin
-           1 + (n + 1)
-         ≡⟨ cong (1 +_) (+-comm n 1) ⟩
-           2 + n
-         ≡⟨ +-comm 2 n ⟩
-           n + 2
-         ∎) ⟩
-        (n + n) + (n + 2)
-      ≡⟨ +-assoc n n (n + 2) ⟩
-        n + (n + (n + 2))
-      ≡⟨ cong (n +_) (sym (+-assoc n n 2)) ⟩
-        n + ((n + n) + 2)
-      ≡⟨ sym (+-assoc n (n + n) 2) ⟩
-        (n + (n + n)) + 2
-      ≡⟨ cong (_+ 2) (begin
-           n + (n + n)
-         ≡⟨ cong (n +_) (sym (lem-two-mul n)) ⟩
-           n + 2 * n
-         ≡⟨ lem-mul-step 2 n ⟩
-           3 * n
-         ∎) ⟩
-        3 * n + 2
-      ∎) ⟩
-    m * (4 * n + 3) + (3 * n + 2)
-  ≡⟨ sym (+-assoc (m * (4 * n + 3)) (3 * n) 2) ⟩
-    m * (4 * n + 3) + 3 * n + 2
   ∎
 
 thm-counts-seq : ∀ m n → CountsSeq.Thm m n
@@ -398,33 +287,19 @@ thm-counts-seq m n =
         (((n + n) + 1) + (m * (4 * n + 3) + (n + 1)))
         zero-counts
   ≡⟨ cong (λ k → add k (1 + (m * (n + 2) + (n + 2))) (((n + n) + 1) + (m * (4 * n + 3) + (n + 1))) zero-counts)
-       (ct-total m n) ⟩
+       (step₁ m n) ⟩
     add (m * (n + 2) + n + 3)
         (1 + (m * (n + 2) + (n + 2)))
         (((n + n) + 1) + (m * (4 * n + 3) + (n + 1)))
         zero-counts
   ≡⟨ cong (λ k → add (m * (n + 2) + n + 3) k (((n + n) + 1) + (m * (4 * n + 3) + (n + 1))) zero-counts)
-       (begin
-          1 + (m * (n + 2) + (n + 2))
-        ≡⟨ refl ⟩
-          suc (m * (n + 2) + (n + 2))
-        ≡⟨ cong suc (+-comm (m * (n + 2)) (n + 2)) ⟩
-          suc ((n + 2) + m * (n + 2))
-       ≡⟨ sym (+-suc (n + 2) (m * (n + 2))) ⟩
-         (n + 2) + suc (m * (n + 2))
-       ≡⟨ cong ((n + 2) +_) (cong suc (sym (+-identityʳ (m * (n + 2))))) ⟩
-         (n + 2) + suc (m * (n + 2) + 0)
-       ≡⟨ cong ((n + 2) +_) (sym (+-suc (m * (n + 2)) 0)) ⟩
-         (n + 2) + (m * (n + 2) + 1)
-       ≡⟨ ct-total m n ⟩
-         m * (n + 2) + n + 3
-       ∎) ⟩
+       (step₂ m n) ⟩
     add (m * (n + 2) + n + 3)
         (m * (n + 2) + n + 3)
         (((n + n) + 1) + (m * (4 * n + 3) + (n + 1)))
         zero-counts
   ≡⟨ cong (λ k → add (m * (n + 2) + n + 3) (m * (n + 2) + n + 3) k zero-counts)
-       (r-total m n) ⟩
+       (step₃ m n) ⟩
     add (m * (n + 2) + n + 3)
         (m * (n + 2) + n + 3)
         (m * (4 * n + 3) + 3 * n + 2)
@@ -432,3 +307,12 @@ thm-counts-seq m n =
   ≡⟨ add-zero (m * (n + 2) + n + 3) (m * (n + 2) + n + 3) (m * (4 * n + 3) + 3 * n + 2) ⟩
     (C: (m * (n + 2) + n + 3) T: (m * (n + 2) + n + 3) R: (m * (4 * n + 3) + 3 * n + 2))
   ∎
+  where
+  step₁ : ∀ m n → (n + 2) + (m * (n + 2) + 1) ≡ m * (n + 2) + n + 3
+  step₁ = Nat.solve-∀
+
+  step₂ : ∀ m n → 1 + (m * (n + 2) + (n + 2)) ≡ m * (n + 2) + n + 3
+  step₂ = Nat.solve-∀
+
+  step₃ : ∀ m n → ((n + n) + 1) + (m * (4 * n + 3) + (n + 1)) ≡ m * (4 * n + 3) + 3 * n + 2
+  step₃ = Nat.solve-∀
