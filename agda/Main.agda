@@ -13,6 +13,7 @@ open import ResourcedSingleTreeGame using (_⨮_; rempty; module RMoves)
 open import Sufficient using (Legal; thm-rmoves)
 open import Counting using (count; C:_T:_R:_; thm-counts-seq)
 import Necessary
+import Approx
 import MultiTreeGame
 
 -- Amortization theorem: pay 3 for each append and tail, then the rotations are also paid for.
@@ -59,12 +60,30 @@ counting : ∀ m n → let
 counting = thm-counts-seq
 
 -- If any possible move sequence is also executable with resource constraints,
--- then kₐ + kₜ ≥ 4.
+
+ResourcedExecutionComplete : (kₐ kₜ : ℕ) → Set
+ResourcedExecutionComplete kₐ kₜ =
+  ∀ ms t
+  → moves ms ε ≡ just t
+  → ∃ λ leftover → RMoves.rmoves kₐ kₜ ms rempty ≡ just (leftover ⨮ t)
+
+-- then kₐ + kₜ ≥ 4 (in ℕ).
 
 necessary
   : ∀ kₐ kₜ
-  → (∀ ms t
-     → moves ms ε ≡ just t
-     → ∃ λ leftover → RMoves.rmoves kₐ kₜ ms rempty ≡ just (leftover ⨮ t))
+  → ResourcedExecutionComplete kₐ kₜ
   → kₐ + kₜ ≥ 4
 necessary = Necessary.thm
+
+-- Lower limit: kₐ + kₜ approximates 4.
+-- This means for all N there is p/q ≤ 1/N such that  kₐ + kₜ ≥ 4 - p/q.
+-- We express the two inequations in terms of ℕ only.
+
+approximation
+  : ∀ kₐ kₜ
+  → ResourcedExecutionComplete kₐ kₜ
+  → ∀ N → ∃ λ p → ∃ λ q
+  → q ≥ N * p
+  × q * (kₐ + kₜ) + p ≥ q * 4
+approximation kₐ kₜ hyp N = p , q , fraction , thm
+  where open Approx kₐ kₜ hyp N

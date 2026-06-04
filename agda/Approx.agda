@@ -1,3 +1,5 @@
+{-# OPTIONS --safe #-}
+
 -- The budget kₐ + kₜ approximates 4.
 -- This means for all 0 < ε < 1 we get kₐ + kₜ + ε ≥ 4.
 -- It is sufficient to show that for all N > 0 we show that there is such ε = p/q ≤ 1/N.
