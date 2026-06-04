@@ -9,6 +9,7 @@ open import Data.Nat.Properties using
   ( +-assoc; +-comm; +-identityʳ; *-distribʳ-+
   ; ≤-refl; ≤-trans; +-monoˡ-≤; +-monoʳ-≤; module ≤-Reasoning)
 import Data.Nat.Solver as Nat
+import Data.Nat.Tactic.RingSolver as Nat
 
 open import Tree using (Tree; ε; _∙_; tail; rotate; Φ)
 open import Game using (Moves; C; R; T; ε; _∙_)
@@ -69,57 +70,21 @@ module RMoves (kₐ kₜ : ℕ) where
     begin
       (r# + r#') + n'                                    ≡⟨ +-assoc r# r#' n' ⟩
       r# + (r#' + n')                                    ≤⟨ +-monoʳ-≤ r# p₂ ⟩
-      r# + (c#' * kₐ + (t#' * kₜ + n₁))                  ≡⟨ lem r# c#' kₐ t#' kₜ n₁ ⟩
+      r# + (c#' * kₐ + (t#' * kₜ + n₁))                  ≡⟨ step₁ r# (c#' * kₐ) (t#' * kₜ) n₁ ⟩
       c#' * kₐ + (t#' * kₜ + (r# + n₁))                  ≤⟨ +-monoʳ-≤ (c#' * kₐ) (+-monoʳ-≤ (t#' * kₜ) p₁) ⟩
-      c#' * kₐ + (t#' * kₜ + (c# * kₐ + (t# * kₜ + n)))  ≡⟨ rhs-compose c# t# c#' t#' n ⟩
+      c#' * kₐ + (t#' * kₜ + (c# * kₐ + (t# * kₜ + n)))  ≡⟨ step₂ kₐ kₜ c# t# c#' t#' n ⟩
       (c# + c#') * kₐ + ((t# + t#') * kₜ + n)
     ∎
     where
-    -- These lemmata could be solved with the ring solver.
+    step₁ : (r c t n : ℕ)
+          → r + (c + (t + n)) ≡ c + (t + (r + n))
+    step₁ = Nat.solve-∀
 
-    lem : ∀ (r# c#' kₐ t#' kₜ n₁ : ℕ)
-        → r# + (c#' * kₐ + (t#' * kₜ + n₁)) ≡ c#' * kₐ + (t#' * kₜ + (r# + n₁))
-    lem r# c#' kₐ t#' kₜ n₁ = let open ≡-Reasoning in
-      begin
-      r# + (c#' * kₐ + (t#' * kₜ + n₁))  ≡⟨ sym (+-assoc r# (c#' * kₐ) (t#' * kₜ + n₁)) ⟩
-      (r# + c#' * kₐ) + (t#' * kₜ + n₁)  ≡⟨ cong (_+ (t#' * kₜ + n₁)) (+-comm r# (c#' * kₐ)) ⟩
-      (c#' * kₐ + r#) + (t#' * kₜ + n₁)  ≡⟨ +-assoc (c#' * kₐ) r# (t#' * kₜ + n₁) ⟩
-      c#' * kₐ + (r# + (t#' * kₜ + n₁))  ≡⟨ cong (c#' * kₐ +_) (sym (+-assoc r# (t#' * kₜ) n₁)) ⟩
-      c#' * kₐ + ((r# + t#' * kₜ) + n₁)  ≡⟨ cong (λ k → c#' * kₐ + (k + n₁)) (+-comm r# (t#' * kₜ)) ⟩
-      c#' * kₐ + ((t#' * kₜ + r#) + n₁)  ≡⟨ cong (c#' * kₐ +_) (+-assoc (t#' * kₜ) r# n₁) ⟩
-      c#' * kₐ + (t#' * kₜ + (r# + n₁))
-      ∎
+    step₂ : (kₐ kₜ c₁ t₁ c₂ t₂ n : ℕ)
+          → c₂ * kₐ + (t₂ * kₜ + (c₁ * kₐ + (t₁ * kₜ + n))) ≡ (c₁ + c₂) * kₐ + ((t₁ + t₂) * kₜ + n)
+    step₂ = Nat.solve-∀
 
-    rhs-compose
-      : ∀ c₁ t₁ c₂ t₂ n
-      → c₂ * kₐ + (t₂ * kₜ + (c₁ * kₐ + (t₁ * kₜ + n)))
-        ≡ (c₁ + c₂) * kₐ + ((t₁ + t₂) * kₜ + n)
-    rhs-compose c₁ t₁ c₂ t₂ n = let open ≡-Reasoning in
-      begin
-        c₂ * kₐ + (t₂ * kₜ + (c₁ * kₐ + (t₁ * kₜ + n)))
-      ≡⟨ cong (c₂ * kₐ +_) (sym (+-assoc (t₂ * kₜ) (c₁ * kₐ) (t₁ * kₜ + n))) ⟩
-        c₂ * kₐ + ((t₂ * kₜ + c₁ * kₐ) + (t₁ * kₜ + n))
-      ≡⟨ cong (λ k → c₂ * kₐ + (k + (t₁ * kₜ + n))) (+-comm (t₂ * kₜ) (c₁ * kₐ)) ⟩
-        c₂ * kₐ + ((c₁ * kₐ + t₂ * kₜ) + (t₁ * kₜ + n))
-      ≡⟨ sym (+-assoc (c₂ * kₐ) (c₁ * kₐ + t₂ * kₜ) (t₁ * kₜ + n)) ⟩
-        (c₂ * kₐ + (c₁ * kₐ + t₂ * kₜ)) + (t₁ * kₜ + n)
-      ≡⟨ cong (_+ (t₁ * kₜ + n)) (sym (+-assoc (c₂ * kₐ) (c₁ * kₐ) (t₂ * kₜ))) ⟩
-        ((c₂ * kₐ + c₁ * kₐ) + t₂ * kₜ) + (t₁ * kₜ + n)
-      ≡⟨ +-assoc (c₂ * kₐ + c₁ * kₐ) (t₂ * kₜ) (t₁ * kₜ + n) ⟩
-        (c₂ * kₐ + c₁ * kₐ) + (t₂ * kₜ + (t₁ * kₜ + n))
-      ≡⟨ cong ((c₂ * kₐ + c₁ * kₐ) +_) (sym (+-assoc (t₂ * kₜ) (t₁ * kₜ) n)) ⟩
-        (c₂ * kₐ + c₁ * kₐ) + ((t₂ * kₜ + t₁ * kₜ) + n)
-      ≡⟨ cong (λ k → k + ((t₂ * kₜ + t₁ * kₜ) + n)) (+-comm (c₂ * kₐ) (c₁ * kₐ)) ⟩
-        (c₁ * kₐ + c₂ * kₐ) + ((t₂ * kₜ + t₁ * kₜ) + n)
-      ≡⟨ cong (λ k → (c₁ * kₐ + c₂ * kₐ) + (k + n)) (+-comm (t₂ * kₜ) (t₁ * kₜ)) ⟩
-        (c₁ * kₐ + c₂ * kₐ) + ((t₁ * kₜ + t₂ * kₜ) + n)
-      ≡⟨ cong (λ k → k + ((t₁ * kₜ + t₂ * kₜ) + n)) (sym (*-distribʳ-+ kₐ c₁ c₂)) ⟩
-        (c₁ + c₂) * kₐ + ((t₁ * kₜ + t₂ * kₜ) + n)
-      ≡⟨ cong (λ k → (c₁ + c₂) * kₐ + (k + n)) (sym (*-distribʳ-+ kₜ t₁ t₂)) ⟩
-        (c₁ + c₂) * kₐ + (((t₁ + t₂) * kₜ) + n)
-      ∎
-
-
+  -- Flip the products so that Agda does not unfold multiplication for given c# and t#.
   thm-counts'
     : ∀ m n t {n' t'} (let (C: c# T: t# R: r#) = count m)
     → rmoves m (n ⨮ t) ≡ just (n' ⨮ t')
