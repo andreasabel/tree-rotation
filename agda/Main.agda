@@ -1,4 +1,4 @@
--- {-# OPTIONS --safe #-}  -- Restore when done
+{-# OPTIONS --safe #-}
 
 -- Agda proofs on optimal constant-time amortization theorem for catenable queues.
 
