@@ -5,7 +5,7 @@
 module MultiTreeGame where
 
 open import Library
-open import Tree using (Tree; ε; _∙_)
+open import Tree using (Tree; ε; _∙_; Resourced; _⨮_)
 
 variable
   l m n : ℕ
@@ -54,28 +54,54 @@ tail i ts with pick i ts
 -- Move sequences.
 
 -- Individual moves pick 0..2 trees, operate on them, and place them back at the front.
-data Move : (m n : ForestSize) → Set where
+data Moves : (m n : ForestSize) → Set where
   -- create a unit tree
-  U : Move m (1 + m)
+  U : Moves m (1 + m)
   -- concatenate two trees (note this is impossible for m=0)
-  C : (i : Fin (1 + m)) (j : Fin m) → Move (1 + m) m
+  C : (i : Fin (1 + m)) (j : Fin m) → Moves (1 + m) m
   -- rotate a tree
-  R : (i : Fin m) → Move m m
+  R : (i : Fin m) → Moves m m
   -- take the tail of a tree
-  T : (i : Fin m) → Move m m
+  T : (i : Fin m) → Moves m m
   -- No moves
-  ε : Move m m
+  ε : Moves m m
   -- Concatenate two move sequences
-  _∙_ : (mv₁ : Move l m) (mv₂ : Move m n) → Move l n
+  _∙_ : (mv₁ : Moves l m) (mv₂ : Moves m n) → Moves l n
 
 -- Executing a move sequence.
 
-run : Move m n → Forest m → Maybe (Forest n)
-run U ts = just (unit ts)
-run (C i j) ts = just (concat i j ts)
-run (R i) ts = rotate i ts
-run (T i) ts = tail i ts
-run ε ts = just ts
-run (mv₁ ∙ mv₂) ts with run mv₁ ts
-... | nothing = nothing
-... | just ts₁ = run mv₂ ts₁
+run : Moves m n → Forest m → Maybe (Forest n)
+run U           = just ∘ unit
+run (C i j)     = just ∘ concat i j
+run (R i)       = rotate i
+run (T i)       = tail i
+run ε           = just
+run (mv₁ ∙ mv₂) = run mv₁ >=> run mv₂
+
+-- Resourced execution
+
+-- A forest with a "bank account".
+
+RF : ForestSize → Set
+RF n = Resourced (Forest n)
+
+-- Initial position: empty forest, empty account.
+
+rempty : RF 0
+rempty = 0 ⨮ []
+
+-- Execute moves on the resourced forest if possible,
+-- for the given budget kₐ for concat and kₜ for tail.
+-- A rotation costs 1 and is thus only executable if the bank account is non-empty.
+-- Creation of empty trees is cost free.
+
+module RMoves (kₐ kₜ : ℕ) where
+
+  rmoves : Moves m n → RF m → Maybe (RF n)
+  rmoves U       (k     ⨮ ts) = just (k ⨮ ε ∷ ts)
+  rmoves (C i j) (k     ⨮ ts) = just (kₐ + k ⨮ concat i j ts)
+  rmoves (T i)   (k     ⨮ ts) = Maybe.map (kₜ + k ⨮_) (tail i ts)
+  rmoves (R i)   (suc k ⨮ ts) = Maybe.map (k ⨮_) (rotate i ts)
+  rmoves (R _)   (zero  ⨮ ts) = nothing
+  rmoves ε        = just
+  rmoves (m ∙ m') = rmoves m >=> rmoves m'
