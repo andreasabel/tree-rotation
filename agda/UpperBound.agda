@@ -64,7 +64,7 @@ open ≤-Reasoning
 
 -- Amortization theorem: pay 3 for each append and tail, then the rotations are also paid for.
 
-amor-append : 2 + Φ l + Φ r ≥ Φ (l ∙ r)
+amor-append : ∀ {l r} → 2 + Φ l + Φ r ≥ Φ (l ∙ r)
 amor-append {l = l} {r = r} =
   begin
     Φ (l ∙ r)

@@ -9,7 +9,7 @@ data Tree : Set where
   _∙_ : (t₁ t₂ : Tree) → Tree
 
 variable
-  l r t t' t₁ t₂ : Tree
+  t t' t₁ t₂ : Tree
 
 rotate : Tree → Maybe Tree
 rotate ((t₁ ∙ t₂) ∙ t₃) = just (t₁ ∙ (t₂ ∙ t₃))

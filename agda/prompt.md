@@ -223,3 +223,11 @@ I filled:
  - thm using the counted sequence instance, a derived arithmetic lemma lem', and two solver-backed equality steps
 
 Approx.agda now typechecks cleanly.
+
+Prompt 10 2026-06-05
+====================
+
+Prove the theorem in Sufficient.agda.
+The proof might be similar than in SufficientSingleTree.agda (formerly called Sufficient.agda).
+However, here we have generalized the C move to concatenate two trees,
+and the arena is a forest rather than a single tree.

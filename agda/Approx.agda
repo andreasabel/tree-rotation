@@ -24,7 +24,7 @@
 -- Given N, with p = 196N + 10 and q = 196N² + 70N + 3 we have Np ≤ q
 -- and (kₐ + kₜ)q + p ≥ 4q thanks to our sequence for m=n=14N.
 
-open import Library
+open import Library hiding (m; n)
 open import Tree using (ε; _⨮_)
 open import SingleTreeGame using (Moves; ε; moves)
 open import Sequence using (seq; thm-seq)

@@ -5,16 +5,19 @@
 module MultiTreeGame where
 
 open import Library
-open import Tree using (Tree; ε; _∙_; Resourced; _⨮_)
-
-variable
-  l m n : ℕ
+open import Tree using (Tree; ε; _∙_; Φ; Resourced; _⨮_)
 
 -- The arena is a vector of trees
 
 ForestSize = ℕ
 
 Forest = Vec Tree
+
+-- Potential
+
+Φs : Forest n → ℕ
+Φs [] = 0
+Φs (t ∷ ts) = Φ t + Φs ts
 
 -- Select a tree from the forest
 

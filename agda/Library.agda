@@ -33,3 +33,8 @@ f ^ suc n = f ∘ (f ^ n)
 ≤1+pred : ∀ n → n ≤ suc (pred n)
 ≤1+pred zero    = z≤n
 ≤1+pred (suc n) = ≤-refl
+
+-- Variables
+
+variable
+  k l m n : ℕ
