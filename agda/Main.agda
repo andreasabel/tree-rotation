@@ -10,7 +10,7 @@ open import UpperBound using (amor-append; amor-tail; amor-rotate)
 open import SingleTreeGame using (ε; move; moves)
 open import Sequence using (seq; thm-seq)
 open import ResourcedSingleTreeGame using (rempty; module RMoves)
-open import Sufficient using (Legal; thm-rmoves)
+open import SufficientSingleTree using (Legal; thm-rmoves)
 open import Counting using (count; C:_T:_R:_; thm-counts-seq)
 import Necessary
 import Approx

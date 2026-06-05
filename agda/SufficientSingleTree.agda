@@ -2,7 +2,7 @@
 
 -- Potential function proves sufficiency of 2,2-budget
 
-module Sufficient where
+module SufficientSingleTree where
 
 open import Library
 open import Data.Nat.Properties using
