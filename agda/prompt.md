@@ -299,3 +299,33 @@ Created agda/CLAUDE.md. It covers:
 ※ recap: Created agda/CLAUDE.md documenting the build command, the 13-module dependency tower from
   Library/Tree up to Main, and the project's proof-style conventions. Next: review the file and adjust any
   sections you want trimmed or expanded.
+
+
+Prompt 12 2026-06-05
+====================
+
+The file Sufficient.agda has an initial attempt to prove `thm-rmoves` there but the proof does not type-check yet.
+Please fix the proof.
+In the end, please clean up, removing unused lemmata in Sufficient.agda if such are present.
+
+Claude Answer
+-------------
+
+The file is clean and typechecks. Summary of the fix:
+
+  1. concat-budget — the original failed because pick-view i ts abstracts pick-view i ts (not pick i ts), so
+  concat's internal with pick i ts stayed stuck. Fixed by:
+    - Adding helper pick-Φ that derives the Φ-equation from a pick i ts ≡ … equation.
+    - Using with pick i ts in pk₁ (and similarly for pick j ts₁), which abstracts the actual expression that
+  concat matches on — making concat i j ts reduce to (t₁ ∙ t₂) ∷ ts₂ in the goal.
+  2. thm-rmoves (T i) — latent error: tail-budget-forest i ts refl required run (T i) ts to reduce at the call
+   site, but with pick i ts didn't propagate the abstraction into the lemma call. Fixed by inlining the bound
+  using pick-Φ i ts pk-i and tail-budget pt.
+  3. thm-rmoves (R i) (suc k) — same latent issue with the inner refl for the rmoves equation. Fixed by with
+  pick i ts in pk-i; with rotate t in pr, then inlining the bound using pick-Φ and rotate-budget. The zero
+  case still uses rotate-budget-forest since that path has no with pick i ts abstraction at the call site.
+  4. Cleanup — removed tail-budget-forest (now unused) and the unused +-identityʳ import.
+
+  agda Main.agda passes with exit code 0, so the whole project still checks.
+
+✻ Crunched for 39m 56s
