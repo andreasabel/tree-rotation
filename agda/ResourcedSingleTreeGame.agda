@@ -5,7 +5,7 @@
 module ResourcedSingleTreeGame where
 
 open import Library
-open import Tree using (Tree; ε; _∙_; tail; rotate; Φ)
+open import Tree using (Tree; ε; _∙_; tail; rotate; Φ; Resourced; _⨮_)
 open import SingleTreeGame using (Moves; C; R; T; ε; _∙_)
 open import Counting using (count; count-compose; C:_T:_R:_)
 
@@ -14,15 +14,6 @@ open import Data.Nat.Properties using
   ; ≤-refl; ≤-trans; +-monoˡ-≤; +-monoʳ-≤; module ≤-Reasoning)
 import Data.Nat.Solver as Nat
 import Data.Nat.Tactic.RingSolver as Nat
-
--- Pair something with a resource (in ℕ).
-
-record Resourced (A : Set) : Set where
-  constructor _⨮_  -- C-x 8 RET 2a2e
-  field
-    resources : ℕ
-    payload   : A
-infixl 4  _⨮_
 
 -- A tree with a "bank account".
 

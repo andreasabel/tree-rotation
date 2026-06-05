@@ -25,10 +25,10 @@
 -- and (kₐ + kₜ)q + p ≥ 4q thanks to our sequence for m=n=14N.
 
 open import Library
-open import Tree using (ε)
+open import Tree using (ε; _⨮_)
 open import SingleTreeGame using (Moves; ε; moves)
 open import Sequence using (seq; thm-seq)
-open import ResourcedSingleTreeGame using (_⨮_; rempty; module RMoves)
+open import ResourcedSingleTreeGame using (rempty; module RMoves)
 open import Counting using (MoveCounts; count; C:_T:_R:_; thm-counts-seq)
 
 open import Data.Nat.Properties using

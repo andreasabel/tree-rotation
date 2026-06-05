@@ -9,7 +9,7 @@ open import Data.Nat.Properties using
   ( +-identityʳ; +-suc; +-assoc; +-comm
   ; ≤-refl; ≤-trans; ≤-pred; +-monoˡ-≤; +-monoʳ-≤; +-cancelʳ-≤; module ≤-Reasoning)
 
-open import Tree using (Tree; ε; _∙_; tail; rotate; Φ)
+open import Tree using (Tree; ε; _∙_; tail; rotate; Φ; _⨮_)
 open import SingleTreeGame using (Moves; C; R; T; ε; _∙_; moves)
 
 open import UpperBound using (amor-append; amor-tail; amor-rotate)
