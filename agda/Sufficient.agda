@@ -9,10 +9,10 @@ open import Data.Nat.Properties using
   ( +-identityʳ; +-suc; +-assoc; +-comm
   ; ≤-refl; ≤-trans; ≤-pred; +-monoˡ-≤; +-monoʳ-≤; +-cancelʳ-≤; module ≤-Reasoning)
 
-open import Tree using (Tree; ε; _∙_; tail; rotate; Φ; _⨮_)
+open import Tree using (Tree; ε; _∙_; tail; rotate; _⨮_)
 
 open import UpperBound using (amor-append; amor-tail; amor-rotate)
-open import MultiTreeGame using (Moves; C; R; T; ε; _∙_; run; module RMoves)
+open import MultiTreeGame using (Forest; Moves; C; R; T; ε; _∙_; run; RF; module RMoves; Φs)
 
 open ≤-Reasoning
 
@@ -25,17 +25,17 @@ open RMoves 2 2
 Legal : Moves m n → RF m → RF n → Set
 Legal mv rf@(k ⨮ ts) rf'@(k' ⨮ ts')
   = rmoves mv rf ≡ just rf'
-  × k' + Φs t ≥ k + Φs t'
+  × k' + Φs ts ≥ k + Φs ts'
 
 -- Goal is to prove this theorem by induction on the moves ms:
 
 Thm-RMoves
-  = ∀ (mv : Moves m n) (ts : Forest m) (t' : Forest n)
-  → moves mv ts ≡ just ts'
+  = ∀ {m n} (mv : Moves m n) (ts : Forest m) (ts' : Forest n)
+  → run mv ts ≡ just ts'
   → ∀ k → k ≥ Φs ts
   → ∃ λ k' → (k' ≥ Φs ts') × Legal mv (k ⨮ ts) (k' ⨮ ts')
 
 -- Theorem: legal move sequences are resource-correct.
 -- Prove by induction on mv:
 thm-rmoves : Thm-RMoves
-thm-rmoves = ?
+thm-rmoves = {!!}

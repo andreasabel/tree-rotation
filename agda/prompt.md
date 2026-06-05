@@ -231,3 +231,38 @@ Prove the theorem in Sufficient.agda.
 The proof might be similar than in SufficientSingleTree.agda (formerly called Sufficient.agda).
 However, here we have generalized the C move to concatenate two trees,
 and the arena is a forest rather than a single tree.
+
+Answer
+------
+
+I can’t prove thm-rmoves in Sufficient.agda without changing the file first, because the current theorem scaffolding is ill-typed.
+
+The issues in the current file are:
+
+ - RF, Forest, and Φs are used but not imported from MultiTreeGame.
+ - Legal uses Φs t and Φs t', but its patterns bind ts and ts'; Φs expects forests, not trees.
+ - Thm-RMoves uses moves mv ts ≡ just ts', but in MultiTreeGame the evaluator is run, not moves.
+ - Thm-RMoves binds (t' : Forest n) but then refers to ts'.
+
+The intended fixes appear to be:
+
+ open import MultiTreeGame using
+   ( Moves; Forest; Φs; RF; C; U; R; T; ε; _∙_; run; module RMoves )
+
+ Legal : Moves m n → RF m → RF n → Set
+ Legal mv (k ⨮ ts) (k' ⨮ ts')
+   = rmoves mv (k ⨮ ts) ≡ just (k' ⨮ ts')
+   × k' + Φs ts ≥ k + Φs ts'
+
+ Thm-RMoves
+   = ∀ (mv : Moves m n) (ts : Forest m) (ts' : Forest n)
+   → run mv ts ≡ just ts'
+   → ∀ k → k ≥ Φs ts
+   → ∃ λ k' → (k' ≥ Φs ts') × Legal mv (k ⨮ ts) (k' ⨮ ts')
+
+Once those are corrected, the proof should indeed closely follow SufficientSingleTree.agda, with extra helper lemmas for how pick/concat affect Φs.
+
+Prompt 11 2026-06-05
+====================
+
+Ok, I applied the fixes, please try again.
