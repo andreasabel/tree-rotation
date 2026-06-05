@@ -19,6 +19,20 @@ tail : Tree → Maybe Tree
 tail (ε ∙ t) = just t
 tail _       = nothing
 
+-- General tools
+
+-- Degenerate tree, left leaning.
+
+left-spine : ℕ → Tree
+left-spine zero    = ε
+left-spine (suc n) = left-spine n ∙ ε
+
+-- Degenerate tree, right leaning.
+
+right-spine : ℕ → Tree
+right-spine zero    = ε
+right-spine (suc n) = ε ∙ right-spine n
+
 -- Potential
 
 Φᵣ : Tree → ℕ

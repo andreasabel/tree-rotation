@@ -5,7 +5,7 @@ module Sequence where
 open import Library
 open import Data.Nat.Properties using (+-suc; +-comm; +-identityʳ)
 
-open import Tree using (Tree; ε; _∙_; tail; rotate)
+open import Tree using (Tree; ε; _∙_; tail; rotate; left-spine; right-spine)
 open import SingleTreeGame
 
 open ≡-Reasoning
