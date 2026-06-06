@@ -373,6 +373,37 @@ Prompt 14 2026-06-06
 I copied the file Approx.agda into RationalApprox.
 The purpose is to port the resourced move execution to one where resources are non-negative rationals (ℚ) rather than natural numbers.
 The file RationalApprox.agda currently does not type-check, since not all definitions have been ported properly to the rationals yet.
-Your task is to do so: to fix definition of Thm and its.
+Your task is to do so: to fix definition of Thm and its proof.
 (See also the TODOs in comments there.)
 Feel free to add any imports you need and remove imports you do not need.
+
+Answer
+------
+
+Done. RationalApprox.agda type-checks cleanly, and agda Main.agda exits 0.
+
+Key changes from Approx.agda → RationalApprox.agda:
+
+Module parameters — added two non-negativity assumptions (kₐ-pos, kₜ-pos) and strengthened hyp to also yield
+ 0ℚ ≤ leftover. Both are needed because over ℚ, adding/positivity reasoning is no longer free.
+
+Imports — hid ℕ's + * ≤ ≥ ≤-refl from Library, brought them back qualified (ℕ+, etc.). Imported ℚ ops via
+Data.Rational(.Properties) and the ℚ ring solver. Reused [_]ℚ and [+]ℚ from RationalSingleTreeGame so the
+embedding stays consistent.
+
+Definitions — p, q stay over ℕ (they're indices). Fraction stays ℕ-valued. Thm is restated in ℚ: [ q ]ℚ *
+(kₐ + kₜ) + [ p ]ℚ ≥ [ q * 4 ]ℚ.
+
+Proofs:
+- fraction uses ℕ's ≤-Reasoning locally via let open ℕP.≤-Reasoning.
+- lem now consumes the new 0ℚ ≤ leftover field to recover [ r# ]ℚ ≤ [ r# ]ℚ + leftover.
+- lem' is identical in spirit but states the same inequality with the c#/t#/r# projections rewritten to
+their closed forms via thm-counts-seq.
+- thm follows the original chain, but adds (a) a cong [_]ℚ/[+]ℚ bridge for step₁ (lifted from ℕ), (b)
+≤-add-right from a *-pos proof showing [ N*28 ]ℚ * (kₐ + kₜ) ≥ 0ℚ, (c) a ℚ-side ring identity step₂' that
+rebuckets (C·kₐ + C·kₜ) + D·(kₐ+kₜ) into (C+D)·(kₐ+kₜ), and (d) a q-as-c+d ℕ identity (q ≡ c#-exp + N·28)
+lifted via cong [_]ℚ ∘ sym and [+]ℚ to bridge [ c#-exp ]ℚ + [ N*28 ]ℚ to [ q ]ℚ.
+
+Helpers added: ≤-add-right, +-pos, *-pos, 0≤1ℚ, []-pos, kₐ+kₜ-pos.
+
+Crunched for 17m 32s
