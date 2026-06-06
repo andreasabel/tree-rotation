@@ -8,10 +8,7 @@ open import Library hiding (_+_; _*_; _≤_)
 open import Data.Nat using () renaming (_+_ to _ℕ+_)
 open import Relation.Binary.PropositionalEquality using (cong₂)
 
-open import Agda.Builtin.Int renaming (pos to ℤfromℕ)
-open import Data.Nat.Coprimality using (1-coprimeTo)
 open import Data.Rational
-open import Data.Rational.Literals using (fromℤ)
 open import Data.Rational.Properties using
   ( +-identityˡ; +-assoc
   ; ≤-reflexive; +-monoʳ-≤; module ≤-Reasoning)
@@ -23,21 +20,10 @@ open import Counting using (count; count-compose; C:_T:_R:_)
 
 -- Embed ℕ into ℚ.
 
-fromℕ : ℕ → ℚ
-fromℕ n = fromℤ (ℤfromℕ n)
--- mkℚ (ℤfromℕ n) 0 (Data.Nat.Coprimality.sym (1-coprimeTo n))
--- fromℕ n = ℤfromℕ n / 1 -- mkℚ (ℤfromℕ n) 0 (Data.Nat.Coprimality.sym (1-coprimeTo n))
-
--- fromℕ-hom : ∀ m n → fromℕ (m ℕ+ n) ≡ fromℕ m + fromℕ n
--- fromℕ-hom zero n = sym (+-identityˡ (fromℕ n))
--- fromℕ-hom (suc m) n = {!!}
-
--- TODO: replace this inductive definition by the more idiomatic fromℕ
 [_]ℚ : ℕ → ℚ
 [ zero  ]ℚ = 0ℚ
 [ suc n ]ℚ = 1ℚ + [ n ]ℚ
 
--- TODO: fix this proof
 [+]ℚ : ∀ a b → [ a ℕ+ b ]ℚ ≡ [ a ]ℚ + [ b ]ℚ
 [+]ℚ zero    b = sym (+-identityˡ [ b ]ℚ)
 [+]ℚ (suc a) b
