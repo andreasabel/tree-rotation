@@ -329,3 +329,13 @@ The file is clean and typechecks. Summary of the fix:
   agda Main.agda passes with exit code 0, so the whole project still checks.
 
 ✻ Crunched for 39m 56s
+
+Prompt 13 2026-06-06
+====================
+
+I copied the file ResourcedSingleTreeGame.agda into RationalSingleTreeGame.
+The purpose is to port the resourced move execution to one where resources are non-negative rationals (ℚ) rather than natural numbers.
+The file ResourcedSingleTreeGame.agda currently does not type-check, since not all definitions have been ported properly to the rationals yet.
+Your task is to do so: to fix definitions and proofs.
+(See also the TODOs in comments there.)
+Feel free to add any imports you need.
