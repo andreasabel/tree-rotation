@@ -77,15 +77,11 @@ Thm = [ q ]ℚ * (kₐ + kₜ) + [ p ]ℚ ≥ [ q ℕ* 4 ]ℚ
 
 -- The proof of Fraction follows by simple ≤-Reasoning over ℕ using the ring solver.
 
-≤-add-right-ℕ : ∀ a b → a ℕ≤ a ℕ+ b
-≤-add-right-ℕ zero    b = z≤n
-≤-add-right-ℕ (suc a) b = s≤s (≤-add-right-ℕ a b)
-
 fraction : Fraction
 fraction = let open ℕP.≤-Reasoning in
   begin
     N ℕ* p
-  ≤⟨ ≤-add-right-ℕ (N ℕ* p) (N ℕ* 60 ℕ+ 3) ⟩
+  ≤⟨ ℕP.m≤m+n (N ℕ* p) (N ℕ* 60 ℕ+ 3) ⟩
     N ℕ* p ℕ+ (N ℕ* 60 ℕ+ 3)
   ≡⟨ step N ⟩
     q

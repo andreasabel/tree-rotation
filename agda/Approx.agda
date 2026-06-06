@@ -33,7 +33,7 @@ open import Counting using (MoveCounts; count; C:_T:_R:_; thm-counts-seq)
 
 open import Data.Nat.Properties using
   ( +-assoc; +-comm; +-identityʳ; *-distribʳ-+
-  ; ≤-refl; ≤-trans; +-monoˡ-≤; +-monoʳ-≤; m≤n+m; module ≤-Reasoning)
+  ; ≤-refl; ≤-trans; +-monoˡ-≤; +-monoʳ-≤; m≤n+m; m≤m+n; module ≤-Reasoning)
 import Data.Nat.Solver as Nat
 import Data.Nat.Tactic.RingSolver as Nat
 
@@ -49,10 +49,6 @@ module Approx
   where
 
 open ≤-Reasoning
-
-≤-add-right : ∀ a b → a ≤ a + b
-≤-add-right zero    b = z≤n
-≤-add-right (suc a) b = s≤s (≤-add-right a b)
 
 p : ℕ
 p = N * 196 + 10
@@ -70,7 +66,7 @@ Thm      = q * (kₐ + kₜ) + p ≥ q * 4
 fraction : Fraction
 fraction = begin
   N * p
-  ≤⟨ ≤-add-right (N * p) (N * 60 + 3) ⟩
+  ≤⟨ m≤m+n (N * p) (N * 60 + 3) ⟩
   N * p + (N * 60 + 3)
   ≡⟨ step N ⟩
   q
@@ -105,7 +101,7 @@ lem with hmv
 ... | leftover , run =
   begin
     r#
-  ≤⟨ ≤-add-right r# leftover ⟩
+  ≤⟨ m≤m+n r# leftover ⟩
     r# + leftover
   ≤⟨ thm-counts mv 0 ε run ⟩
     c# * kₐ + (t# * kₜ + 0)
@@ -138,7 +134,7 @@ thm =
     p + (N * 14 * (4 * (N * 14) + 3) + 3 * (N * 14) + 2)
   ≤⟨ +-monoʳ-≤ p lem' ⟩
     p + ((N * 14 * (N * 14 + 2) + N * 14 + 3) * kₐ + (N * 14 * (N * 14 + 2) + N * 14 + 3) * kₜ)
-  ≤⟨ ≤-add-right
+  ≤⟨ m≤m+n
        (p + ((N * 14 * (N * 14 + 2) + N * 14 + 3) * kₐ + (N * 14 * (N * 14 + 2) + N * 14 + 3) * kₜ))
        (N * 28 * (kₐ + kₜ)) ⟩
     (p + ((N * 14 * (N * 14 + 2) + N * 14 + 3) * kₐ + (N * 14 * (N * 14 + 2) + N * 14 + 3) * kₜ))
