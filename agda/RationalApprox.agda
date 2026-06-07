@@ -205,3 +205,144 @@ thm =
     step : ∀ (kₐ kₜ P C D : ℚ)
          → (P + (C * kₐ + C * kₜ)) + D * (kₐ + kₜ) ≡ (C + D) * (kₐ + kₜ) + P
     step = ℚ.solve-∀
+
+-- A consequence: there is 0 ≤ r < 1/N such that kₐ + kₜ ≥ 4 - r.
+-- We pick r = p/q.
+
+-- Multiplicative homomorphism for the ℕ → ℚ embedding.
+[*]ℚ : ∀ a b → [ a ℕ* b ]ℚ ≡ [ a ]ℚ * [ b ]ℚ
+[*]ℚ zero    b = sym (*-zeroˡ [ b ]ℚ)
+[*]ℚ (suc a) b
+  = trans ([+]ℚ b (a ℕ* b))
+          (trans (cong ([ b ]ℚ +_) ([*]ℚ a b))
+                 (sym (step [ a ]ℚ [ b ]ℚ)))
+  where
+  step : ∀ x y → (1ℚ + x) * y ≡ y + x * y
+  step = ℚ.solve-∀
+
+-- Order-preservation of the ℕ → ℚ embedding.
+[≤]ℚ : ∀ {a b} → a ℕ≤ b → [ a ]ℚ ≤ [ b ]ℚ
+[≤]ℚ {zero}  {b}     z≤n     = []-pos b
+[≤]ℚ {suc a} {suc b} (s≤s p) = +-monoʳ-≤ 1ℚ ([≤]ℚ p)
+
+0<1ℚ : 0ℚ < 1ℚ
+0<1ℚ = *<* (+<+ (s≤s z≤n))
+
+[<]ℚ : ∀ {a b} → a ℕ< b → [ a ]ℚ < [ b ]ℚ
+[<]ℚ {a} {b} sa≤b =
+  begin-strict
+    [ a ]ℚ
+  ≡⟨ sym (+-identityˡ [ a ]ℚ) ⟩
+    0ℚ + [ a ]ℚ
+  <⟨ +-monoˡ-< [ a ]ℚ 0<1ℚ ⟩
+    1ℚ + [ a ]ℚ
+  ≤⟨ [≤]ℚ sa≤b ⟩
+    [ b ]ℚ
+  ∎
+
+-- q is positive.
+q-as-suc : q ≡ suc (N ℕ* N ℕ* 196 ℕ+ N ℕ* 70 ℕ+ 2)
+q-as-suc = ℕP.+-suc (N ℕ* N ℕ* 196 ℕ+ N ℕ* 70) 2
+
+0<q-ℕ : 0 ℕ< q
+0<q-ℕ = subst (0 ℕ<_) (sym q-as-suc) (s≤s z≤n)
+
+[q]-positive : 0ℚ < [ q ]ℚ
+[q]-positive = [<]ℚ 0<q-ℕ
+
+instance
+  Pos-[q] : Positive [ q ]ℚ
+  Pos-[q] = positive [q]-positive
+
+  NZ-[q] : NonZero [ q ]ℚ
+  NZ-[q] = pos⇒nonZero [ q ]ℚ
+
+-- Strict version of fraction.
+Np<q : N ℕ* p ℕ< q
+Np<q = subst (N ℕ* p ℕ<_) q-form (ℕP.m<m+n (N ℕ* p) 0<60N+3)
+  where
+  q-form : N ℕ* p ℕ+ (N ℕ* 60 ℕ+ 3) ≡ q
+  q-form = step N
+    where
+    step : ∀ N → N ℕ* (N ℕ* 196 ℕ+ 10) ℕ+ (N ℕ* 60 ℕ+ 3) ≡ N ℕ* N ℕ* 196 ℕ+ N ℕ* 70 ℕ+ 3
+    step = Nat.solve-∀
+
+  0<60N+3 : 0 ℕ< N ℕ* 60 ℕ+ 3
+  0<60N+3 = subst (0 ℕ<_) (sym (ℕP.+-suc (N ℕ* 60) 2)) (s≤s z≤n)
+
+-- The rational witness r = p/q.
+r : ℚ
+r = [ p ]ℚ ÷ [ q ]ℚ
+
+-- The defining property: r · q = p.
+r*q≡p : r * [ q ]ℚ ≡ [ p ]ℚ
+r*q≡p
+  = trans (*-assoc [ p ]ℚ (1/ [ q ]ℚ) [ q ]ℚ)
+  ( trans (cong ([ p ]ℚ *_) (*-inverseˡ [ q ]ℚ))
+          (*-identityʳ [ p ]ℚ))
+
+0≤r : 0ℚ ≤ r
+0≤r = *-pos ([]-pos p) (<⇒≤ (positive⁻¹ (1/ [ q ]ℚ) {{1/pos⇒pos [ q ]ℚ}}))
+
+-- r * N < 1, i.e., r < 1/N.
+r*N<1 : r * [ N ]ℚ < 1ℚ
+r*N<1 = *-cancelˡ-<-nonNeg [ q ]ℚ {{pos⇒nonNeg [ q ]ℚ}}
+  (begin-strict
+    [ q ]ℚ * (r * [ N ]ℚ)
+  ≡⟨ rearrange [ q ]ℚ r [ N ]ℚ ⟩
+    (r * [ q ]ℚ) * [ N ]ℚ
+  ≡⟨ cong (_* [ N ]ℚ) r*q≡p ⟩
+    [ p ]ℚ * [ N ]ℚ
+  ≡⟨ sym ([*]ℚ p N) ⟩
+    [ p ℕ* N ]ℚ
+  ≡⟨ cong [_]ℚ (ℕP.*-comm p N) ⟩
+    [ N ℕ* p ]ℚ
+  <⟨ [<]ℚ Np<q ⟩
+    [ q ]ℚ
+  ≡⟨ sym (*-identityʳ [ q ]ℚ) ⟩
+    [ q ]ℚ * 1ℚ
+  ∎)
+  where
+  rearrange : ∀ a b c → a * (b * c) ≡ (b * a) * c
+  rearrange = ℚ.solve-∀
+
+-- kₐ + kₜ + r ≥ 4.
+sum+r≥4 : kₐ + kₜ + r ≥ [ 4 ]ℚ
+sum+r≥4 = *-cancelˡ-≤-pos [ q ]ℚ
+  (begin
+    [ q ]ℚ * [ 4 ]ℚ
+  ≡⟨ sym ([*]ℚ q 4) ⟩
+    [ q ℕ* 4 ]ℚ
+  ≤⟨ thm ⟩
+    [ q ]ℚ * (kₐ + kₜ) + [ p ]ℚ
+  ≡⟨ cong ([ q ]ℚ * (kₐ + kₜ) +_) (sym r*q≡p) ⟩
+    [ q ]ℚ * (kₐ + kₜ) + r * [ q ]ℚ
+  ≡⟨ rearrange [ q ]ℚ (kₐ + kₜ) r ⟩
+    [ q ]ℚ * (kₐ + kₜ + r)
+  ∎)
+  where
+  rearrange : ∀ q s r → q * s + r * q ≡ q * (s + r)
+  rearrange = ℚ.solve-∀
+
+-- kₐ + kₜ ≥ 4 - r.
+sum≥4-r : kₐ + kₜ ≥ [ 4 ]ℚ - r
+sum≥4-r =
+  begin
+    [ 4 ]ℚ - r
+  ≤⟨ +-monoˡ-≤ (- r) sum+r≥4 ⟩
+    (kₐ + kₜ + r) + (- r)
+  ≡⟨ rearrange kₐ kₜ r ⟩
+    kₐ + kₜ
+  ∎
+  where
+  rearrange : ∀ a b r → (a + b + r) + (- r) ≡ a + b
+  rearrange = ℚ.solve-∀
+
+-- The headline approximation statement, in the form requested.
+Theorem = ∃ λ (r : ℚ)
+  → 0ℚ ≤ r
+  × r * [ N ]ℚ < 1ℚ
+  × kₐ + kₜ ≥ [ 4 ]ℚ - r
+
+theorem : Theorem
+theorem = r , 0≤r , r*N<1 , sum≥4-r
