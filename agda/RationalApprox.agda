@@ -24,9 +24,9 @@
 -- Given N, with p = 196N + 10 and q = 196N² + 70N + 3 we have Np ≤ q
 -- and (kₐ + kₜ)q + p ≥ 4q thanks to our sequence for m=n=14N.
 
-open import Library hiding (m; n; _+_; _*_; _≤_; _≥_; ≤-refl)
+open import Library hiding (m; n; _+_; _*_; _≤_; _≥_; _<_; _≮_; ≤-refl)
 open import Data.Nat using ()
-  renaming (_+_ to _ℕ+_; _*_ to _ℕ*_; _≤_ to _ℕ≤_; _≥_ to _ℕ≥_)
+  renaming (_+_ to _ℕ+_; _*_ to _ℕ*_; _≤_ to _ℕ≤_; _≥_ to _ℕ≥_; _<_ to _ℕ<_)
 import Data.Nat.Properties as ℕP
 import Data.Nat.Tactic.RingSolver as Nat
 
@@ -37,14 +37,16 @@ open import RationalSingleTreeGame
   using (rempty; module RMoves; [_]ℚ; [+]ℚ; _⨮_)
 open import Counting using (MoveCounts; count; C:_T:_R:_; thm-counts-seq)
 
-open import Data.Integer using (+≤+)
+open import Data.Integer using (+≤+; +<+)
 open import Data.Rational
 open import Data.Rational.Properties using
   ( +-identityˡ; +-identityʳ; +-assoc; +-comm
-  ; *-zeroˡ
-  ; ≤-refl; ≤-reflexive; ≤-trans
-  ; +-mono-≤; +-monoʳ-≤; +-monoˡ-≤
+  ; *-zeroˡ; *-identityʳ; *-comm; *-assoc; *-inverseˡ
+  ; ≤-refl; ≤-reflexive; ≤-trans; <⇒≤; <-≤-trans; ≤-<-trans
+  ; +-mono-≤; +-monoʳ-≤; +-monoˡ-≤; +-monoˡ-<
   ; *-monoʳ-≤-nonNeg
+  ; *-cancelˡ-≤-pos; *-cancelˡ-<-nonNeg
+  ; positive⁻¹; 1/pos⇒pos; pos⇒nonNeg; pos⇒nonZero
   ; module ≤-Reasoning)
 import Data.Rational.Tactic.RingSolver as ℚ
 

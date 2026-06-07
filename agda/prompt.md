@@ -407,3 +407,48 @@ lifted via cong [_]ℚ ∘ sym and [+]ℚ to bridge [ c#-exp ]ℚ + [ N*28 ]ℚ 
 Helpers added: ≤-add-right, +-pos, *-pos, 0≤1ℚ, []-pos, kₐ+kₜ-pos.
 
 Crunched for 17m 32s
+
+
+
+Prompt 15 2026-06-06
+====================
+
+In RationalApprox we have rational versions of
+
+- Fraction = q ≥ N * p
+- Thm      = q * (kₐ + kₜ) + p ≥ q * 4
+
+From this with N = suc N', we can prove for all N':
+There is 0 ≤ r < 1/N such that kₐ + kₜ ≥ 4 - r.
+
+Add this as "Theorem" to RationalApprox and prove this by simple arithmetic manipulation from Fraction and Thm using r = p/q.
+
+Also append this theorem to Main.agda (in the style of the other theorems there).
+
+Answer
+------
+Everything type-checks. Summary:
+
+RationalApprox.agda — added the Theorem (and helpers) at the end:
+
+- Multiplicative homomorphism [*]ℚ, order-preserving lifts [≤]ℚ/[<]ℚ, and 0<1ℚ for the ℕ→ℚ embedding.
+- q-as-suc/0<q-ℕ/[q]-positive, then instance Pos-[q] and NZ-[q] (the latter via pos⇒nonZero so it stays
+definitionally aligned with what 1/pos⇒pos uses).
+- Np<q: strict version of Fraction, since q = Np + (60N+3).
+- r = [ p ]ℚ ÷ [ q ]ℚ and r*q≡p.
+- The three conditions: 0≤r, r*N<1, sum+r≥4 (then sum≥4-r).
+- Theorem = ∃ r → 0ℚ ≤ r × r * [ N ]ℚ < 1ℚ × kₐ + kₜ ≥ [ 4 ]ℚ - r; theorem packages the parts.
+
+Main.agda — added a nested module Approximation-ℚ mirroring the existing approximation:
+
+- ℚ operators are renamed with a ℚ-suffix locally to avoid clashing with the ambient ℕ ops from Library, and
+ rempty/RMoves from RationalSingleTreeGame are renamed to remptyℚ/RMovesℚ to avoid the corresponding ℕ-side
+names already imported.
+- ResourcedExecutionCompleteℚ is the ℚ-resourced version of ResourcedExecutionComplete, requiring 0ℚ ≤
+leftover as well as the run.
+- approximationℚ re-exports RationalApprox.theorem instantiated at the module's suc N', giving the headline
+statement ∃ r → 0 ≤ r × r·(suc N') < 1 × kₐ + kₜ ≥ 4 − r for every N'.
+
+agda Main.agda exits 0.
+
+Cogitated for 28m 22s

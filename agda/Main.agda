@@ -15,6 +15,8 @@ open import Counting using (count; C:_T:_R:_; thm-counts-seq)
 import Necessary
 import Approx
 import MultiTreeGame
+import RationalSingleTreeGame
+import RationalApprox
 
 -- Amortization theorem: pay 3 for each append and tail, then the rotations are also paid for.
 
@@ -87,3 +89,34 @@ approximation
   × q * (kₐ + kₜ) + p ≥ q * 4
 approximation kₐ kₜ hyp N = p , q , fraction , thm
   where open Approx kₐ kₜ hyp N
+
+-- Same statement, sharpened over the rationals:
+-- the budget kₐ + kₜ approximates 4 from below within 1/N for every N ≥ 1.
+
+module Approximation-ℚ where
+  open import Data.Rational using (ℚ; 0ℚ; 1ℚ)
+    renaming (_+_ to _+ℚ_; _*_ to _*ℚ_; _-_ to _-ℚ_
+             ; _≤_ to _≤ℚ_; _≥_ to _≥ℚ_; _<_ to _<ℚ_)
+  open RationalSingleTreeGame using ([_]ℚ; _⨮_)
+    renaming (rempty to remptyℚ; module RMoves to RMovesℚ)
+
+  -- Resource-aware execution completeness over the rationals.
+
+  ResourcedExecutionCompleteℚ : (kₐ kₜ : ℚ) → Set
+  ResourcedExecutionCompleteℚ kₐ kₜ =
+    ∀ ms t
+    → moves ms ε ≡ just t
+    → ∃ λ leftover → 0ℚ ≤ℚ leftover × RMovesℚ.rmoves kₐ kₜ ms remptyℚ ≡ just (leftover ⨮ t)
+
+  -- For every N' there is 0 ≤ r < 1/(suc N') with kₐ + kₜ ≥ 4 - r.
+
+  approximationℚ
+    : ∀ kₐ kₜ
+    → 0ℚ ≤ℚ kₐ → 0ℚ ≤ℚ kₜ
+    → ResourcedExecutionCompleteℚ kₐ kₜ
+    → ∀ N' → ∃ λ (r : ℚ)
+            → 0ℚ ≤ℚ r
+            × r *ℚ [ suc N' ]ℚ <ℚ 1ℚ
+            × kₐ +ℚ kₜ ≥ℚ [ 4 ]ℚ -ℚ r
+  approximationℚ kₐ kₜ kₐ-pos kₜ-pos hyp N' = theorem
+    where open RationalApprox kₐ kₜ kₐ-pos kₜ-pos hyp (suc N')
