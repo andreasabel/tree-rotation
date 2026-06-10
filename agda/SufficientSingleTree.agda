@@ -5,16 +5,14 @@
 module SufficientSingleTree where
 
 open import Library
-open import Data.Nat.Properties using
-  ( +-identityʳ; +-suc; +-assoc; +-comm
-  ; ≤-refl; ≤-trans; ≤-pred; +-monoˡ-≤; +-monoʳ-≤; +-cancelʳ-≤; module ≤-Reasoning)
-
-open import Tree using (Tree; ε; _∙_; tail; rotate; Φ; _⨮_)
+open import Tree using (Tree; ε; _∙_; tail; rotate; _⨮_; module Potential)
 open import SingleTreeGame using (Moves; C; R; T; ε; _∙_; moves)
 
 open import UpperBound using (amor-append; amor-tail; amor-rotate)
 open import ResourcedSingleTreeGame
 
+open ℕ
+open Potential
 open ≤-Reasoning
 
 open RMoves 2 2

@@ -4,8 +4,7 @@
 
 module RationalSingleTreeGame where
 
-open import Library hiding (_+_; _*_; _≤_)
-open import Data.Nat using () renaming (_+_ to _ℕ+_)
+open import Library
 open import Relation.Binary.PropositionalEquality using (cong₂)
 
 open import Data.Rational
@@ -24,7 +23,7 @@ open import Counting using (count; count-compose; C:_T:_R:_)
 [ zero  ]ℚ = 0ℚ
 [ suc n ]ℚ = 1ℚ + [ n ]ℚ
 
-[+]ℚ : ∀ a b → [ a ℕ+ b ]ℚ ≡ [ a ]ℚ + [ b ]ℚ
+[+]ℚ : ∀ a b → [ a ℕ.+ b ]ℚ ≡ [ a ]ℚ + [ b ]ℚ
 [+]ℚ zero    b = sym (+-identityˡ [ b ]ℚ)
 [+]ℚ (suc a) b
   = trans (cong (1ℚ +_) ([+]ℚ a b))
@@ -111,7 +110,7 @@ module RMoves (kₐ kₜ : ℚ) where
       open ≤-Reasoning
     in
     begin
-      [ r# ℕ+ r#' ]ℚ + q'
+      [ r# ℕ.+ r#' ]ℚ + q'
     ≡⟨ cong (_+ q') ([+]ℚ r# r#') ⟩
       ([ r# ]ℚ + [ r#' ]ℚ) + q'
     ≡⟨ +-assoc [ r# ]ℚ [ r#' ]ℚ q' ⟩
@@ -126,7 +125,7 @@ module RMoves (kₐ kₜ : ℚ) where
       ([ c# ]ℚ + [ c#' ]ℚ) * kₐ + (([ t# ]ℚ + [ t#' ]ℚ) * kₜ + q)
     ≡⟨ cong₂ (λ a b → a * kₐ + (b * kₜ + q))
              (sym ([+]ℚ c# c#')) (sym ([+]ℚ t# t#')) ⟩
-      [ c# ℕ+ c#' ]ℚ * kₐ + ([ t# ℕ+ t#' ]ℚ * kₜ + q)
+      [ c# ℕ.+ c#' ]ℚ * kₐ + ([ t# ℕ.+ t#' ]ℚ * kₜ + q)
     ∎
     where
     step₁ : (r c t q : ℚ) → r + (c + (t + q)) ≡ c + (t + (r + q))

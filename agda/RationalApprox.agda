@@ -24,12 +24,7 @@
 -- Given N, with p = 196N + 10 and q = 196N² + 70N + 3 we have Np ≤ q
 -- and (kₐ + kₜ)q + p ≥ 4q thanks to our sequence for m=n=14N.
 
-open import Library hiding (m; n; _+_; _*_; _≤_; _≥_; _<_; _≮_; ≤-refl)
-open import Data.Nat using ()
-  renaming (_+_ to _ℕ+_; _*_ to _ℕ*_; _≤_ to _ℕ≤_; _≥_ to _ℕ≥_; _<_ to _ℕ<_)
-import Data.Nat.Properties as ℕP
-import Data.Nat.Tactic.RingSolver as Nat
-
+open import Library hiding (m; n)
 open import Tree using (ε)
 open import SingleTreeGame using (Moves; ε; moves)
 open import Sequence using (seq; thm-seq)
@@ -50,6 +45,8 @@ open import Data.Rational.Properties using
   ; module ≤-Reasoning)
 import Data.Rational.Tactic.RingSolver as ℚ
 
+open ℕ using (z≤n; s≤s)
+
 module RationalApprox
   -- Budget for concat and tail.
   (kₐ kₜ : ℚ)
@@ -66,39 +63,39 @@ module RationalApprox
   where
 
 p : ℕ
-p = N ℕ* 196 ℕ+ 10
+p = N ℕ.* 196 ℕ.+ 10
 
 q : ℕ
-q = N ℕ* N ℕ* 196 ℕ+ N ℕ* 70 ℕ+ 3
+q = N ℕ.* N ℕ.* 196 ℕ.+ N ℕ.* 70 ℕ.+ 3
 
 -- We are showing these two theorems:
 
-Fraction = q ℕ≥ N ℕ* p
+Fraction = q ℕ.≥ N ℕ.* p
 
-Thm = [ q ]ℚ * (kₐ + kₜ) + [ p ]ℚ ≥ [ q ℕ* 4 ]ℚ
+Thm = [ q ]ℚ * (kₐ + kₜ) + [ p ]ℚ ≥ [ q ℕ.* 4 ]ℚ
 
 -- The proof of Fraction follows by simple ≤-Reasoning over ℕ using the ring solver.
 
 fraction : Fraction
-fraction = let open ℕP.≤-Reasoning in
+fraction = let open ℕ.≤-Reasoning in
   begin
-    N ℕ* p
-  ≤⟨ ℕP.m≤m+n (N ℕ* p) (N ℕ* 60 ℕ+ 3) ⟩
-    N ℕ* p ℕ+ (N ℕ* 60 ℕ+ 3)
+    N ℕ.* p
+  ≤⟨ ℕ.m≤m+n (N ℕ.* p) (N ℕ.* 60 ℕ.+ 3) ⟩
+    N ℕ.* p ℕ.+ (N ℕ.* 60 ℕ.+ 3)
   ≡⟨ step N ⟩
     q
   ∎
   where
-  step : ∀ N → N ℕ* (N ℕ* 196 ℕ+ 10) ℕ+ (N ℕ* 60 ℕ+ 3) ≡ N ℕ* N ℕ* 196 ℕ+ N ℕ* 70 ℕ+ 3
-  step = Nat.solve-∀
+  step : ∀ N → N ℕ.* (N ℕ.* 196 ℕ.+ 10) ℕ.+ (N ℕ.* 60 ℕ.+ 3) ≡ N ℕ.* N ℕ.* 196 ℕ.+ N ℕ.* 70 ℕ.+ 3
+  step = ℕ.solve-∀
 
 -- For the proof of Thm we use the move sequence instantiated to m = n = N * 14.
 
 m : ℕ
-m = N ℕ* 14
+m = N ℕ.* 14
 
 n : ℕ
-n = N ℕ* 14
+n = N ℕ.* 14
 
 mv : Moves
 mv = seq m n ε
@@ -149,54 +146,54 @@ lem with hmv
   ∎
 
 -- lem' : Same as lem but with c#, t#, r# spelled out via the closed form from thm-counts-seq.
-lem' : [ N ℕ* 14 ℕ* (N ℕ* 14 ℕ+ 2) ℕ+ N ℕ* 14 ℕ+ 3 ]ℚ * kₐ
-     + [ N ℕ* 14 ℕ* (N ℕ* 14 ℕ+ 2) ℕ+ N ℕ* 14 ℕ+ 3 ]ℚ * kₜ
-     ≥ [ N ℕ* 14 ℕ* (4 ℕ* (N ℕ* 14) ℕ+ 3) ℕ+ 3 ℕ* (N ℕ* 14) ℕ+ 2 ]ℚ
+lem' : [ N ℕ.* 14 ℕ.* (N ℕ.* 14 ℕ.+ 2) ℕ.+ N ℕ.* 14 ℕ.+ 3 ]ℚ * kₐ
+     + [ N ℕ.* 14 ℕ.* (N ℕ.* 14 ℕ.+ 2) ℕ.+ N ℕ.* 14 ℕ.+ 3 ]ℚ * kₜ
+     ≥ [ N ℕ.* 14 ℕ.* (4 ℕ.* (N ℕ.* 14) ℕ.+ 3) ℕ.+ 3 ℕ.* (N ℕ.* 14) ℕ.+ 2 ]ℚ
 lem' =
   begin
-    [ N ℕ* 14 ℕ* (4 ℕ* (N ℕ* 14) ℕ+ 3) ℕ+ 3 ℕ* (N ℕ* 14) ℕ+ 2 ]ℚ
+    [ N ℕ.* 14 ℕ.* (4 ℕ.* (N ℕ.* 14) ℕ.+ 3) ℕ.+ 3 ℕ.* (N ℕ.* 14) ℕ.+ 2 ]ℚ
   ≡⟨ sym (cong (λ x → [ MoveCounts.r# x ]ℚ) (thm-counts-seq m n)) ⟩
     [ r# ]ℚ
   ≤⟨ lem ⟩
     [ c# ]ℚ * kₐ + [ t# ]ℚ * kₜ
   ≡⟨ cong (λ x → [ MoveCounts.c# x ]ℚ * kₐ + [ MoveCounts.t# x ]ℚ * kₜ) (thm-counts-seq m n) ⟩
-    [ N ℕ* 14 ℕ* (N ℕ* 14 ℕ+ 2) ℕ+ N ℕ* 14 ℕ+ 3 ]ℚ * kₐ
-    + [ N ℕ* 14 ℕ* (N ℕ* 14 ℕ+ 2) ℕ+ N ℕ* 14 ℕ+ 3 ]ℚ * kₜ
+    [ N ℕ.* 14 ℕ.* (N ℕ.* 14 ℕ.+ 2) ℕ.+ N ℕ.* 14 ℕ.+ 3 ]ℚ * kₐ
+    + [ N ℕ.* 14 ℕ.* (N ℕ.* 14 ℕ.+ 2) ℕ.+ N ℕ.* 14 ℕ.+ 3 ]ℚ * kₜ
   ∎
 
 -- Use lem' to show Thm.
 thm : Thm
 thm =
   begin
-    [ q ℕ* 4 ]ℚ
+    [ q ℕ.* 4 ]ℚ
   ≡⟨ cong [_]ℚ (step₁ N) ⟩
-    [ p ℕ+ (N ℕ* 14 ℕ* (4 ℕ* (N ℕ* 14) ℕ+ 3) ℕ+ 3 ℕ* (N ℕ* 14) ℕ+ 2) ]ℚ
-  ≡⟨ [+]ℚ p (N ℕ* 14 ℕ* (4 ℕ* (N ℕ* 14) ℕ+ 3) ℕ+ 3 ℕ* (N ℕ* 14) ℕ+ 2) ⟩
-    [ p ]ℚ + [ N ℕ* 14 ℕ* (4 ℕ* (N ℕ* 14) ℕ+ 3) ℕ+ 3 ℕ* (N ℕ* 14) ℕ+ 2 ]ℚ
+    [ p ℕ.+ (N ℕ.* 14 ℕ.* (4 ℕ.* (N ℕ.* 14) ℕ.+ 3) ℕ.+ 3 ℕ.* (N ℕ.* 14) ℕ.+ 2) ]ℚ
+  ≡⟨ [+]ℚ p (N ℕ.* 14 ℕ.* (4 ℕ.* (N ℕ.* 14) ℕ.+ 3) ℕ.+ 3 ℕ.* (N ℕ.* 14) ℕ.+ 2) ⟩
+    [ p ]ℚ + [ N ℕ.* 14 ℕ.* (4 ℕ.* (N ℕ.* 14) ℕ.+ 3) ℕ.+ 3 ℕ.* (N ℕ.* 14) ℕ.+ 2 ]ℚ
   ≤⟨ +-monoʳ-≤ [ p ]ℚ lem' ⟩
-    [ p ]ℚ + ([ N ℕ* 14 ℕ* (N ℕ* 14 ℕ+ 2) ℕ+ N ℕ* 14 ℕ+ 3 ]ℚ * kₐ
-              + [ N ℕ* 14 ℕ* (N ℕ* 14 ℕ+ 2) ℕ+ N ℕ* 14 ℕ+ 3 ]ℚ * kₜ)
-  ≤⟨ ≤-add-right (*-pos ([]-pos (N ℕ* 28)) kₐ+kₜ-pos) ⟩
-    ([ p ]ℚ + ([ N ℕ* 14 ℕ* (N ℕ* 14 ℕ+ 2) ℕ+ N ℕ* 14 ℕ+ 3 ]ℚ * kₐ
-               + [ N ℕ* 14 ℕ* (N ℕ* 14 ℕ+ 2) ℕ+ N ℕ* 14 ℕ+ 3 ]ℚ * kₜ))
-      + [ N ℕ* 28 ]ℚ * (kₐ + kₜ)
-  ≡⟨ step₂' [ p ]ℚ [ N ℕ* 14 ℕ* (N ℕ* 14 ℕ+ 2) ℕ+ N ℕ* 14 ℕ+ 3 ]ℚ [ N ℕ* 28 ]ℚ ⟩
-    ([ N ℕ* 14 ℕ* (N ℕ* 14 ℕ+ 2) ℕ+ N ℕ* 14 ℕ+ 3 ]ℚ + [ N ℕ* 28 ]ℚ) * (kₐ + kₜ) + [ p ]ℚ
+    [ p ]ℚ + ([ N ℕ.* 14 ℕ.* (N ℕ.* 14 ℕ.+ 2) ℕ.+ N ℕ.* 14 ℕ.+ 3 ]ℚ * kₐ
+              + [ N ℕ.* 14 ℕ.* (N ℕ.* 14 ℕ.+ 2) ℕ.+ N ℕ.* 14 ℕ.+ 3 ]ℚ * kₜ)
+  ≤⟨ ≤-add-right (*-pos ([]-pos (N ℕ.* 28)) kₐ+kₜ-pos) ⟩
+    ([ p ]ℚ + ([ N ℕ.* 14 ℕ.* (N ℕ.* 14 ℕ.+ 2) ℕ.+ N ℕ.* 14 ℕ.+ 3 ]ℚ * kₐ
+               + [ N ℕ.* 14 ℕ.* (N ℕ.* 14 ℕ.+ 2) ℕ.+ N ℕ.* 14 ℕ.+ 3 ]ℚ * kₜ))
+      + [ N ℕ.* 28 ]ℚ * (kₐ + kₜ)
+  ≡⟨ step₂' [ p ]ℚ [ N ℕ.* 14 ℕ.* (N ℕ.* 14 ℕ.+ 2) ℕ.+ N ℕ.* 14 ℕ.+ 3 ]ℚ [ N ℕ.* 28 ]ℚ ⟩
+    ([ N ℕ.* 14 ℕ.* (N ℕ.* 14 ℕ.+ 2) ℕ.+ N ℕ.* 14 ℕ.+ 3 ]ℚ + [ N ℕ.* 28 ]ℚ) * (kₐ + kₜ) + [ p ]ℚ
   ≡⟨ cong (λ x → x * (kₐ + kₜ) + [ p ]ℚ)
-       (sym ([+]ℚ (N ℕ* 14 ℕ* (N ℕ* 14 ℕ+ 2) ℕ+ N ℕ* 14 ℕ+ 3) (N ℕ* 28))) ⟩
-    [ (N ℕ* 14 ℕ* (N ℕ* 14 ℕ+ 2) ℕ+ N ℕ* 14 ℕ+ 3) ℕ+ N ℕ* 28 ]ℚ * (kₐ + kₜ) + [ p ]ℚ
+       (sym ([+]ℚ (N ℕ.* 14 ℕ.* (N ℕ.* 14 ℕ.+ 2) ℕ.+ N ℕ.* 14 ℕ.+ 3) (N ℕ.* 28))) ⟩
+    [ (N ℕ.* 14 ℕ.* (N ℕ.* 14 ℕ.+ 2) ℕ.+ N ℕ.* 14 ℕ.+ 3) ℕ.+ N ℕ.* 28 ]ℚ * (kₐ + kₜ) + [ p ]ℚ
   ≡⟨ cong (λ x → [ x ]ℚ * (kₐ + kₜ) + [ p ]ℚ) (sym (q-as-c+d N)) ⟩
     [ q ]ℚ * (kₐ + kₜ) + [ p ]ℚ
   ∎
   where
-  step₁ : ∀ N → (N ℕ* N ℕ* 196 ℕ+ N ℕ* 70 ℕ+ 3) ℕ* 4
-              ≡ (N ℕ* 196 ℕ+ 10)
-                ℕ+ (N ℕ* 14 ℕ* (4 ℕ* (N ℕ* 14) ℕ+ 3) ℕ+ 3 ℕ* (N ℕ* 14) ℕ+ 2)
-  step₁ = Nat.solve-∀
+  step₁ : ∀ N → (N ℕ.* N ℕ.* 196 ℕ.+ N ℕ.* 70 ℕ.+ 3) ℕ.* 4
+              ≡ (N ℕ.* 196 ℕ.+ 10)
+                ℕ.+ (N ℕ.* 14 ℕ.* (4 ℕ.* (N ℕ.* 14) ℕ.+ 3) ℕ.+ 3 ℕ.* (N ℕ.* 14) ℕ.+ 2)
+  step₁ = ℕ.solve-∀
 
-  q-as-c+d : ∀ N → N ℕ* N ℕ* 196 ℕ+ N ℕ* 70 ℕ+ 3
-                 ≡ (N ℕ* 14 ℕ* (N ℕ* 14 ℕ+ 2) ℕ+ N ℕ* 14 ℕ+ 3) ℕ+ N ℕ* 28
-  q-as-c+d = Nat.solve-∀
+  q-as-c+d : ∀ N → N ℕ.* N ℕ.* 196 ℕ.+ N ℕ.* 70 ℕ.+ 3
+                 ≡ (N ℕ.* 14 ℕ.* (N ℕ.* 14 ℕ.+ 2) ℕ.+ N ℕ.* 14 ℕ.+ 3) ℕ.+ N ℕ.* 28
+  q-as-c+d = ℕ.solve-∀
 
   step₂' : ∀ (P C D : ℚ)
          → (P + (C * kₐ + C * kₜ)) + D * (kₐ + kₜ) ≡ (C + D) * (kₐ + kₜ) + P
@@ -210,10 +207,10 @@ thm =
 -- We pick r = p/q.
 
 -- Multiplicative homomorphism for the ℕ → ℚ embedding.
-[*]ℚ : ∀ a b → [ a ℕ* b ]ℚ ≡ [ a ]ℚ * [ b ]ℚ
+[*]ℚ : ∀ a b → [ a ℕ.* b ]ℚ ≡ [ a ]ℚ * [ b ]ℚ
 [*]ℚ zero    b = sym (*-zeroˡ [ b ]ℚ)
 [*]ℚ (suc a) b
-  = trans ([+]ℚ b (a ℕ* b))
+  = trans ([+]ℚ b (a ℕ.* b))
           (trans (cong ([ b ]ℚ +_) ([*]ℚ a b))
                  (sym (step [ a ]ℚ [ b ]ℚ)))
   where
@@ -221,14 +218,14 @@ thm =
   step = ℚ.solve-∀
 
 -- Order-preservation of the ℕ → ℚ embedding.
-[≤]ℚ : ∀ {a b} → a ℕ≤ b → [ a ]ℚ ≤ [ b ]ℚ
+[≤]ℚ : ∀ {a b} → a ℕ.≤ b → [ a ]ℚ ≤ [ b ]ℚ
 [≤]ℚ {zero}  {b}     z≤n     = []-pos b
 [≤]ℚ {suc a} {suc b} (s≤s p) = +-monoʳ-≤ 1ℚ ([≤]ℚ p)
 
 0<1ℚ : 0ℚ < 1ℚ
 0<1ℚ = *<* (+<+ (s≤s z≤n))
 
-[<]ℚ : ∀ {a b} → a ℕ< b → [ a ]ℚ < [ b ]ℚ
+[<]ℚ : ∀ {a b} → a ℕ.< b → [ a ]ℚ < [ b ]ℚ
 [<]ℚ {a} {b} sa≤b =
   begin-strict
     [ a ]ℚ
@@ -241,11 +238,11 @@ thm =
   ∎
 
 -- q is positive.
-q-as-suc : q ≡ suc (N ℕ* N ℕ* 196 ℕ+ N ℕ* 70 ℕ+ 2)
-q-as-suc = ℕP.+-suc (N ℕ* N ℕ* 196 ℕ+ N ℕ* 70) 2
+q-as-suc : q ≡ suc (N ℕ.* N ℕ.* 196 ℕ.+ N ℕ.* 70 ℕ.+ 2)
+q-as-suc = ℕ.+-suc (N ℕ.* N ℕ.* 196 ℕ.+ N ℕ.* 70) 2
 
-0<q-ℕ : 0 ℕ< q
-0<q-ℕ = subst (0 ℕ<_) (sym q-as-suc) (s≤s z≤n)
+0<q-ℕ : 0 ℕ.< q
+0<q-ℕ = subst (0 ℕ.<_) (sym q-as-suc) (s≤s z≤n)
 
 [q]-positive : 0ℚ < [ q ]ℚ
 [q]-positive = [<]ℚ 0<q-ℕ
@@ -258,17 +255,17 @@ instance
   NZ-[q] = pos⇒nonZero [ q ]ℚ
 
 -- Strict version of fraction.
-Np<q : N ℕ* p ℕ< q
-Np<q = subst (N ℕ* p ℕ<_) q-form (ℕP.m<m+n (N ℕ* p) 0<60N+3)
+Np<q : N ℕ.* p ℕ.< q
+Np<q = subst (N ℕ.* p ℕ.<_) q-form (ℕ.m<m+n (N ℕ.* p) 0<60N+3)
   where
-  q-form : N ℕ* p ℕ+ (N ℕ* 60 ℕ+ 3) ≡ q
+  q-form : N ℕ.* p ℕ.+ (N ℕ.* 60 ℕ.+ 3) ≡ q
   q-form = step N
     where
-    step : ∀ N → N ℕ* (N ℕ* 196 ℕ+ 10) ℕ+ (N ℕ* 60 ℕ+ 3) ≡ N ℕ* N ℕ* 196 ℕ+ N ℕ* 70 ℕ+ 3
-    step = Nat.solve-∀
+    step : ∀ N → N ℕ.* (N ℕ.* 196 ℕ.+ 10) ℕ.+ (N ℕ.* 60 ℕ.+ 3) ≡ N ℕ.* N ℕ.* 196 ℕ.+ N ℕ.* 70 ℕ.+ 3
+    step = ℕ.solve-∀
 
-  0<60N+3 : 0 ℕ< N ℕ* 60 ℕ+ 3
-  0<60N+3 = subst (0 ℕ<_) (sym (ℕP.+-suc (N ℕ* 60) 2)) (s≤s z≤n)
+  0<60N+3 : 0 ℕ.< N ℕ.* 60 ℕ.+ 3
+  0<60N+3 = subst (0 ℕ.<_) (sym (ℕ.+-suc (N ℕ.* 60) 2)) (s≤s z≤n)
 
 -- The rational witness r = p/q.
 r : ℚ
@@ -294,9 +291,9 @@ r*N<1 = *-cancelˡ-<-nonNeg [ q ]ℚ {{pos⇒nonNeg [ q ]ℚ}}
   ≡⟨ cong (_* [ N ]ℚ) r*q≡p ⟩
     [ p ]ℚ * [ N ]ℚ
   ≡⟨ sym ([*]ℚ p N) ⟩
-    [ p ℕ* N ]ℚ
-  ≡⟨ cong [_]ℚ (ℕP.*-comm p N) ⟩
-    [ N ℕ* p ]ℚ
+    [ p ℕ.* N ]ℚ
+  ≡⟨ cong [_]ℚ (ℕ.*-comm p N) ⟩
+    [ N ℕ.* p ]ℚ
   <⟨ [<]ℚ Np<q ⟩
     [ q ]ℚ
   ≡⟨ sym (*-identityʳ [ q ]ℚ) ⟩
@@ -312,7 +309,7 @@ sum+r≥4 = *-cancelˡ-≤-pos [ q ]ℚ
   (begin
     [ q ]ℚ * [ 4 ]ℚ
   ≡⟨ sym ([*]ℚ q 4) ⟩
-    [ q ℕ* 4 ]ℚ
+    [ q ℕ.* 4 ]ℚ
   ≤⟨ thm ⟩
     [ q ]ℚ * (kₐ + kₜ) + [ p ]ℚ
   ≡⟨ cong ([ q ]ℚ * (kₐ + kₜ) +_) (sym r*q≡p) ⟩

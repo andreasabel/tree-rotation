@@ -3,9 +3,10 @@
 module UpperBound where
 
 open import Library
-open import Data.Nat.Properties
 open import Tree
 
+open ℕ
+open Potential
 open ≤-Reasoning
 
 -- Φₗ sandwiched by Φᵣ:  Φᵣ ≤ Φₗ ≤ 1 + Φᵣ

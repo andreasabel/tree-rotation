@@ -25,11 +25,7 @@ module Necessary
   -- Number of T moves t# = 27
   where
 
-open import Data.Nat.Properties using
-  ( +-identityʳ; *-comm
-  ; *-monoˡ-≤ ; *-monoʳ-≤; ≤-refl; *-distribˡ-+; *-distribʳ-+; m≤n+m; n≮n; ≮⇒≥
-  ; module ≤-Reasoning
-  )
+open ℕ
 open ≤-Reasoning
 
 open RMoves kₐ kₜ

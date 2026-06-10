@@ -5,15 +5,13 @@
 module Sufficient where
 
 open import Library
-open import Data.Nat.Properties using
-  ( +-suc; +-assoc; +-comm
-  ; ≤-refl; ≤-trans; ≤-pred; +-monoˡ-≤; +-monoʳ-≤; +-cancelʳ-≤; module ≤-Reasoning)
-
-open import Tree using (Tree; ε; _∙_; Φ; tail; rotate; _⨮_)
+open import Tree using (Tree; ε; _∙_; tail; rotate; _⨮_; module Potential)
 
 open import UpperBound using (amor-append; amor-tail; amor-rotate)
 open import MultiTreeGame using (Forest; Moves; U; C; R; T; ε; _∙_; run; RF; module RMoves; Φs; pick; concat)
 
+open ℕ
+open Potential
 open ≤-Reasoning
 
 open RMoves 2 2

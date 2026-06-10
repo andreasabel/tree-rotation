@@ -31,12 +31,6 @@ open import Sequence using (seq; thm-seq)
 open import ResourcedSingleTreeGame using (rempty; module RMoves)
 open import Counting using (MoveCounts; count; C:_T:_R:_; thm-counts-seq)
 
-open import Data.Nat.Properties using
-  ( +-assoc; +-comm; +-identityʳ; *-distribʳ-+
-  ; ≤-refl; ≤-trans; +-monoˡ-≤; +-monoʳ-≤; m≤n+m; m≤m+n; module ≤-Reasoning)
-import Data.Nat.Solver as Nat
-import Data.Nat.Tactic.RingSolver as Nat
-
 module Approx
   -- Budget for concat and tail.
   (kₐ kₜ : ℕ)
@@ -48,6 +42,7 @@ module Approx
   (N : ℕ)
   where
 
+open ℕ
 open ≤-Reasoning
 
 p : ℕ
@@ -75,7 +70,7 @@ fraction = begin
   open ≤-Reasoning
 
   step : ∀ N → N * (N * 196 + 10) + (N * 60 + 3) ≡ N * N * 196 + N * 70 + 3
-  step = Nat.solve-∀
+  step = ℕ.solve-∀
 
 -- For the proof of Thm we use the move sequence instantiated to m = n = N * 14.
 
@@ -146,11 +141,11 @@ thm =
   open ≤-Reasoning
 
   step₁ : ∀ N → (N * N * 196 + N * 70 + 3) * 4 ≡ (N * 196 + 10) + (N * 14 * (4 * (N * 14) + 3) + 3 * (N * 14) + 2)
-  step₁ = Nat.solve-∀
+  step₁ = ℕ.solve-∀
 
   step₂
     : ∀ N kₐ kₜ
     → ((N * 196 + 10) + ((N * 14 * (N * 14 + 2) + N * 14 + 3) * kₐ + (N * 14 * (N * 14 + 2) + N * 14 + 3) * kₜ))
       + N * 28 * (kₐ + kₜ)
       ≡ (N * N * 196 + N * 70 + 3) * (kₐ + kₜ) + (N * 196 + 10)
-  step₂ = Nat.solve-∀
+  step₂ = ℕ.solve-∀

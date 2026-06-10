@@ -35,17 +35,20 @@ right-spine (suc n) = ε ∙ right-spine n
 
 -- Potential
 
-Φᵣ : Tree → ℕ
-Φᵣ ε = 0
-Φᵣ (l ∙ r) = suc (Φᵣ l) ⊔ pred (Φᵣ r)
+module Potential where
+  open ℕ
 
-Φₗ : Tree → ℕ
-Φₗ ε = 0
-Φₗ (l ∙ r) = suc (Φₗ l) ⊔ Φᵣ r
+  Φᵣ : Tree → ℕ
+  Φᵣ ε = 0
+  Φᵣ (l ∙ r) = suc (Φᵣ l) ⊔ pred (Φᵣ r)
 
-Φ : Tree → ℕ
-Φ ε = 0
-Φ (l ∙ r) = suc (Φₗ l) ⊔ pred (Φᵣ r)
+  Φₗ : Tree → ℕ
+  Φₗ ε = 0
+  Φₗ (l ∙ r) = suc (Φₗ l) ⊔ Φᵣ r
+
+  Φ : Tree → ℕ
+  Φ ε = 0
+  Φ (l ∙ r) = suc (Φₗ l) ⊔ pred (Φᵣ r)
 
 -- Pair something with a resource (in ℕ).
 

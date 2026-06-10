@@ -7,7 +7,7 @@ open import Data.Empty          public using (⊥; ⊥-elim)
 open import Data.Fin            public using (Fin; zero; suc)
 open import Data.List           public using (List; []; _∷_)
 open import Data.Maybe          public using (Maybe; nothing; just; _>>=_) hiding (module Maybe)
-open import Data.Nat            public using (ℕ; zero; suc; pred; _+_; _*_; _⊔_; _≤_; _≥_; _<_; _≮_; z≤n; s≤s)
+open import Data.Nat            public using (ℕ; zero; suc; pred) hiding (module ℕ)
 open import Data.Product        public using (∃; _×_; _,_; proj₁; proj₂)
 open import Data.Vec            public using (Vec; []; _∷_)
 open import Relation.Nullary    public using (¬_; yes; no)
@@ -15,24 +15,37 @@ open import Relation.Nullary    public using (¬_; yes; no)
 open import Relation.Binary.PropositionalEquality public
   using (_≡_; refl; sym; trans; cong; subst; module ≡-Reasoning)
 
-open import Data.Nat.Properties public using (≤-refl; _≤?_) -- public using (module ≤-Reasoning)
-
 module Maybe = Data.Maybe
 
 _>=>_ : {A B C : Set} → (A → Maybe B) → (B → Maybe C) → A → Maybe C
 f >=> g = λ a → f a >>= g
 
-infixr 10 _^_
+module ℕ where
 
-_^_ : {A : Set} → (A → A) → ℕ → A → A
-f ^ zero = id
-f ^ suc n = f ∘ (f ^ n)
+  open import Data.Nat public
+    using
+    (_+_; _*_; _⊔_
+    ; _≤_; _≥_; _<_; _≮_; z≤n; s≤s
+    )
+  open import Data.Nat.Properties public
+    -- using
+    -- ( +-identityʳ; +-assoc; +-comm; *-distribʳ-+; +-suc; *-suc
+    -- ; ≤-refl; ≤-trans; +-monoˡ-≤; +-monoʳ-≤; _≤?_; module ≤-Reasoning
+    -- )
+  open import Data.Nat.Solver public
+  open import Data.Nat.Tactic.RingSolver public using (solve-∀)
 
--- Retract
+  infixr 10 _^_
 
-≤1+pred : ∀ n → n ≤ suc (pred n)
-≤1+pred zero    = z≤n
-≤1+pred (suc n) = ≤-refl
+  _^_ : {A : Set} → (A → A) → ℕ → A → A
+  f ^ zero = id
+  f ^ suc n = f ∘ (f ^ n)
+
+  -- Retract
+
+  ≤1+pred : ∀ n → n ≤ suc (pred n)
+  ≤1+pred zero    = z≤n
+  ≤1+pred (suc n) = ≤-refl
 
 -- Variables
 

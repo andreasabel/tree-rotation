@@ -3,13 +3,10 @@
 module Counting where
 
 open import Library
-open import Data.Nat.Properties using
-  ( +-identityʳ; +-suc; +-assoc; +-comm; *-suc
-  ; module ≤-Reasoning)
-import Data.Nat.Tactic.RingSolver as Nat
-
 open import SingleTreeGame as Game using (Moves; C; R; T; ε; _∙_)
 open import Sequence using (cr; tr; crtr; crtrr; start; loop; unravel; seq)
+
+open ℕ
 open ≡-Reasoning
 
 record MoveCounts : Set where
@@ -224,9 +221,9 @@ lem-loop-suf n ms cs =
   ∎
   where
   step₁ : ∀ n → 1 + (3 * n + (n + 2)) ≡ 4 * n + 3
-  step₁ = Nat.solve-∀
+  step₁ = solve-∀
   step₂ : ∀ n → 1 + (n + 1) ≡ n + 2
-  step₂ = Nat.solve-∀
+  step₂ = solve-∀
 
 lem-loop-m-suf : ∀ m n ms cs → counts (((loop n) ^ m) ms) cs ≡ add (m * (n + 2)) (m * (n + 2)) (m * (4 * n + 3)) (counts ms cs)
 lem-loop-m-suf zero    n ms cs = refl
@@ -309,10 +306,10 @@ thm-counts-seq m n =
   ∎
   where
   step₁ : ∀ m n → (n + 2) + (m * (n + 2) + 1) ≡ m * (n + 2) + n + 3
-  step₁ = Nat.solve-∀
+  step₁ = solve-∀
 
   step₂ : ∀ m n → 1 + (m * (n + 2) + (n + 2)) ≡ m * (n + 2) + n + 3
-  step₂ = Nat.solve-∀
+  step₂ = solve-∀
 
   step₃ : ∀ m n → ((n + n) + 1) + (m * (4 * n + 3) + (n + 1)) ≡ m * (4 * n + 3) + 3 * n + 2
-  step₃ = Nat.solve-∀
+  step₃ = solve-∀

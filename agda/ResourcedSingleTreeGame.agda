@@ -5,15 +5,10 @@
 module ResourcedSingleTreeGame where
 
 open import Library
-open import Tree using (Tree; ε; _∙_; tail; rotate; Φ; Resourced; _⨮_)
+open import Tree using (Tree; ε; _∙_; tail; rotate; Resourced; _⨮_)
 open import SingleTreeGame using (Moves; C; R; T; ε; _∙_)
 open import Counting using (count; count-compose; C:_T:_R:_)
-
-open import Data.Nat.Properties using
-  ( +-assoc; +-comm; +-identityʳ; *-distribʳ-+
-  ; ≤-refl; ≤-trans; +-monoˡ-≤; +-monoʳ-≤; module ≤-Reasoning)
-import Data.Nat.Solver as Nat
-import Data.Nat.Tactic.RingSolver as Nat
+open ℕ
 
 -- A tree with a "bank account".
 
@@ -72,11 +67,11 @@ module RMoves (kₐ kₜ : ℕ) where
     where
     step₁ : (r c t n : ℕ)
           → r + (c + (t + n)) ≡ c + (t + (r + n))
-    step₁ = Nat.solve-∀
+    step₁ = solve-∀
 
     step₂ : (kₐ kₜ c₁ t₁ c₂ t₂ n : ℕ)
           → c₂ * kₐ + (t₂ * kₜ + (c₁ * kₐ + (t₁ * kₜ + n))) ≡ (c₁ + c₂) * kₐ + ((t₁ + t₂) * kₜ + n)
-    step₂ = Nat.solve-∀
+    step₂ = solve-∀
 
   -- Flip the products so that Agda does not unfold multiplication for given c# and t#.
   thm-counts'
@@ -90,7 +85,7 @@ module RMoves (kₐ kₜ : ℕ) where
                                    c :* kₐ :+ (t :* kₜ :+ n) := n :+ (kₐ :* c :+ kₜ :* t))
                                  refl c# t# n kₐ kₜ ⟩
       n + (kₐ * c# + kₜ * t#)  ∎
-   where open ≤-Reasoning; open Nat.+-*-Solver
+   where open ≤-Reasoning; open +-*-Solver
 
 -- TRASH
 

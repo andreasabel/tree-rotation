@@ -5,7 +5,10 @@
 module MultiTreeGame where
 
 open import Library
-open import Tree using (Tree; ε; _∙_; Φ; Resourced; _⨮_)
+open import Tree using (Tree; ε; _∙_; Resourced; _⨮_; module Potential)
+
+open ℕ
+open Potential
 
 -- The arena is a vector of trees
 
