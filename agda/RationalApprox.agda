@@ -62,45 +62,7 @@ module RationalApprox
   (N : ℕ)
   where
 
-p : ℕ
-p = N ℕ.* 196 ℕ.+ 10
-
-q : ℕ
-q = N ℕ.* N ℕ.* 196 ℕ.+ N ℕ.* 70 ℕ.+ 3
-
--- We are showing these two theorems:
-
-Fraction = q ℕ.≥ N ℕ.* p
-
-Thm = [ q ]ℚ * (kₐ + kₜ) + [ p ]ℚ ≥ [ q ℕ.* 4 ]ℚ
-
--- The proof of Fraction follows by simple ≤-Reasoning over ℕ using the ring solver.
-
-fraction : Fraction
-fraction = let open ℕ.≤-Reasoning in
-  begin
-    N ℕ.* p
-  ≤⟨ ℕ.m≤m+n (N ℕ.* p) (N ℕ.* 60 ℕ.+ 3) ⟩
-    N ℕ.* p ℕ.+ (N ℕ.* 60 ℕ.+ 3)
-  ≡⟨ step N ⟩
-    q
-  ∎
-  where
-  step : ∀ N → N ℕ.* (N ℕ.* 196 ℕ.+ 10) ℕ.+ (N ℕ.* 60 ℕ.+ 3) ≡ N ℕ.* N ℕ.* 196 ℕ.+ N ℕ.* 70 ℕ.+ 3
-  step = ℕ.solve-∀
-
--- For the proof of Thm we use the move sequence instantiated to m = n = N * 14.
-
-m : ℕ
-m = N ℕ.* 14
-
-n : ℕ
-n = N ℕ.* 14
-
-mv : Moves
-mv = seq m n ε
-
-open MoveCounts (count mv) using (c#; t#; r#)
+open import Approx N using (p; q; m; n; Fraction; fraction; mv; c#; t#; r#)
 open RMoves kₐ kₜ
 open ≤-Reasoning
 
@@ -160,6 +122,8 @@ lem' =
     [ N ℕ.* 14 ℕ.* (N ℕ.* 14 ℕ.+ 2) ℕ.+ N ℕ.* 14 ℕ.+ 3 ]ℚ * kₐ
     + [ N ℕ.* 14 ℕ.* (N ℕ.* 14 ℕ.+ 2) ℕ.+ N ℕ.* 14 ℕ.+ 3 ]ℚ * kₜ
   ∎
+
+Thm = [ q ]ℚ * (kₐ + kₜ) + [ p ]ℚ ≥ [ q ℕ.* 4 ]ℚ
 
 -- Use lem' to show Thm.
 thm : Thm

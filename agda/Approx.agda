@@ -31,16 +31,9 @@ open import Sequence using (seq; thm-seq)
 open import ResourcedSingleTreeGame using (rempty; module RMoves)
 open import Counting using (MoveCounts; count; C:_T:_R:_; thm-counts-seq)
 
-module Approx
-  -- Budget for concat and tail.
-  (kₐ kₜ : ℕ)
-  -- We assume that this budget is sufficient to execute any legal move sequence.
-  (hyp : ∀ mv t
-   → moves mv ε ≡ just t
-   → ∃ λ leftover → RMoves.rmoves kₐ kₜ mv rempty ≡ just (leftover ⨮ t))
-  -- Approximation precision as N goes to +∞.
-  (N : ℕ)
-  where
+-- Approximation precision as N goes to +∞.
+
+module Approx (N : ℕ) where
 
 open ℕ
 open ≤-Reasoning
@@ -51,10 +44,9 @@ p = N * 196 + 10
 q : ℕ
 q = N * N * 196 + N * 70 + 3
 
--- We are showing these two theorems:
+-- The precision of the approximation is p/q ≤ 1/N.
 
 Fraction = q ≥ N * p
-Thm      = q * (kₐ + kₜ) + p ≥ q * 4
 
 -- The proof of Fraction follows by simple ≤-Reasoning using the ring solver.
 
@@ -83,69 +75,82 @@ n = N * 14
 mv : Moves
 mv = seq m n ε
 
-open MoveCounts (count mv) using (c#; t#; r#)
-open RMoves kₐ kₜ
+open MoveCounts (count mv) public using (c#; t#; r#)
 
--- The move sequence mv is executable, since very sequence ought to.
-hmv : ∃ λ leftover → rmoves mv rempty ≡ just (leftover ⨮ ε)
-hmv = hyp mv ε (thm-seq m n)
-
--- Show lem from (thm-counts m n ε (proj₂ hm))
-lem : c# * kₐ + t# * kₜ ≥ r#
-lem with hmv
-... | leftover , run =
-  begin
-    r#
-  ≤⟨ m≤m+n r# leftover ⟩
-    r# + leftover
-  ≤⟨ thm-counts mv 0 ε run ⟩
-    c# * kₐ + (t# * kₜ + 0)
-  ≡⟨ cong (c# * kₐ +_) (+-identityʳ (t# * kₜ)) ⟩
-    c# * kₐ + t# * kₜ
-  ∎
-
-lem' : (N * 14 * (N * 14 + 2) + N * 14 + 3) * kₐ + (N * 14 * (N * 14 + 2) + N * 14 + 3) * kₜ
-       ≥ N * 14 * (4 * (N * 14) + 3) + 3 * (N * 14) + 2
-lem' =
-  begin
-    N * 14 * (4 * (N * 14) + 3) + 3 * (N * 14) + 2
-  ≡⟨ sym (cong MoveCounts.r# (thm-counts-seq m n)) ⟩
-    r#
-  ≤⟨ lem ⟩
-    c# * kₐ + t# * kₜ
-  ≡⟨ cong (λ x → x * kₐ + t# * kₜ) (cong MoveCounts.c# (thm-counts-seq m n)) ⟩
-    (N * 14 * (N * 14 + 2) + N * 14 + 3) * kₐ + t# * kₜ
-  ≡⟨ cong (λ x → (N * 14 * (N * 14 + 2) + N * 14 + 3) * kₐ + x * kₜ)
-           (cong MoveCounts.t# (thm-counts-seq m n)) ⟩
-    (N * 14 * (N * 14 + 2) + N * 14 + 3) * kₐ + (N * 14 * (N * 14 + 2) + N * 14 + 3) * kₜ
-  ∎
-
--- Use lem to show the thm.
-thm : Thm
-thm =
-  begin
-    q * 4
-  ≡⟨ step₁ N ⟩
-    p + (N * 14 * (4 * (N * 14) + 3) + 3 * (N * 14) + 2)
-  ≤⟨ +-monoʳ-≤ p lem' ⟩
-    p + ((N * 14 * (N * 14 + 2) + N * 14 + 3) * kₐ + (N * 14 * (N * 14 + 2) + N * 14 + 3) * kₜ)
-  ≤⟨ m≤m+n
-       (p + ((N * 14 * (N * 14 + 2) + N * 14 + 3) * kₐ + (N * 14 * (N * 14 + 2) + N * 14 + 3) * kₜ))
-       (N * 28 * (kₐ + kₜ)) ⟩
-    (p + ((N * 14 * (N * 14 + 2) + N * 14 + 3) * kₐ + (N * 14 * (N * 14 + 2) + N * 14 + 3) * kₜ))
-      + N * 28 * (kₐ + kₜ)
-  ≡⟨ step₂ N kₐ kₜ ⟩
-    q * (kₐ + kₜ) + p
-  ∎
+module Proofs
+  -- Budget for concat and tail.
+  (kₐ kₜ : ℕ)
+  -- We assume that this budget is sufficient to execute any legal move sequence.
+  (hyp : ∀ mv t
+   → moves mv ε ≡ just t
+   → ∃ λ leftover → RMoves.rmoves kₐ kₜ mv rempty ≡ just (leftover ⨮ t))
   where
-  open ≤-Reasoning
 
-  step₁ : ∀ N → (N * N * 196 + N * 70 + 3) * 4 ≡ (N * 196 + 10) + (N * 14 * (4 * (N * 14) + 3) + 3 * (N * 14) + 2)
-  step₁ = ℕ.solve-∀
+  -- The goal of this module is to show this theorem:
+  Thm = q * (kₐ + kₜ) + p ≥ q * 4
 
-  step₂
-    : ∀ N kₐ kₜ
-    → ((N * 196 + 10) + ((N * 14 * (N * 14 + 2) + N * 14 + 3) * kₐ + (N * 14 * (N * 14 + 2) + N * 14 + 3) * kₜ))
-      + N * 28 * (kₐ + kₜ)
-      ≡ (N * N * 196 + N * 70 + 3) * (kₐ + kₜ) + (N * 196 + 10)
-  step₂ = ℕ.solve-∀
+  open RMoves kₐ kₜ
+
+  -- The move sequence mv is executable, since very sequence ought to.
+  hmv : ∃ λ leftover → rmoves mv rempty ≡ just (leftover ⨮ ε)
+  hmv = hyp mv ε (thm-seq m n)
+
+  -- Show lem from (thm-counts m n ε (proj₂ hm))
+  lem : c# * kₐ + t# * kₜ ≥ r#
+  lem with hmv
+  ... | leftover , run =
+    begin
+      r#
+    ≤⟨ m≤m+n r# leftover ⟩
+      r# + leftover
+    ≤⟨ thm-counts mv 0 ε run ⟩
+      c# * kₐ + (t# * kₜ + 0)
+    ≡⟨ cong (c# * kₐ +_) (+-identityʳ (t# * kₜ)) ⟩
+      c# * kₐ + t# * kₜ
+    ∎
+
+  lem' : (N * 14 * (N * 14 + 2) + N * 14 + 3) * kₐ + (N * 14 * (N * 14 + 2) + N * 14 + 3) * kₜ
+         ≥ N * 14 * (4 * (N * 14) + 3) + 3 * (N * 14) + 2
+  lem' =
+    begin
+      N * 14 * (4 * (N * 14) + 3) + 3 * (N * 14) + 2
+    ≡⟨ sym (cong MoveCounts.r# (thm-counts-seq m n)) ⟩
+      r#
+    ≤⟨ lem ⟩
+      c# * kₐ + t# * kₜ
+    ≡⟨ cong (λ x → x * kₐ + t# * kₜ) (cong MoveCounts.c# (thm-counts-seq m n)) ⟩
+      (N * 14 * (N * 14 + 2) + N * 14 + 3) * kₐ + t# * kₜ
+    ≡⟨ cong (λ x → (N * 14 * (N * 14 + 2) + N * 14 + 3) * kₐ + x * kₜ)
+             (cong MoveCounts.t# (thm-counts-seq m n)) ⟩
+      (N * 14 * (N * 14 + 2) + N * 14 + 3) * kₐ + (N * 14 * (N * 14 + 2) + N * 14 + 3) * kₜ
+    ∎
+
+  -- Use lem to show the thm.
+  thm : Thm
+  thm =
+    begin
+      q * 4
+    ≡⟨ step₁ N ⟩
+      p + (N * 14 * (4 * (N * 14) + 3) + 3 * (N * 14) + 2)
+    ≤⟨ +-monoʳ-≤ p lem' ⟩
+      p + ((N * 14 * (N * 14 + 2) + N * 14 + 3) * kₐ + (N * 14 * (N * 14 + 2) + N * 14 + 3) * kₜ)
+    ≤⟨ m≤m+n
+         (p + ((N * 14 * (N * 14 + 2) + N * 14 + 3) * kₐ + (N * 14 * (N * 14 + 2) + N * 14 + 3) * kₜ))
+         (N * 28 * (kₐ + kₜ)) ⟩
+      (p + ((N * 14 * (N * 14 + 2) + N * 14 + 3) * kₐ + (N * 14 * (N * 14 + 2) + N * 14 + 3) * kₜ))
+        + N * 28 * (kₐ + kₜ)
+    ≡⟨ step₂ N kₐ kₜ ⟩
+      q * (kₐ + kₜ) + p
+    ∎
+    where
+    open ≤-Reasoning
+
+    step₁ : ∀ N → (N * N * 196 + N * 70 + 3) * 4 ≡ (N * 196 + 10) + (N * 14 * (4 * (N * 14) + 3) + 3 * (N * 14) + 2)
+    step₁ = ℕ.solve-∀
+
+    step₂
+      : ∀ N kₐ kₜ
+      → ((N * 196 + 10) + ((N * 14 * (N * 14 + 2) + N * 14 + 3) * kₐ + (N * 14 * (N * 14 + 2) + N * 14 + 3) * kₜ))
+        + N * 28 * (kₐ + kₜ)
+        ≡ (N * N * 196 + N * 70 + 3) * (kₐ + kₜ) + (N * 196 + 10)
+    step₂ = ℕ.solve-∀
