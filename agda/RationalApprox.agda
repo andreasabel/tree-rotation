@@ -62,6 +62,7 @@ module RationalApprox
   (N : ℕ)
   where
 
+-- We use the same parameters as in the case where budgets were integral.
 open import Approx N using (p; q; m; n; Fraction; fraction; mv; c#; t#; r#)
 open RMoves kₐ kₜ
 open ≤-Reasoning
