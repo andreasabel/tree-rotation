@@ -409,7 +409,6 @@ Helpers added: ≤-add-right, +-pos, *-pos, 0≤1ℚ, []-pos, kₐ+kₜ-pos.
 Crunched for 17m 32s
 
 
-
 Prompt 15 2026-06-06
 ====================
 
@@ -452,3 +451,39 @@ statement ∃ r → 0 ≤ r × r·(suc N') < 1 × kₐ + kₜ ≥ 4 − r for ev
 agda Main.agda exits 0.
 
 Cogitated for 28m 22s
+
+
+Prompt 16 2026-06-12
+====================
+
+In Approx.agda, I replaced 14N by 6N since it also allows to prove the Thm.
+The lemmata lem and lem' are already fixed, but the proof of the Thm is broken because some numbers did not get updated yet.
+Please fix the proof thm.
+
+Answer
+------
+
+Approx.agda type-checks. The thm proof is fixed.
+
+The key insight for 6N: because c#-exp = M² + 3M + 3 (with M = 6N) is now larger than q = M² + 2M + 3 by
+exactly M = 6N, the original 14N chain — which added 28N·(kₐ+kₜ) to bridge c#·(kₐ+kₜ) up to q·(kₐ+kₜ) —
+cannot be reused (it would need a negative increment).
+
+Instead the new proof multiplies both sides of the goal by c#-exp and cancels it at the end, using a
+slack-6N·p ℕ identity to bridge c#·(q·4) to r#·q + c#·p:
+
+- step₁: c#·(q·4) + 6N·p ≡ r#·q + c#·p (ring identity).
+- chain: c#·(q·4) ≤ c#·(q·4) + 6N·p ≡ r#·q + c#·p ≤ (c#·kₐ + c#·kₜ)·q + c#·p ≡ c#·(q·(kₐ+kₜ) + p) (using
+lem' lifted by q and +-monoˡ-≤).
+- *-cancelˡ-≤ c#-exp strips c#-exp from both sides; the NonZero instance comes via a subst using +-suc since
+ c#-exp = (…) + 3 doesn't reduce to suc _ definitionally.
+- Added one import: open import Data.Nat using (NonZero).
+
+Note: RationalApprox.agda and Main.agda still reference the old 14N expansions in their lem'/thm and won't
+type-check until those are propagated to 6N as well — let me know if you'd like me to update them too.
+
+✻ Crunched for 31m 19s
+
+※ recap: Porting the catenable-queues proofs from 14N to 6N: I fixed Approx.agda's thm via a multiplicative
+  cancellation by c#-exp. Next, propagate the 14N→6N update to RationalApprox.agda's lem' and thm so Main.agda
+   type-checks again. (disable recaps in /config)

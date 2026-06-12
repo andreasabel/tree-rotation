@@ -25,6 +25,7 @@
 -- and (kₐ + kₜ)q + p ≥ 4q thanks to our sequence for m=n=14N.
 
 open import Library hiding (m; n)
+open import Data.Nat using (NonZero)
 open import Tree using (ε; _⨮_)
 open import SingleTreeGame using (Moves; ε; moves)
 open import Sequence using (seq; thm-seq)
@@ -125,32 +126,44 @@ module Proofs
       (N * 6 * (N * 6 + 2) + N * 6 + 3) * kₐ + (N * 6 * (N * 6 + 2) + N * 6 + 3) * kₜ
     ∎
 
-  -- Use lem to show the thm.
+  -- For 6N, c#-exp > q (by 6N), so the original 14N chain (which added 28N·(kₐ+kₜ)
+  -- to bridge c# up to q) cannot be reused directly.
+  -- We instead multiply both sides of the goal by c#-exp and cancel it again at
+  -- the end: from lem' (multiplied by q) we get c#-exp·q·(kₐ+kₜ) ≥ r#-exp·q, and
+  -- a small ℕ identity (with slack 6N·p) bridges c#-exp·(q·4) to r#-exp·q + c#-exp·p.
+
   thm : Thm
-  thm =
-    begin
-      q * 4
+  thm = *-cancelˡ-≤ (N * 6 * (N * 6 + 2) + N * 6 + 3) {{nz}}
+    (begin
+      (N * 6 * (N * 6 + 2) + N * 6 + 3) * (q * 4)
+    ≤⟨ m≤m+n ((N * 6 * (N * 6 + 2) + N * 6 + 3) * (q * 4)) (N * 6 * p) ⟩
+      (N * 6 * (N * 6 + 2) + N * 6 + 3) * (q * 4) + N * 6 * p
     ≡⟨ step₁ N ⟩
-      p + (N * 14 * (4 * (N * 14) + 3) + 3 * (N * 14) + 2)
-    ≤⟨ +-monoʳ-≤ p lem' ⟩
-      p + ((N * 14 * (N * 14 + 2) + N * 14 + 3) * kₐ + (N * 14 * (N * 14 + 2) + N * 14 + 3) * kₜ)
-    ≤⟨ m≤m+n
-         (p + ((N * 14 * (N * 14 + 2) + N * 14 + 3) * kₐ + (N * 14 * (N * 14 + 2) + N * 14 + 3) * kₜ))
-         (N * 28 * (kₐ + kₜ)) ⟩
-      (p + ((N * 14 * (N * 14 + 2) + N * 14 + 3) * kₐ + (N * 14 * (N * 14 + 2) + N * 14 + 3) * kₜ))
-        + N * 28 * (kₐ + kₜ)
+      (N * 6 * (4 * (N * 6) + 3) + 3 * (N * 6) + 2) * q
+        + (N * 6 * (N * 6 + 2) + N * 6 + 3) * p
+    ≤⟨ +-monoˡ-≤ ((N * 6 * (N * 6 + 2) + N * 6 + 3) * p) (*-monoˡ-≤ q lem') ⟩
+      ((N * 6 * (N * 6 + 2) + N * 6 + 3) * kₐ + (N * 6 * (N * 6 + 2) + N * 6 + 3) * kₜ) * q
+        + (N * 6 * (N * 6 + 2) + N * 6 + 3) * p
     ≡⟨ step₂ N kₐ kₜ ⟩
-      q * (kₐ + kₜ) + p
-    ∎
+      (N * 6 * (N * 6 + 2) + N * 6 + 3) * (q * (kₐ + kₜ) + p)
+    ∎)
     where
     open ≤-Reasoning
 
-    step₁ : ∀ N → (N * N * 196 + N * 70 + 3) * 4 ≡ (N * 196 + 10) + (N * 14 * (4 * (N * 14) + 3) + 3 * (N * 14) + 2)
+    step₁ : ∀ N →
+        (N * 6 * (N * 6 + 2) + N * 6 + 3) * ((N * N * 36 + N * 12 + 3) * 4) + N * 6 * (N * 36 + 10)
+      ≡ (N * 6 * (4 * (N * 6) + 3) + 3 * (N * 6) + 2) * (N * N * 36 + N * 12 + 3)
+        + (N * 6 * (N * 6 + 2) + N * 6 + 3) * (N * 36 + 10)
     step₁ = ℕ.solve-∀
 
-    step₂
-      : ∀ N kₐ kₜ
-      → ((N * 196 + 10) + ((N * 14 * (N * 14 + 2) + N * 14 + 3) * kₐ + (N * 14 * (N * 14 + 2) + N * 14 + 3) * kₜ))
-        + N * 28 * (kₐ + kₜ)
-        ≡ (N * N * 196 + N * 70 + 3) * (kₐ + kₜ) + (N * 196 + 10)
+    step₂ : ∀ N kₐ kₜ →
+        ((N * 6 * (N * 6 + 2) + N * 6 + 3) * kₐ + (N * 6 * (N * 6 + 2) + N * 6 + 3) * kₜ)
+          * (N * N * 36 + N * 12 + 3)
+        + (N * 6 * (N * 6 + 2) + N * 6 + 3) * (N * 36 + 10)
+      ≡ (N * 6 * (N * 6 + 2) + N * 6 + 3) * ((N * N * 36 + N * 12 + 3) * (kₐ + kₜ) + (N * 36 + 10))
     step₂ = ℕ.solve-∀
+
+    nz : NonZero (N * 6 * (N * 6 + 2) + N * 6 + 3)
+    nz = subst NonZero (sym (+-suc (N * 6 * (N * 6 + 2) + N * 6) 2)) _
+
+-- -}
