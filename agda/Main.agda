@@ -94,7 +94,9 @@ module Budget-ℕ where
     → q ≥ N * p
     × q * (kₐ + kₜ) + p ≥ q * 4
   approximation kₐ kₜ hyp N = p , q , fraction , thm
-    where open Approx kₐ kₜ hyp N
+    where
+    open Approx N
+    open Proofs kₐ kₜ hyp
 
 -- Rational budgets
 

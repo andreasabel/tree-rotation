@@ -487,3 +487,36 @@ type-check until those are propagated to 6N as well — let me know if you'd lik
 ※ recap: Porting the catenable-queues proofs from 14N to 6N: I fixed Approx.agda's thm via a multiplicative
   cancellation by c#-exp. Next, propagate the 14N→6N update to RationalApprox.agda's lem' and thm so Main.agda
    type-checks again. (disable recaps in /config)
+
+
+Prompt 17 2026-06-12
+====================
+
+Please also update RationalApprox and Main from 14N to 6N.
+
+Answer
+------
+
+Everything type-checks. Here's a summary of the changes:
+
+Approx.agda (already done previously):
+- thm rewritten using multiplicative cancellation in ℕ (since c#-exp > q for 6N, the original 14N additive
+chain cannot be reused).
+
+RationalApprox.agda (rewritten):
+- lem': updated 14 → 6.
+- q-as-suc: updated 196 → 36, 70 → 12 (new q = 36N² + 12N + 3).
+- Np<q: updated step (60 → 2 for the 2N+3 increment, 196 → 36, 70 → 12).
+- Thm proof: replaced the old additive chain with the multiplicative-cancellation approach in ℚ (parallels
+Approx.agda's new thm but in ℚ). This required moving [*]ℚ, [≤]ℚ, 0<1ℚ, [<]ℚ, and the q-positivity/instance
+block above thm, and adding a new [c-exp]-positive / Pos-[c-exp] block. The chain bridges via the ℕ identity
+ c#·(q·4) + N·6·p ≡ r#·q + c#·p (with slack N·6·p ≥ 0) and lem' lifted by [q]ℚ (via *-monoʳ-≤-nonNeg), then
+cancels [c#]ℚ via *-cancelˡ-≤-pos.
+
+Main.agda:
+- approximation updated from open Approx kₐ kₜ hyp N to open Approx N; open Proofs kₐ kₜ hyp because Approx
+is now parameterised only by N, with the budget-dependent proofs in an inner module Proofs.
+
+agda Main.agda exits 0.
+
+Cogitated for 12m 21s
