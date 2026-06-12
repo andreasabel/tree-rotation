@@ -33,9 +33,6 @@ jobs:
 
     steps:
 
-      # Checkout to $HOME empties $HOME so we have to do it before we put stuff there.
-      - uses: actions/checkout@v6
-
       - name: Debug info --- directories
         run: |
           echo "HOME = ${HOME}"
@@ -47,6 +44,9 @@ jobs:
         with:
           agda-version: ${{ env.AGDA_VERSION }}
           agda-stdlib-version: ${{ env.STDLIB_VERSION }}
+
+      # Checkout to $HOME empties $HOME so we have to do it before we put stuff there.
+      - uses: actions/checkout@v6
 
       - name: Restore cache
         uses: actions/cache/restore@v5
