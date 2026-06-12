@@ -39,10 +39,10 @@ open ℕ
 open ≤-Reasoning
 
 p : ℕ
-p = N * 196 + 10
+p = N * 36 + 10
 
 q : ℕ
-q = N * N * 196 + N * 70 + 3
+q = N * N * 36 + N * 12 + 3
 
 -- The precision of the approximation is p/q ≤ 1/N.
 
@@ -53,24 +53,24 @@ Fraction = q ≥ N * p
 fraction : Fraction
 fraction = begin
   N * p
-  ≤⟨ m≤m+n (N * p) (N * 60 + 3) ⟩
-  N * p + (N * 60 + 3)
+  ≤⟨ m≤m+n (N * p) (N * 2 + 3) ⟩
+  N * p + (N * 2 + 3)
   ≡⟨ step N ⟩
   q
   ∎
   where
   open ≤-Reasoning
 
-  step : ∀ N → N * (N * 196 + 10) + (N * 60 + 3) ≡ N * N * 196 + N * 70 + 3
+  step : ∀ N → N * (N * 36 + 10) + (N * 2 + 3) ≡ N * N * 36 + N * 12 + 3
   step = ℕ.solve-∀
 
--- For the proof of Thm we use the move sequence instantiated to m = n = N * 14.
+-- For the proof of Thm we use the move sequence instantiated to m = n = N * 6.
 
 m : ℕ
-m = N * 14
+m = N * 6
 
 n : ℕ
-n = N * 14
+n = N * 6
 
 mv : Moves
 mv = seq m n ε
@@ -109,20 +109,20 @@ module Proofs
       c# * kₐ + t# * kₜ
     ∎
 
-  lem' : (N * 14 * (N * 14 + 2) + N * 14 + 3) * kₐ + (N * 14 * (N * 14 + 2) + N * 14 + 3) * kₜ
-         ≥ N * 14 * (4 * (N * 14) + 3) + 3 * (N * 14) + 2
+  lem' : (N * 6 * (N * 6 + 2) + N * 6 + 3) * kₐ + (N * 6 * (N * 6 + 2) + N * 6 + 3) * kₜ
+         ≥ N * 6 * (4 * (N * 6) + 3) + 3 * (N * 6) + 2
   lem' =
     begin
-      N * 14 * (4 * (N * 14) + 3) + 3 * (N * 14) + 2
+      N * 6 * (4 * (N * 6) + 3) + 3 * (N * 6) + 2
     ≡⟨ sym (cong MoveCounts.r# (thm-counts-seq m n)) ⟩
       r#
     ≤⟨ lem ⟩
       c# * kₐ + t# * kₜ
     ≡⟨ cong (λ x → x * kₐ + t# * kₜ) (cong MoveCounts.c# (thm-counts-seq m n)) ⟩
-      (N * 14 * (N * 14 + 2) + N * 14 + 3) * kₐ + t# * kₜ
-    ≡⟨ cong (λ x → (N * 14 * (N * 14 + 2) + N * 14 + 3) * kₐ + x * kₜ)
+      (N * 6 * (N * 6 + 2) + N * 6 + 3) * kₐ + t# * kₜ
+    ≡⟨ cong (λ x → (N * 6 * (N * 6 + 2) + N * 6 + 3) * kₐ + x * kₜ)
              (cong MoveCounts.t# (thm-counts-seq m n)) ⟩
-      (N * 14 * (N * 14 + 2) + N * 14 + 3) * kₐ + (N * 14 * (N * 14 + 2) + N * 14 + 3) * kₜ
+      (N * 6 * (N * 6 + 2) + N * 6 + 3) * kₐ + (N * 6 * (N * 6 + 2) + N * 6 + 3) * kₜ
     ∎
 
   -- Use lem to show the thm.
