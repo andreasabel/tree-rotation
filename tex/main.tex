@@ -1,0 +1,453 @@
+\nonstopmode
+
+\newif\ifcomments
+\commentstrue
+
+%% For double-blind review submission
+%%\documentclass[acmsmall%acmlarge%,review,anonymous
+%%]{acmart}\settopmatter{printfolios=true}
+%% For single-blind review submission
+\documentclass[svgnames,dvipsnames,table,review%,anonymous
+]{jfp-epi}
+\settopmatter{printfolios=true}
+
+%% For final camera-ready submission
+%\documentclass[dvipsnames]{jfp-epi}\settopmatter{}
+
+\jfpVolume{99}
+\jfpArticle{13}
+\jfpDOI{10.46298/jfp.01234}
+\jfpYear{2027}
+
+\received[Submitted]{October 2026}
+%\received[accepted]{April 2089}
+
+\usepackage[utf8]{inputenc}
+\usepackage[verbose]{newunicodechar}
+\usepackage[capitalise]{cleveref} % capitalise to please Andreas :)
+% \usepackage{thmtools} % breaks many links. But not needed
+\Crefname{example}{Example}{Examples}
+\Crefname{definition}{Definition}{Definitions}
+\Crefname{law}{Law}{Laws}
+\Crefname{lemma}{Lemma}{Lemmas}
+\Crefname{corollary}{Corollary}{Corollaries}
+\usepackage[textsize=tiny,disable]{todonotes}
+\usepackage[misc]{ifsym}
+
+% Remove todo-notes in final version
+% \renewcommand{\todo}[1]{}
+
+\ifcomments
+\newcommand\andreas[1]{\todo[backgroundcolor=green!10]{AA: #1}}
+\newcommand\koen[1]{\todo[backgroundcolor=blue!10]{KC: #1}}
+\newcommand\christian[1]{\todo[backgroundcolor=green!10]{CS: #1}}
+\else
+\newcommand\andreas[1]{}
+\newcommand\koen[1]{}
+\newcommand\christian[1]{}
+\fi
+
+%\usepackage{tikz}
+%\usetikzlibrary{matrix}
+
+\input{newunicodedefs}
+
+% For having two versions of a paper in one file.
+% Stuff that does not fit into the short version can be encosed in \LONGVERSION{...}
+
+\ifdefined\LONGVERSION
+\newcommand{\SHORTVERSION}[1]{}
+\else
+% short version:
+\newcommand{\LONGVERSION}[1]{}
+\newcommand{\SHORTVERSION}[1]{#1}
+% % long version:
+% \newcommand{\LONGVERSION}[1]{#1}
+% \newcommand{\SHORTVERSION}[1]{}
+% \newcommand{\SHORTVERSION}[1]{BEGIN~SHORT\ #1 \ END~SHORT}
+\fi
+\newcommand{\LONGSHORT}[2]{\LONGVERSION{#1}\SHORTVERSION{#2}}
+\newcommand{\SHORTLONG}[2]{\SHORTVERSION{#1}\LONGVERSION{#2}}
+\newcommand{\EXTENDED}[1]{}
+\newwrite\agdarefs
+\immediate\openout\agdarefs=References.agda
+
+% \newcommand\agdaref[2]{\href{file:/home/jyp/repo/modal/agda/html/#1.html\##2}{✓}}
+\def\myhash{\#}
+\write\agdarefs{{-\string# OPTIONS -W all --warning=error \string#-}}
+\write\agdarefs{module References where}
+\write\agdarefs{}
+\newcommand\agdacomment[1]{\write\agdarefs{-- #1}}
+\newcommand\agdablank{\write\agdarefs{}}
+\NewDocumentCommand\agdaref{o m o m}{%
+  \href{html/#2.html\#\IfValueT{#3}{#3.}#4}{✓}%
+  \IfValueT{#1}{\agdacomment{#1}}%
+  \write\agdarefs{import #2}%
+  \write\agdarefs{open #2\IfValueT{#3}{.#3} using (#4)} %
+  \write\agdarefs{}%
+}
+\newcommand\magdaref[2]{\text{\agdaref{#1}{#2}}}
+
+\newcommand{\NOVERSION}[1]{}  %% currently not included
+\newcommand\seeExtendedMaterial{(See extended material)}
+
+\SHORTVERSION{
+\newcommand\proofInSupp{The proof can be found in the long version of
+  the paper, provided as supplementary material.
+  \renewcommand\proofInSupp{\hfill\seeExtendedMaterial} }
+}
+\LONGVERSION{
+\newcommand\proofInSupp{}
+}
+
+\newenvironment{definition*}{}{} % if this should not be emphasized
+\makeatletter
+\newenvironment{proof*}[1][\proofname]{\par
+  \normalfont \topsep6\p@\@plus6\p@\relax
+  \trivlist
+  \item[\@proofindent\hskip\labelsep
+        {\@proofnamefont #1\@addpunct{.}}]\ignorespaces
+}{%
+}
+\makeatother
+%\usepackage[right]{showlabels}\renewcommand{\showlabelfont}{\small\ttfamily\color{gray}}
+
+%\usepackage{prooftree}
+%\usepackage{dsfont}
+%\usepackage{mathpartir}
+%\usepackage{mathtools} %mathrlap, prescript
+% \usepackage[all]{xy}
+%\usepackage{colortbl}
+
+% \usepackage[cal=boondoxo]{mathalfa}
+%\usepackage{calc} % \widthof
+
+\usepackage{latex/agda}
+
+% NO EFFECT:
+% \renewcommand{\AgdaOperator}    [1]
+%     {\AgdaNoSpaceMath{\AgdaFontStyle{\textcolor{AgdaOperator}{\mathbf{#1}}}}}
+
+%% Note: Authors migrating a paper from PACMPL format to traditional
+%% SIGPLAN proceedings format should change 'acmlarge' to
+%% 'sigplan,10pt'.
+
+
+
+%% Some recommended packages.
+% \usepackage{booktabs}   %% For formal tables:
+%                         %% http://ctan.org/pkg/booktabs
+% \usepackage{subcaption} %% For complex figures with subfigures/subcaptions
+%                         %% http://ctan.org/pkg/subcaption
+
+\newtheorem{remark}{Remark}
+
+%% Bibliography style
+\bibliographystyle{ACM-Reference-Format}
+%% Citation style
+% \citestyle{acmauthoryear}   %% For author/year citations
+% \citestyle{numbers,sort&compress}
+
+\input{textMacros}
+
+% Macros for this paper
+\newcommand{\rot}{\ensuremath{\mathord{\mathsf{r}}}}
+\newcommand{\tail}{\ensuremath{\mathord{\mathsf{t}}}}
+\newcommand{\tC}{\ensuremath{\mathsf{C}}}
+\newcommand{\tR}{\ensuremath{\mathsf{R}}}
+\newcommand{\tT}{\ensuremath{\mathsf{T}}}
+\renewcommand{\Cat}[2]{\ensuremath{\tC_{#1,#2}}}
+\newcommand{\Rot}[1]{\ensuremath{\tR_{#1}}}
+\renewcommand{\Tail}[1]{\ensuremath{\tT_{#1}}}
+\newcommand{\vms}{\ensuremath{\mathit{ms}}}
+\newcommand{\vts}{\ensuremath{\mathit{ts}}}
+\newcommand{\vtsp}{\ensuremath{\mathit{ts'}}}
+
+
+
+\begin{document}
+
+%% Title information
+\title{%
+  Binary trees are constant-time catenable queues
+  \LONGVERSION{ (Extended~Version)}}
+%\titlenote{with title note}             %% \titlenote is optional;
+                                        %% can be repeated if necessary;
+                                        %% contents suppressed with 'anonymous'
+%\subtitle{Subtitle}                     %% \subtitle is optional
+%\subtitlenote{with subtitle note}       %% \subtitlenote is optional;
+                                        %% can be repeated if necessary;
+                                        %% contents suppressed with 'anonymous'
+
+
+%% Author information
+%% Contents and number of authors suppressed with 'anonymous'.
+%% Each author should be introduced by \author, followed by
+%% \authornote (optional), \orcid (optional), \affiliation, and
+%% \email.
+%% An author may have multiple affiliations and/or emails; repeat the
+%% appropriate command.
+%% Many elements are not rendered, but should be provided for metadata
+%% extraction tools.
+
+\author{Andreas Abel}
+%\authornote{with author1 note}          %% \authornote is optional;
+                                        %% can be repeated if necessary
+\orcid{0000-0003-0420-4492}             %% \orcid is optional
+\affiliation{
+  \department{Department of Computer Science and Engineering}
+  \institution{University of Gothenburg and Chalmers University of Technology}
+  \city{Göteborg}
+%  \state{State1}
+  \country{Sweden}
+}
+\email{andreas.abel@gu.se}          %% \email is recommended
+
+
+\author{Koen Claessen}
+%\authornote{with author1 note}          %% \authornote is optional;
+                                        %% can be repeated if necessary
+\orcid{}             %% \orcid is optional
+\affiliation{
+  \department{Department of Computer Science and Engineering}
+  \institution{University of Gothenburg and Chalmers University of Technology}
+  \city{Göteborg}
+%  \state{State1}
+  \country{Sweden}
+}
+\email{}          %% \email is recommended
+
+\author{Christian Sattler}
+%\authornote{with author1 note}          %% \authornote is optional;
+                                        %% can be repeated if necessary
+\orcid{}             %% \orcid is optional
+\affiliation{
+  \department{Department of Computer Science and Engineering}
+  \institution{University of Gothenburg and Chalmers University of Technology}
+  \city{Göteborg}
+%  \state{State1}
+  \country{Sweden}
+}
+\email{}          %% \email is recommended
+
+
+
+%% Paper note
+%% The \thanks command may be used to create a "paper note" ---
+%% similar to a title note or an author note, but not explicitly
+%% associated with a particular element.  It will appear immediately
+%% above the permission/copyright statement.
+%\thanks{with paper note}                %% \thanks is optional
+                                        %% can be repeated if necesary
+                                        %% contents suppressed with 'anonymous'
+
+
+%% Abstract
+%% Note: \begin{abstract}...\end{abstract} environment must come
+%% before \maketitle command
+\begin{abstract}
+  Binary trees are constant-time catenable queues.
+  The paper is backed by a mechanisation
+  in Agda.
+\end{abstract}
+
+
+%% \maketitle
+%% Note: \maketitle command must come after title commands, author
+%% commands, abstract environment, Computing Classification System
+%% environment and commands, and keywords command.
+\maketitle
+
+
+% \fleq % nyarlathotep
+%\fleq  %% Flushleft equations
+%\cneq  %% Center equations
+
+
+\section{Introduction}\label{sec:intro}
+
+Binary trees are constant-time catenable queues.
+
+% https://hackage.haskell.org/package/alist
+
+\section{Explicit rotation}\label{sec:rotation}
+
+%\input{latex/Code}
+
+We consider a modified API that makes tree rotation a primitive operation, since this simplifies the amortization proofs.
+Since the contents of the queue does not matter for complexity considerations, only its \emph{structure}, we drop the labels from the tree definition and only consider the cases of an (empty) leaf \(ε\) and a binary node constructor \(\_∙\_\).
+Tree rotation \(\_\rot\) is a partial function defined by \(((t₁ ∙ t₂) ∙ t₃)\rot = t₁ ∙ (t₂ ∙ t₃)\).
+Dropping from the front of the queue is represented by the partial function ``tail'' \(\_\tail\) defined by \( (ε ∙ t)\tail = t \).
+The idea is that the tail of a queue can only be taken if its tree representation has been maximally rotated at the root and thus is of the form \( ε ∙ t \).
+
+\subsection{The tree game}
+
+To study the amortized complexity, we need to talk about arbitrary sequences of tree operations.
+We conceptualize such sequences as moves in a game where the arena is a multiset of trees which we call a \emph{forest}.
+Each move takes out some trees from the forest, applies the corresponding operation on them and puts the result back into the forest.
+For simplicity we represent the forest as a non-empty list so that we can identify particular trees by their index in the list.  Note that taking out trees from the forest and putting a tree back (which we do at the front of the list) typically changes indices of tree in the forest.
+The moves $m$ we are considering are:
+\[
+\begin{array}{l@{\qquad}l}
+  \Cat i j & \mbox{concatenate trees $i$ and $j$} \\
+  \Rot i   & \mbox{rotate tree $i$, if possible} \\
+  \Tail i  & \mbox{take tail of tree $i$, if possible} \\
+\end{array}
+\]
+We write $\vts \, m = \vtsp$ if move $m$ can be applied to forest $\vts$, yielding forest $\vts'$.
+For instance, $(t₀, t₁, t₂, t₃) \Cat 1 2 = (t₁ ∙ t₃, t₀, t₂)$ since after taking out $t₁$ the second index, $2$, refers to $t₃$ in the remaining forest $(t₀, t₂, t₃)$.
+We may omit indices if they are $0$.
+E.g. $(ε, ε, ε)\tC\tC = ((ε ∙ ε) ∙ ε)$ and $(ε, ε, ε)\tC\tC\tR\tT\tT = (ε)$.
+
+It is clear that the only terminal forest is $(ε)$; no move is applicable here, but any other forest has at least one move.  Any tree that is not $ε$ can either be rotated or truncated to its tail, and if the forest has more than one tree, concatenation is possible.
+A forest of $n$ leaf-trees $\varepsilon$ is called an \emph{initial} forest and written $\varepsilon^n$.
+We are most interested in move sequences starting in initial forests.
+
+To establish amortized complexity we are interested in the longest move sequences starting from a given forest, and the amount of $\tC$, $\tT$ and $\tR$ moves in those sequences.
+It is obvious that the number of $\tC$ moves in a longest sequence is the number of trees in the forest minus one, since each such move reduces the number of trees by one.
+Since each $\tT$ move removes one leaf but the last one, the number of $\tT$ moves is at most the number of leaves in the forest minus one.
+The maximal number of $\tR$ moves is the quantity we are most interested in.
+If it is linearly bounded by the size of the forest, we can execute rotations for free, yielding amortized constant time for queue extraction which in the general case consists of a number of rotations and then a tail operation.
+We will prove that in move sequences starting in an inital forest $\varepsilon^{n+1}$ the number of rotations will be at most $4n$.
+
+\subsection{Resourced execution}
+
+To amortize the rotations, we raise some fees $k_\tC$ and $k_\tT$ that have to be paid for concatenation and tail operations.
+Those are stored on a virtual bank account $k$ (attached to a forest as subscript $\vts_k$) so that we can pay a unit cost of $1$ for each rotation.
+For uniformity, let us set $k_\tR = -1$ and refine move execution by the bank account:
+\[
+  \vts_k \, m = \vtsp_{k'} \mbox{ if } k' = k + k_m \geq 0 \mbox{ and } \vts \, m = \vtsp
+  .
+\]
+The goal is to show that there are constants $k_\tC$ and $k_\tT$ such that for each legal move sequence $\vts \, \vms = \vtsp$ there is some initial resource $k$ and some leftover resource $k' \geq 0$ such that $\vts_k \, \vms = \vtsp_{k'}$.
+Moreover, for an initial forest $\vts = \varepsilon^n$ the resourced execution should succeed without initial resources, so $k=0$.
+
+One solution is $k_\tC = k_\tT = 2$, and we prove its correctness via the potential method.
+To this end, we define the following potential functions on forests and trees:
+\[
+\begin{array}{lll}
+\Phi(t_0,\dots,t_n) & = & \sum_{i=0..n} \Phi(t_i) \\
+\Phi(\varepsilon)   & = & \Phi_l(\varepsilon) = \Phi_r(\varepsilon) = 0 \\
+\Phi(t₁ ∙ t₂)       & = & \max (\Phi_l(t₁)+1, \Phi_r(t₂)-1) \\
+\Phi_l(t₁ ∙ t₂)     & = & \max (\Phi_l(t₁)+1, \Phi_r(t₂)) \\
+\Phi_r(t₁ ∙ t₂)     & = & \max (\Phi_r(t₁)+1, \Phi_r(t₂)-1) \\
+\end{array}
+\]
+Clearly, all of these functions yield non-negative integers.
+The various potential functions on trees are related as follows:
+\begin{lemma} \hfill
+  \label{lem:phi}
+  \begin{enumerate}
+  \item $\Phi_r(t) \leq \Phi_l(t) \leq 1 + \Phi_r(t)$.
+  \item $\Phi_r(t) \leq \Phi(t) \leq 1 + \Phi_r(t)$.
+  \item $\Phi_l(t) \leq 1 + \Phi(t)$.
+  \end{enumerate}
+\end{lemma}
+\begin{proof}
+  Easy arithmetical proofs by induction on $t$.
+\end{proof}
+
+\begin{theorem}
+  If $\vts \, \vms = \vtsp$ and $k \geq \Phi(\vts)$ then $\vts_k \, \vms = \vtsp_{k'}$ for some $k' \geq \Phi(\vtsp)$.
+\end{theorem}
+\begin{proof*}
+  By induction on the moves.  It is sufficient to consider single moves.
+  \begin{caselist}
+
+  \nextcase $m = \Cat i j$.
+  Then there is some partition of $\vts$ into two trees $t_1$ and $t_2$ and some rest $\vtsp$.
+  We have to show that for $k \geq \Phi(t_1) + \Phi(t_2) + \Phi(\vtsp)$
+  there is some $k' \geq \Phi(t_1 ∙ t_2) + \Phi(\vtsp)$ such that $k + 2 = k'$.
+  It is sufficient to show that $\Phi(t_1) + \Phi(t_2) + 2 \geq \Phi(t_1 ∙ t_2) = \max (\Phi_l(t₁)+1, \Phi_r(t₂)-1)$.
+  This follows from $\Phi(t_1) + 2 \geq \Phi_l(t₁) + 1$
+  and $\Phi(t_2) + 2 \geq \Phi_r(t₂)-1$, both implied by \Cref{lem:phi}.
+
+  \nextcase $m = \Tail i$.
+  Then forest $\vts$ is partitioned into a tree $t_i = ε ∙ t$ and a remainder $\vtsp$.
+  If is sufficient to show that $\Phi(ε ∙ t) + 2 = \max(1, \Phi_r(t)) + 2 \geq \Phi(t)$.
+  This follows from  \Cref{lem:phi}, $\Phi_r(t)) + 1 \geq \Phi(t)$.
+
+  \nextcase $m = \Rot i$.
+  Then forest $\vts$ is partitioned into a tree $(t₁ ∙ t₂) ∙ t₃$ and a remainder $\vtsp$.
+  It is sufficient to show that
+  $\Phi((t₁ ∙ t₂) ∙ t₃) \geq \Phi(t₁ ∙ (t₂ ∙ t₃)) + 1$
+  but both sides are equal to $\max(\Phi_l(t₁)+2, \Phi_r(t₂)+1, \Phi_r(t₃)-1)$.
+  \qed
+
+  \end{caselist}
+\end{proof*}
+\begin{corollary}
+  If $\varepsilon^n \, \vms = \vtsp$ then $\varepsilon^n_0 \, \vms = \vtsp_{k'}$ for some $k' \geq 0$.
+\end{corollary}
+
+
+\subsection{Optimality}
+
+We have shown that $k_\tC = k_\tT = 2$ is sufficient to amortize all rotations, but is this budget optimal?
+In the following we show that $k_\tC + k_\tT \geq 4$ is necessary to cover arbitrary move sequences from an initial forest.
+To this end, we look for longest move sequences from $\varepsilon^{n+1}$ and check whether the amount of rotations grows towards $4n$.
+
+First, we notice that the move sequence $s_n = \tC(\tC\tR)^{n+1}\tT\tR^n$ with a $\tR/\tC$ ratio of $\frac{2n+1}{n+2}$ run on an initial forest produces a list-shaped tree $(ε ∙ (ε ∙ (ε ∙ \cdots)))$ with $n+1$ leaves.
+The sequence $l_n = \tC\tR(\tC\tR\tT\tR\tR)^n\tC\tR\tT\tR\tT\tR^n$ started at this list reproduces it and thus can be repeated, in each iteration producing a $\tR/\tC$ ratio of $\frac{4n+3}{n+2}$.
+Finally the sequence $e_n = \tC\tR(\tT\tR)^n\tT\tT$ unravels the list into a single leaf, contributing a $\tR/\tC$ ratio of $\frac{n+1}{1}$.
+The sequence $a_n^m = s_n (l_n)^m e_n$ gets an accumulated ratio of
+\[
+  \frac{(2n+1)+(4n+3)m+(n+1)}{(n+2)+(n+2)m+1}
+  = \frac{4nm+3m+3n+2}{nm + 2m + n + 3}
+  = 4 - \frac{5m+n+10}{nm + 2m + n + 3}
+  = 4 - \frac p q
+\]
+where $p = 5m + n + 10$ and $q = nm + 2m + n + 3$.
+Intuitively, this approaches 4 as $m$ and $n$ go towards infinity, since $p/q > 0$ becomes arbitrary small.
+Formally, we prove that for each $N > 0$ we can pick $n$ and $m$ such that $p/q \leq 1/N$.
+Indeed $n = m = 6N$ fulfills $pN \leq q$ since $pN = (5 \cdot 6N + 6N + 10)N = 36N^2 + 10N < 36N^2 + 12N + 6N + 3 = q$.
+
+% Formally, we prove that for each $N > 0$ there is $p/q < 1/N$ such that the ratio $\tC/\tR$ of for some sequence is at least $4 - p/q$.
+% The sequence in question is $a_n^m$ for $n = m = 14N$ and $p = 6 \cdot 14N + 10$ and $q = (14N)^2 + 3\cdot(14N) + 3$
+% Note that the $\tC/\tR$ ratio of $a_n^m = a_{14N}^{14N}$ is
+% \[
+%   \frac{4\cdot (14N)^2 + 6\cdot 14N + 2}{(14N)^2 + 3\cdot(14N) + 3}
+%   = \frac{4q - 6\cdot(14N) - 10}{q}
+%   = \frac{4q - p}{q}
+%   = 4 - \frac p q
+%   .
+% \]
+% We also have $Np = 6 \cdot 14N^2 + 10N < 14 \cdot 14N^2 + 42N + 3 = q$, thus $p/q \leq 1/N$.
+
+%\Rotation{}
+
+
+
+\section{Conclusion}\label{sec:conclusion}
+
+
+%% Acknowledgments
+% \begin{acks}                            %% acks environment is optional
+                                        %% contents suppressed with 'anonymous'
+  %% Commands \grantsponsor{<sponsorID>}{<name>}{<url>} and
+  %% \grantnum[<url>]{<sponsorID>}{<number>} should be used to
+  %% acknowledge financial support and will be used by metadata
+  %% extraction tools.
+
+% \end{acks}
+
+%%\SHORTVERSION{\clearpage}
+
+%% Bibliography
+\bibliography{auto-main}
+
+
+% %% Appendix
+% \appendix
+% \section{Appendix}
+
+% Text of appendix \ldots
+
+% \appendix
+
+
+\end{document}
+
+%%% Local Variables:
+%%% ispell-local-dictionary: "british"
+%%% End:
