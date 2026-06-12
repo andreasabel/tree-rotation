@@ -1,0 +1,131 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - '*'
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+# Need write permissions for deploy
+# https://github.com/JamesIves/github-pages-deploy-action#getting-started-airplane
+permissions:
+  contents: write
+
+env:
+  AGDA_VERSION: '2.8.0'
+  STDLIB_VERSION: '2.3'
+  DEPLOY_DIR: ${{ github.ref_name }}
+  HTML_DIR: html/${{ github.ref_name }}
+  SRC_DIR: agda
+  # Entry point for Agda compilation
+  MAIN: Main.agda
+  # Entry point for uploaded HTML, becomes index.html
+  INDEX: Main.html
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # Checkout to $HOME empties $HOME so we have to do it before we put stuff there.
+      - uses: actions/checkout@v6
+
+      - name: Debug info --- directories
+        run: |
+          echo "HOME = ${HOME}"
+          echo "current directory = $(pwd)"
+
+      - name: Setup Agda ${{ env.AGDA_VERSION }}
+        id: setup-agda
+        uses: agda/agda-setup-action@v1
+        with:
+          agda-version: ${{ env.AGDA_VERSION }}
+          agda-stdlib-version: ${{ env.STDLIB_VERSION }}
+
+      - name: Restore cache
+        uses: actions/cache/restore@v5
+        id:   cache
+        env:
+          AGDA_DIR: ${{ steps.setup-agda.outputs.agda-dir }}
+        with:
+          key: agda-${{ env.AGDA_VERSION }}-stdlib-${{ env.STDLIB_VERSION }}-commit-${{ github.sha }}
+          restore-keys: agda-${{ env.AGDA_VERSION }}-stdlib-${{ env.STDLIB_VERSION }}-
+          path: |
+            _build
+            ${{ env.AGDA_DIR }}/libraries.d
+
+      # setup-agda does not support 2.8.0
+
+      # - name: Setup Agda
+      #   uses: wenkokke/setup-agda@v2
+      #   id:   setup
+      #   with:
+      #     agda-version: ${{ env.AGDA_VERSION }}
+      #     agda-stdlib-version: ${{ env.STDLIB_VERSION }}
+
+      # - name: Restore cache
+      #   uses: actions/cache/restore@v4
+      #   id:   cache
+      #   with:
+      #     key: agda-${{ steps.setup.outputs.agda-version }}-stdlib-${{ env.STDLIB_VERSION }}-commit-${{ github.sha }}
+      #     restore-keys: agda-${{ steps.setup.outputs.agda-version }}-stdlib-${{ env.STDLIB_VERSION }}-
+      #     path: |
+      #       _build
+      #       ~/.agda/libraries.d
+
+      - name: Run Agda
+        working-directory: ${{ env.SRC_DIR }}
+        run: agda "${{ env.MAIN }}" --profile=modules +RTS -s
+
+      - name: Save cache
+        uses: actions/cache/save@v5
+        # Primary cache key is unique, so we can always save.
+        if:   always()
+        env:
+          AGDA_DIR: ${{ steps.setup-agda.outputs.agda-dir }}
+        with:
+          key: ${{ steps.cache.outputs.cache-primary-key }}
+          path: |
+            _build
+            ${{ env.AGDA_DIR }}/libraries.d
+
+########################################################################
+## DOC DEPLOYMENT
+########################################################################
+
+      # We start by retrieving the currently deployed docs.
+      # We remove the content that is in the directory we are going to populate
+      # so that stale files corresponding to deleted modules do not accumulate.
+
+      - name: Checkout branch gh-pages to html
+        working-directory: ${{ env.SRC_DIR }}
+        run: |
+          git clone --depth 1 --single-branch --branch gh-pages https://github.com/andreasabel/tree-rotation '${{ env.HTML_DIR }}'
+          rm -f '${{ env.HTML_DIR }}'/*.html
+          rm -f '${{ env.HTML_DIR }}'/*.css
+
+      # We then generate the docs in the HTML_DIR subdirectory.
+      - name: Generate HTML
+        working-directory: ${{ env.SRC_DIR }}
+        run: |
+          agda --html --html-dir="${{ env.HTML_DIR }}" "${{ env.MAIN }}"
+          cp "${{ env.HTML_DIR }}/${{ env.INDEX }}" "${{ env.HTML_DIR }}/index.html"
+
+      - name: Deploy HTML
+        uses: JamesIves/github-pages-deploy-action@v4
+        # if: ${{ success() && env.AGDA_DEPLOY }}
+
+        with:
+          branch: gh-pages
+          folder: ${{ env.SRC_DIR }}/${{ env.HTML_DIR }}
+          git-config-name: Github Actions
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: ${{ env.SRC_DIR }}/${{ env.HTML_DIR }}
