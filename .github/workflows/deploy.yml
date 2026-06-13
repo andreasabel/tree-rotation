@@ -72,7 +72,7 @@ jobs:
           key: agda-${{ env.AGDA_VERSION }}-stdlib-${{ env.STDLIB_VERSION }}-commit-${{ github.sha }}
           restore-keys: agda-${{ env.AGDA_VERSION }}-stdlib-${{ env.STDLIB_VERSION }}-
           path: |
-            ${{ env.SRC_DIR }}/_build
+            agda/_build
             ${{ env.AGDA_DIR }}/libraries.d
 
       # Build
@@ -99,7 +99,7 @@ jobs:
         with:
           key: ${{ steps.cache-agda.outputs.cache-primary-key }}
           path: |
-            ${{ env.SRC_DIR }}/_build
+            agda/_build
             ${{ env.AGDA_DIR }}/libraries.d
 
       - uses: actions/upload-pages-artifact@v5
