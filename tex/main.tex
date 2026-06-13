@@ -391,7 +391,7 @@ The various potential functions on trees are related as follows:
 \end{corollary}
 
 
-\subsection{Optimality}
+\subsection{Optimality}\label{sec:optimality}
 
 We have shown that $k_\tC = k_\tT = 2$ is sufficient to amortize all rotations, but is this budget optimal?
 In the following we show that $k_\tC + k_\tT \geq 4$ is necessary to cover arbitrary move sequences from an initial forest.
@@ -427,6 +427,21 @@ since $pN = (5 \cdot 6N + 6N + 10)N = 36N^2 + 10N < 36N^2 + 12N + 6N + 3 = q$.
 % We also have $Np = 6 \cdot 14N^2 + 10N < 14 \cdot 14N^2 + 42N + 3 = q$, thus $p/q \leq 1/N$.
 
 %\Rotation{}
+
+
+\subsection{Method}
+
+\andreas{Koen and Christian, write something how you found the potential functions.}
+
+To find move sequences that would allow to prove the lower bound, a \href{https://github.com/andreasabel/tree-rotation/tree/master/app}{breadth-first solver} for the tree game was developed in Haskell using a coding agent.
+It could only find the longest move sequences up to 15 concatenations before running out of memory after exploring 100 million positions.
+Yet the \href{https://github.com/andreasabel/tree-rotation/blob/df0d1e4ba1696b2746854d7165b58beffba5002f/data/score-full.csv}{sequences it produced} only used concatenation on the right, so a new solver for this restricted ``single-tree'' game was coded.
+With still an exponentially growing search space, \href{https://github.com/andreasabel/tree-rotation/blob/df0d1e4ba1696b2746854d7165b58beffba5002f/data/score-crt-exhaustive.csv}{it did not get much further}, exploring 54 million positions for a maximum of 16 concatenations.
+However, a certain pattern in the longest move sequences was emerging, and, fixing the initial moves, one could see sequences up to 23 concatenations, confirming the trend, however, without the absolute guarantee that those were longest.
+
+To study the obtained move sequences, an \href{https://andreasabel.github.io/tree-rotation/play/index.html}{interactive visualisation} of the tree game was developed using a coding agent.
+This allowed to extract the parametric regular move sequence that has been used in \Cref{sec:optimality} to show the lower bound of 4 on the combined budget of the concatenation and tail operations.
+Formal Agda proofs that this sequence is possible for all parameter values, that it yields the calculate ratio between rotation and concatenation moves, and that this ration comes arbitrarily close to 4 have then been developed with the assistance of a coding agent.
 
 
 
