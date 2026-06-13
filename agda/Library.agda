@@ -9,7 +9,7 @@ open import Data.List           public using (List; []; _∷_)
 open import Data.Maybe          public using (Maybe; nothing; just; _>>=_) hiding (module Maybe)
 open import Data.Nat            public using (ℕ; zero; suc; pred) hiding (module ℕ)
 open import Data.Product        public using (∃; _×_; _,_; proj₁; proj₂)
-open import Data.Vec            public using (Vec; []; _∷_)
+open import Data.Vec            public using (Vec; []; _∷_; replicate)
 open import Relation.Nullary    public using (¬_; yes; no)
 
 open import Relation.Binary.PropositionalEquality public

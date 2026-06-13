@@ -4,7 +4,7 @@ agda=agda
 latex=pdflatex
 
 .PHONY: default
-default: main.pdf
+default: main.pdf html
 
 #main.pdf:
 #	latexmk -pdf main

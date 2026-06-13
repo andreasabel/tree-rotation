@@ -72,9 +72,10 @@
 \newwrite\agdarefs
 \immediate\openout\agdarefs=References.agda
 
-% \newcommand\agdaref[2]{\href{file:/home/jyp/repo/modal/agda/html/#1.html\##2}{✓}}
+
+% References to the HTML rendered Agda development
+%\newcommand{\agdaref}[2]{\href{html/#1.html\##2}{✓}}
 \def\myhash{\#}
-\write\agdarefs{{-\string# OPTIONS -W all --warning=error \string#-}}
 \write\agdarefs{module References where}
 \write\agdarefs{}
 \newcommand\agdacomment[1]{\write\agdarefs{-- #1}}
@@ -268,6 +269,9 @@
 
 Binary trees are constant-time catenable queues.
 
+This paper is accompanied by an Agda formalization.
+Checkmarks \agdaref{Main}{Amortization} are clickable and lead to the Agda formalization of the concept adjacent to the checkmark.  The formalization may contain extra detail that we chose to omit in the text to keep the presentation concise.
+
 % https://hackage.haskell.org/package/alist
 
 \section{Explicit rotation}\label{sec:rotation}
@@ -275,18 +279,18 @@ Binary trees are constant-time catenable queues.
 %\input{latex/Code}
 
 We consider a modified API that makes tree rotation a primitive operation, since this simplifies the amortization proofs.
-Since the contents of the queue does not matter for complexity considerations, only its \emph{structure}, we drop the labels from the tree definition and only consider the cases of an (empty) leaf \(ε\) and a binary node constructor \(\_∙\_\).
-Tree rotation \(\_\rot\) is a partial function defined by \(((t₁ ∙ t₂) ∙ t₃)\rot = t₁ ∙ (t₂ ∙ t₃)\).
-Dropping from the front of the queue is represented by the partial function ``tail'' \(\_\tail\) defined by \( (ε ∙ t)\tail = t \).
+Since the contents of the queue does not matter for complexity considerations, only its \emph{structure}, we drop the labels from the tree definition and only consider the cases of an (empty) leaf \(ε\) and a binary node constructor \(\_∙\_\) \agdaref{Tree}{_∙_}.
+Tree rotation \(\_\rot\) is a partial function defined by \(((t₁ ∙ t₂) ∙ t₃)\rot = t₁ ∙ (t₂ ∙ t₃)\) \agdaref{Tree}{rotate}.
+Dropping from the front of the queue is represented by the partial function ``tail'' \(\_\tail\) defined by \( (ε ∙ t)\tail = t \) \agdaref{Tree}{tail}.
 The idea is that the tail of a queue can only be taken if its tree representation has been maximally rotated at the root and thus is of the form \( ε ∙ t \).
 
 \subsection{The tree game}
 
 To study the amortized complexity, we need to talk about arbitrary sequences of tree operations.
-We conceptualize such sequences as moves in a game where the arena is a multiset of trees which we call a \emph{forest}.
-Each move takes out some trees from the forest, applies the corresponding operation on them and puts the result back into the forest.
+We conceptualize such sequences as moves in a game where the arena is a multiset of trees which we call a \emph{forest} \agdaref{MultiTreeGame}{Forest}.
+Each move takes out some trees from the forest, applies the corresponding operation on them and puts the result back into the forest \agdaref{MultiTreeGame}{concat}.
 For simplicity we represent the forest as a non-empty list so that we can identify particular trees by their index in the list.  Note that taking out trees from the forest and putting a tree back (which we do at the front of the list) typically changes indices of tree in the forest.
-The moves $m$ we are considering are:
+The moves $m$ \agdaref{MultiTreeGame}{Moves} we are considering are:
 \[
 \begin{array}{l@{\qquad}l}
   \Cat i j & \mbox{concatenate trees $i$ and $j$} \\
@@ -294,9 +298,9 @@ The moves $m$ we are considering are:
   \Tail i  & \mbox{take tail of tree $i$, if possible} \\
 \end{array}
 \]
-We write $\vts \, m = \vtsp$ if move $m$ can be applied to forest $\vts$, yielding forest $\vts'$.
+We write $\vts \, m = \vtsp$ \agdaref{MultiTreeGame}{run} if move $m$ can be applied to forest $\vts$, yielding forest $\vts'$.
 For instance, $(t₀, t₁, t₂, t₃) \Cat 1 2 = (t₁ ∙ t₃, t₀, t₂)$ since after taking out $t₁$ the second index, $2$, refers to $t₃$ in the remaining forest $(t₀, t₂, t₃)$.
-We may omit indices if they are $0$.
+We may omit indices if they are $0$ \agdaref{SingleTreeGame}{Moves}.
 E.g. $(ε, ε, ε)\tC\tC = ((ε ∙ ε) ∙ ε)$ and $(ε, ε, ε)\tC\tC\tR\tT\tT = (ε)$.
 
 It is clear that the only terminal forest is $(ε)$; no move is applicable here, but any other forest has at least one move.  Any tree that is not $ε$ can either be rotated or truncated to its tail, and if the forest has more than one tree, concatenation is possible.
@@ -314,16 +318,17 @@ We will prove that in move sequences starting in an inital forest $\varepsilon^{
 
 To amortize the rotations, we raise some fees $k_\tC$ and $k_\tT$ that have to be paid for concatenation and tail operations.
 Those are stored on a virtual bank account $k$ (attached to a forest as subscript $\vts_k$) so that we can pay a unit cost of $1$ for each rotation.
-For uniformity, let us set $k_\tR = -1$ and refine move execution by the bank account:
+For uniformity, let us set $k_\tR = -1$ and refine move execution by the bank account \agdaref{MultiTreeGame}{RMoves}:
 \[
   \vts_k \, m = \vtsp_{k'} \mbox{ if } k' = k + k_m \geq 0 \mbox{ and } \vts \, m = \vtsp
   .
 \]
-The goal is to show that there are constants $k_\tC$ and $k_\tT$ such that for each legal move sequence $\vts \, \vms = \vtsp$ there is some initial resource $k$ and some leftover resource $k' \geq 0$ such that $\vts_k \, \vms = \vtsp_{k'}$.
-Moreover, for an initial forest $\vts = \varepsilon^n$ the resourced execution should succeed without initial resources, so $k=0$.
+The goal is to show that there are constants $k_\tC$ and $k_\tT$ such that for each legal move sequence $\vts \, \vms = \vtsp$ there is some initial resource $k$ and some leftover resource $k' \geq 0$ such that $\vts_k \, \vms = \vtsp_{k'}$ \agdaref{Main}[Amortization]{sufficient}.
+Moreover, for an initial forest $\vts = \varepsilon^n$ the resourced execution should succeed without initial resources \agdaref{Main}[Amortization]{sufficient-initial}, so $k=0$.
 
 One solution is $k_\tC = k_\tT = 2$, and we prove its correctness via the potential method.
-To this end, we define the following potential functions on forests and trees:
+To this end, we define the following potential functions on forests \agdaref{MultiTreeGame}{Φs}
+and trees \agdaref{Tree}{Potential}:
 \[
 \begin{array}{lll}
 \Phi(t_0,\dots,t_n) & = & \sum_{i=0..n} \Phi(t_i) \\
@@ -338,9 +343,9 @@ The various potential functions on trees are related as follows:
 \begin{lemma} \hfill
   \label{lem:phi}
   \begin{enumerate}
-  \item $\Phi_r(t) \leq \Phi_l(t) \leq 1 + \Phi_r(t)$.
-  \item $\Phi_r(t) \leq \Phi(t) \leq 1 + \Phi_r(t)$.
-  \item $\Phi_l(t) \leq 1 + \Phi(t)$.
+  \item $\Phi_r(t) \leq \Phi_l(t) \leq 1 + \Phi_r(t)$. \agdaref{UpperBound}{Φᵣ≤Φₗ}\agdaref{UpperBound}{Φₗ≤1+Φᵣ}
+  \item $\Phi_r(t) \leq \Phi(t) \leq 1 + \Phi_r(t)$.   \agdaref{UpperBound}{Φᵣ≤Φ}\agdaref{UpperBound}{Φ≤1+Φᵣ}
+  \item $\Phi_l(t) \leq 1 + \Phi(t)$.                  \agdaref{UpperBound}{Φₗ≤1+Φ}
   \end{enumerate}
 \end{lemma}
 \begin{proof}
@@ -348,29 +353,33 @@ The various potential functions on trees are related as follows:
 \end{proof}
 
 \begin{theorem}
-  If $\vts \, \vms = \vtsp$ and $k \geq \Phi(\vts)$ then $\vts_k \, \vms = \vtsp_{k'}$ for some $k' \geq \Phi(\vtsp)$.
+  If $\vts \, \vms = \vtsp$ and $k \geq \Phi(\vts)$ then $\vts_k \, \vms = \vtsp_{k'}$ for some $k' \geq \Phi(\vtsp)$. \agdaref{Main}[Amortization]{sufficient}
 \end{theorem}
 \begin{proof*}
-  By induction on the moves.  It is sufficient to consider single moves.
+  By induction on the moves \agdaref{Sufficient}{thm-rmoves}.
+  It is sufficient to consider single moves.
   \begin{caselist}
 
   \nextcase $m = \Cat i j$.
   Then there is some partition of $\vts$ into two trees $t_1$ and $t_2$ and some rest $\vtsp$.
   We have to show that for $k \geq \Phi(t_1) + \Phi(t_2) + \Phi(\vtsp)$
   there is some $k' \geq \Phi(t_1 ∙ t_2) + \Phi(\vtsp)$ such that $k + 2 = k'$.
-  It is sufficient to show that $\Phi(t_1) + \Phi(t_2) + 2 \geq \Phi(t_1 ∙ t_2) = \max (\Phi_l(t₁)+1, \Phi_r(t₂)-1)$.
+  It is sufficient to show that $\Phi(t_1) + \Phi(t_2) + 2 \geq \Phi(t_1 ∙ t_2) = \max (\Phi_l(t₁)+1, \Phi_r(t₂)-1)$ \agdaref{Sufficient}{append-budget}.
   This follows from $\Phi(t_1) + 2 \geq \Phi_l(t₁) + 1$
-  and $\Phi(t_2) + 2 \geq \Phi_r(t₂)-1$, both implied by \Cref{lem:phi}.
+  and $\Phi(t_2) + 2 \geq \Phi_r(t₂)-1$, both implied by \Cref{lem:phi}
+  \agdaref{Sufficient}{concat-budget}.
 
   \nextcase $m = \Tail i$.
   Then forest $\vts$ is partitioned into a tree $t_i = ε ∙ t$ and a remainder $\vtsp$.
-  If is sufficient to show that $\Phi(ε ∙ t) + 2 = \max(1, \Phi_r(t)) + 2 \geq \Phi(t)$.
+  If is sufficient to show that $\Phi(ε ∙ t) + 2 = \max(1, \Phi_r(t)) + 2 \geq \Phi(t)$
+  \agdaref{Sufficient}{tail-budget}.
   This follows from  \Cref{lem:phi}, $\Phi_r(t)) + 1 \geq \Phi(t)$.
 
   \nextcase $m = \Rot i$.
   Then forest $\vts$ is partitioned into a tree $(t₁ ∙ t₂) ∙ t₃$ and a remainder $\vtsp$.
   It is sufficient to show that
   $\Phi((t₁ ∙ t₂) ∙ t₃) \geq \Phi(t₁ ∙ (t₂ ∙ t₃)) + 1$
+  \agdaref{Sufficient}{rotate-budget}
   but both sides are equal to $\max(\Phi_l(t₁)+2, \Phi_r(t₂)+1, \Phi_r(t₃)-1)$.
   \qed
 
@@ -378,6 +387,7 @@ The various potential functions on trees are related as follows:
 \end{proof*}
 \begin{corollary}
   If $\varepsilon^n \, \vms = \vtsp$ then $\varepsilon^n_0 \, \vms = \vtsp_{k'}$ for some $k' \geq 0$.
+  \agdaref{Main}[Amortization]{sufficient-initial}
 \end{corollary}
 
 
@@ -387,10 +397,11 @@ We have shown that $k_\tC = k_\tT = 2$ is sufficient to amortize all rotations, 
 In the following we show that $k_\tC + k_\tT \geq 4$ is necessary to cover arbitrary move sequences from an initial forest.
 To this end, we look for longest move sequences from $\varepsilon^{n+1}$ and check whether the amount of rotations grows towards $4n$.
 
-First, we notice that the move sequence $s_n = \tC(\tC\tR)^{n+1}\tT\tR^n$ with a $\tR/\tC$ ratio of $\frac{2n+1}{n+2}$ run on an initial forest produces a list-shaped tree $(ε ∙ (ε ∙ (ε ∙ \cdots)))$ with $n+1$ leaves.
-The sequence $l_n = \tC\tR(\tC\tR\tT\tR\tR)^n\tC\tR\tT\tR\tT\tR^n$ started at this list reproduces it and thus can be repeated, in each iteration producing a $\tR/\tC$ ratio of $\frac{4n+3}{n+2}$.
-Finally the sequence $e_n = \tC\tR(\tT\tR)^n\tT\tT$ unravels the list into a single leaf, contributing a $\tR/\tC$ ratio of $\frac{n+1}{1}$.
-The sequence $a_n^m = s_n (l_n)^m e_n$ gets an accumulated ratio of
+First, we notice that the move sequence $s_n = \tC(\tC\tR)^{n+1}\tT\tR^n$ \agdaref{Sequence}{start} with a $\tR/\tC$ ratio of $\frac{2n+1}{n+2}$ \agdaref{Counting}{lem-start-suf} run on an initial forest produces a list-shaped tree $(ε ∙ (ε ∙ (ε ∙ \cdots)))$ with $n+1$ leaves \agdaref{Sequence}{thm-start}.
+The sequence $l_n = \tC\tR(\tC\tR\tT\tR\tR)^n\tC\tR\tT\tR\tT\tR^n$ \agdaref{Sequence}{loop} started at this list reproduces it \agdaref{Sequence}{thm-loop} and thus can be repeated, in each iteration producing a $\tR/\tC$ ratio of $\frac{4n+3}{n+2}$ \agdaref{Counting}{lem-loop-suf}.
+Finally the sequence $e_n = \tC\tR(\tT\tR)^n\tT\tT$ \agdaref{Sequence}{unravel} unravels the list into a single leaf \agdaref{Sequence}{thm-unravel}, contributing a $\tR/\tC$ ratio of $\frac{n+1}{1}$ \agdaref{Counting}{lem-unravel-suf}.
+The sequence $a_n^m = s_n (l_n)^m e_n$ \agdaref{Sequence}{seq} gets an accumulated ratio of
+\agdaref{Main}[Seq]{counting}
 \[
   \frac{(2n+1)+(4n+3)m+(n+1)}{(n+2)+(n+2)m+1}
   = \frac{4nm+3m+3n+2}{nm + 2m + n + 3}
@@ -400,7 +411,8 @@ The sequence $a_n^m = s_n (l_n)^m e_n$ gets an accumulated ratio of
 where $p = 5m + n + 10$ and $q = nm + 2m + n + 3$.
 Intuitively, this approaches 4 as $m$ and $n$ go towards infinity, since $p/q > 0$ becomes arbitrary small.
 Formally, we prove that for each $N > 0$ we can pick $n$ and $m$ such that $p/q \leq 1/N$.
-Indeed $n = m = 6N$ fulfills $pN \leq q$ since $pN = (5 \cdot 6N + 6N + 10)N = 36N^2 + 10N < 36N^2 + 12N + 6N + 3 = q$.
+Indeed $n = m = 6N$ fulfills $pN \leq q$ \agdaref{Main}[Budget-ℕ]{approximation}
+since $pN = (5 \cdot 6N + 6N + 10)N = 36N^2 + 10N < 36N^2 + 12N + 6N + 3 = q$.
 
 % Formally, we prove that for each $N > 0$ there is $p/q < 1/N$ such that the ratio $\tC/\tR$ of for some sequence is at least $4 - p/q$.
 % The sequence in question is $a_n^m$ for $n = m = 14N$ and $p = 6 \cdot 14N + 10$ and $q = (14N)^2 + 3\cdot(14N) + 3$

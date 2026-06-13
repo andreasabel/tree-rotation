@@ -6,31 +6,37 @@ module Main where
 
 open import Library
 open import Tree
-open import UpperBound using (amor-append; amor-tail; amor-rotate)
-open import SingleTreeGame using (ε; move; moves)
 open import Sequence using (seq; thm-seq)
-open import SufficientSingleTree using (Legal; thm-rmoves)
 open import Counting using (count; C:_T:_R:_; thm-counts-seq)
-import Necessary
 import Approx
+import Necessary
 import MultiTreeGame
 import RationalSingleTreeGame
 import RationalApprox
+import ResourcedSingleTreeGame
+import SingleTreeGame
+import Sufficient
+import SufficientSingleTree
+import UpperBound
 
--- Integer budgets
+-- Amortization theorem: save 2 for each append and tail, then the rotations are paid for.
 
-module Budget-ℕ where
-  open import ResourcedSingleTreeGame using (rempty; module RMoves)
+module Amortization where
   open ℕ
   open Potential
+  open UpperBound using (amor-append; amor-tail; amor-rotate)
 
-  -- Amortization theorem: pay 3 for each append and tail, then the rotations are also paid for.
+  -- Budget for concatenation operation
 
   kₐ : ℕ
   kₐ = 2
 
+  -- Budget for tail operation
+
   kₜ : ℕ
   kₜ = 2
+
+  -- Lemma: The budgets are sufficient to compensate changes in potential.
 
   amortization : ∀ {t t'}
     → (                     kₐ + Φ t + Φ t' ≥ Φ (t ∙ t'))
@@ -40,12 +46,55 @@ module Budget-ℕ where
   amortization {t = t} {t' = t'} =
     amor-append {l = t} {r = t'} , amor-tail , amor-rotate
 
-  -- Lower bound.
+  -- Theorem: every possible move sequence succeeds under resourced execution
+  -- if the full potential is available as resource.
+
+  open MultiTreeGame using (Forest; ε^_; Φs; Φ-initial; Moves; run)
+  open Sufficient using (Legal; thm-rmoves)
+
+  sufficient
+    : ∀ {m n} (mv : Moves m n) (ts : Forest m) (ts' : Forest n)
+    → run mv ts ≡ just ts'
+    → ∀ k → k ≥ Φs ts
+    → ∃ λ k' → (k' ≥ Φs ts') × Legal mv (k ⨮ ts) (k' ⨮ ts')
+  sufficient = thm-rmoves
+
+  sufficient-initial
+    : ∀ {m n} (mv : Moves m n) (let ts = ε^ m) (ts' : Forest n)
+    → run mv ts ≡ just ts'
+    → ∃ λ k' → Legal mv (0 ⨮ ts) (k' ⨮ ts')
+  sufficient-initial {m = m} mv ts' h with thm-rmoves mv (ε^ m) ts' h 0 (Φ-initial m)
+  ... | k' , _ , legal = k' , legal
+
+-- A certain move sequence is our tool to prove lower bounds.
+
+module Seq where
+  open SingleTreeGame using (ε; move)
+  open ℕ
 
   -- There is a certain legal move sequence cycling on the empty tree.
 
   move-sequence : ∀ m n → move (seq m n) ε ≡ just ε
   move-sequence = thm-seq
+
+  -- The ratio of R over C moves in this sequence approaches 4.
+  -- (Note that the total numbers of C and T moves coincide as we are cycling back to an empty tree.)
+
+  counting : ∀ m n → let
+       c# = m * (n + 2) + n + 3
+       r# = m * (4 * n + 3) + 3 * n + 2
+    in count (seq m n ε) ≡ (C: c# T: c# R: r#)
+  counting = thm-counts-seq
+
+-- Lower bound: Integer budgets
+-- This part shows that kₐ + kₜ ≥ 4 if kₐ and kₜ are integral.
+
+module Budget-ℕ where
+  open SingleTreeGame using (ε; move; moves)
+  open Seq using (move-sequence)
+  open ResourcedSingleTreeGame using (rempty; module RMoves)
+  open SufficientSingleTree using (Legal; thm-rmoves)
+  open ℕ
 
   -- A resource-aware execution of the move sequence succeeds as well
   -- with the budgets as in the amortization theorem.
@@ -57,15 +106,6 @@ module Budget-ℕ where
   ... | leftover , _ , legal = leftover , legal
 
   -- I calculated the leftover budget to 5m + n + 10 over a total allocation of Rs of 4nm + 10m + 4n + 12.
-
-  -- The ratio of R over C moves in this sequence approaches 4.
-  -- (Note that the total numbers of C and T moves coincide as we are cycling back to an empty tree.)
-
-  counting : ∀ m n → let
-       c# = m * (n + 2) + n + 3
-       r# = m * (4 * n + 3) + 3 * n + 2
-    in count (seq m n ε) ≡ (C: c# T: c# R: r#)
-  counting = thm-counts-seq
 
   -- If any possible move sequence is also executable with resource constraints,
 
@@ -98,18 +138,19 @@ module Budget-ℕ where
     open Approx N
     open Proofs kₐ kₜ hyp
 
--- Rational budgets
+-- Lower bound: Rational budgets
 
 -- Same statement, sharpened over the rationals:
 -- the budget kₐ + kₜ approximates 4 from below within 1/N for every N ≥ 1.
 
 module Budget-ℚ where
+  open SingleTreeGame using (ε; move; moves)
+  open RationalSingleTreeGame using ([_]ℚ; _⨮_)
+    renaming (rempty to remptyℚ; module RMoves to RMovesℚ)
 
   open import Data.Rational using (ℚ; 0ℚ; 1ℚ)
     renaming (_+_ to _+ℚ_; _*_ to _*ℚ_; _-_ to _-ℚ_
              ; _≤_ to _≤ℚ_; _≥_ to _≥ℚ_; _<_ to _<ℚ_)
-  open RationalSingleTreeGame using ([_]ℚ; _⨮_)
-    renaming (rempty to remptyℚ; module RMoves to RMovesℚ)
 
   -- Resource-aware execution completeness over the rationals.
 

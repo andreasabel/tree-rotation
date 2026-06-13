@@ -22,6 +22,18 @@ Forest = Vec Tree
 Φs [] = 0
 Φs (t ∷ ts) = Φ t + Φs ts
 
+-- Initial forest
+
+ε^_ : (n : ℕ) → Forest n
+ε^ n = replicate n ε
+
+Φ-init : ∀ n → Φs (ε^ n) ≡ 0
+Φ-init (zero)  = refl
+Φ-init (suc n) = Φ-init n
+
+Φ-initial : ∀ n → Φs (ε^ n) ≤ 0
+Φ-initial n rewrite Φ-init n = z≤n
+
 -- Select a tree from the forest
 
 pick : Fin n → Forest n → ∃ λ m → n ≡ suc m × Tree × Forest m
