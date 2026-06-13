@@ -1,16 +1,23 @@
 tree-rotation
 =============
 
-Some simple tools to test hypotheses about amortized tree operations.
+Leaf-labelled binary trees are amortized constant-time queues.
 
 Initiated by the puzzle at: https://github.com/koengit/puzzle2026
 
-This repository contains two main components:
+This repository contains the following components:
 
-1. A [browser playground](play/index.html) for interactively stepping through move sequences and visualizing the resulting tree.
-2. A Haskell program, `tree-rotation`, for exact and approximate high-score (rotations/constructors) search and plotting.
+1. A [paper](tex/main.pdf) proving that leaf-labelled binary trees are amortized constant-time queues.
+2. A [rendered](agda/html/Main.html) [Agda formalization](agda/Main.agda) of the definitions, theorems, and proofs.
+3. A [browser playground](play/index.html) for interactively stepping through move sequences and visualizing the resulting tree.
+4. A Haskell program, [`tree-rotation`](tree-rotation.cabal), for highest rotations per constructors ratio search and plotting.
 
 The project is licensed under the **BSD 3-clause license**; see [LICENSE](LICENSE).
+
+## Agda code
+
+The [code](agda/Main.agda) needs requires Agda standard library v2.4.
+It has been tested with Agda 2.8.0 and 2.9.0.
 
 ## Web playground
 
@@ -34,7 +41,7 @@ The displayed tree and score is determined by the moves up to the current cursor
 Thus, you can step backward and forward through a longer sequence and inspect intermediate states without deleting text.
 If the move sequence is illegal, the tree pane shows a large red `X`.
 
-## Command-line solver
+## Command-line solver in Haskell
 
 The executable **`tree-rotation`** solves the game by exhaustive exploration of the game tree.
 

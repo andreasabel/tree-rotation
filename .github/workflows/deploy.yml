@@ -1,4 +1,4 @@
-name: CI
+name: Deploy
 
 on:
   push:
@@ -11,21 +11,9 @@ on:
       - master
   workflow_dispatch:
 
-# Need write permissions for deploy
-# https://github.com/JamesIves/github-pages-deploy-action#getting-started-airplane
-permissions:
-  contents: write
-
 env:
   AGDA_VERSION: '2.8.0'
   STDLIB_VERSION: '2.4'
-  DEPLOY_DIR: ${{ github.ref_name }}
-  HTML_DIR: html/${{ github.ref_name }}
-  SRC_DIR: agda
-  # Entry point for Agda compilation
-  MAIN: Main.agda
-  # Entry point for uploaded HTML, becomes index.html
-  INDEX: Main.html
 
 jobs:
   build:
@@ -33,99 +21,112 @@ jobs:
 
     steps:
 
-      - name: Debug info --- directories
-        run: |
-          echo "HOME = ${HOME}"
-          echo "current directory = $(pwd)"
+      # Setup
 
-      - name: Setup Agda ${{ env.AGDA_VERSION }}
+      - name: Install Pandoc
+        uses: pandoc/actions/setup@v1
+
+      - name: Install Tectonic
+        uses: wtfjoke/setup-tectonic@v4
+
+      - name: Install Agda ${{ env.AGDA_VERSION }}
         id: setup-agda
         uses: agda/agda-setup-action@v1
         with:
           agda-version: ${{ env.AGDA_VERSION }}
           agda-stdlib-version: ${{ env.STDLIB_VERSION }}
 
+      - name: Set up environment variables
+        run: |
+          echo "HOME = ${HOME}"
+          echo "current directory = $(pwd)"
+          agda --version
+          pandoc --version
+          tectonic --version
+          echo "TECTONIC_VERSION=$(tectonic --version)"            >> "${GITHUB_ENV}"
+          echo "TECTONIC_CACHE=$(tectonic -X show user-cache-dir)" >> "${GITHUB_ENV}"
+        # This errors because pandoc --version does not emit a single line
+        # echo "PANDOC_VERSION=$(pandoc --version)"                >> "${GITHUB_ENV}"
+
       # Checkout to $HOME empties $HOME so we have to do it before we put stuff there.
       - uses: actions/checkout@v6
 
-      - name: Restore cache
+      # Restore caches
+
+      - name: Restore Tectonic cache
         uses: actions/cache/restore@v5
-        id:   cache
+        id:   cache-tectonic
+        env:
+          key: tectonic-${{ env.TECTONIC_VERSION }}
+        with:
+          key:          ${{ env.key }}-${{ github.sha }}
+          restore-keys: ${{ env.key }}-
+          path:         ${{ env.TECTONIC_CACHE }}
+
+      - name: Restore Agda cache
+        uses: actions/cache/restore@v5
+        id:   cache-agda
         env:
           AGDA_DIR: ${{ steps.setup-agda.outputs.agda-dir }}
         with:
           key: agda-${{ env.AGDA_VERSION }}-stdlib-${{ env.STDLIB_VERSION }}-commit-${{ github.sha }}
           restore-keys: agda-${{ env.AGDA_VERSION }}-stdlib-${{ env.STDLIB_VERSION }}-
           path: |
-            _build
+            agda/_build
             ${{ env.AGDA_DIR }}/libraries.d
 
-      # setup-agda does not support 2.8.0
+      # Build
 
-      # - name: Setup Agda
-      #   uses: wenkokke/setup-agda@v2
-      #   id:   setup
-      #   with:
-      #     agda-version: ${{ env.AGDA_VERSION }}
-      #     agda-stdlib-version: ${{ env.STDLIB_VERSION }}
+      - name: Build
+        run: make
 
-      # - name: Restore cache
-      #   uses: actions/cache/restore@v4
-      #   id:   cache
-      #   with:
-      #     key: agda-${{ steps.setup.outputs.agda-version }}-stdlib-${{ env.STDLIB_VERSION }}-commit-${{ github.sha }}
-      #     restore-keys: agda-${{ steps.setup.outputs.agda-version }}-stdlib-${{ env.STDLIB_VERSION }}-
-      #     path: |
-      #       _build
-      #       ~/.agda/libraries.d
+      # Save caches
 
-      - name: Run Agda
-        working-directory: ${{ env.SRC_DIR }}
-        run: agda "${{ env.MAIN }}" --profile=modules +RTS -s
+      - name: Save Tectonic cache
+        uses: actions/cache/save@v5
+        # Primary cache key is unique, so we can always save.
+        if:   always()
+        with:
+          key:  ${{ steps.cache-tectonic.outputs.cache-primary-key }}
+          path: ${{ env.TECTONIC_CACHE }}
 
-      - name: Save cache
+      - name: Save Agda cache
         uses: actions/cache/save@v5
         # Primary cache key is unique, so we can always save.
         if:   always()
         env:
           AGDA_DIR: ${{ steps.setup-agda.outputs.agda-dir }}
         with:
-          key: ${{ steps.cache.outputs.cache-primary-key }}
+          key: ${{ steps.cache-agda.outputs.cache-primary-key }}
           path: |
-            _build
+            agda/_build
             ${{ env.AGDA_DIR }}/libraries.d
-
-########################################################################
-## DOC DEPLOYMENT
-########################################################################
-
-      # We start by retrieving the currently deployed docs.
-      # # We remove the content that is in the directory we are going to populate
-      # # so that stale files corresponding to deleted modules do not accumulate.
-
-      - name: Checkout branch gh-pages to html
-        working-directory: ${{ env.SRC_DIR }}
-        run: |
-          git clone --depth 1 --single-branch --branch gh-pages https://github.com/andreasabel/tree-rotation '${{ env.HTML_DIR }}'
-        # rm -f '${{ env.HTML_DIR }}'/*.html
-        # rm -f '${{ env.HTML_DIR }}'/*.css
-
-      # We then generate the docs in the HTML_DIR subdirectory.
-      - name: Generate HTML
-        working-directory: ${{ env.SRC_DIR }}
-        run: |
-          agda --html --html-dir="${{ env.HTML_DIR }}" "${{ env.MAIN }}"
-        # cp "${{ env.HTML_DIR }}/${{ env.INDEX }}" "${{ env.HTML_DIR }}/index.html"
-
-      - name: Deploy HTML
-        uses: JamesIves/github-pages-deploy-action@v4
-        # if: ${{ success() && env.AGDA_DEPLOY }}
-
-        with:
-          branch: gh-pages
-          folder: ${{ env.SRC_DIR }}/${{ env.HTML_DIR }}
-          git-config-name: Github Actions
 
       - uses: actions/upload-pages-artifact@v5
         with:
-          path: ${{ env.SRC_DIR }}/${{ env.HTML_DIR }}
+          path: .
+
+  # Deploy job
+
+  deploy:
+    if: github.ref == 'refs/heads/master'
+    # Add a dependency to the build job
+    needs: build
+
+    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
+    permissions:
+      pages:    write   # to deploy to Pages
+      id-token: write   # to verify the deployment originates from an appropriate source
+
+    # Deploy to the github-pages environment
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    # Specify runner + deployment step
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Deploy to GitHub Pages
+      id:   deployment
+      uses: actions/deploy-pages@v5

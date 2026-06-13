@@ -1,0 +1,97 @@
+\AgdaHide{
+\begin{code}
+module Code where
+
+open import Agda.Primitive renaming (Set to Type)
+open import Agda.Builtin.Maybe
+
+variable
+  A : Type
+\end{code}
+} % END AgdaHide
+
+\newcommand{\APIRotationLabelled}{
+\begin{code}
+record APIRotationLabelled (A : Type) : Type₁ where
+  field
+    Tree      : Type
+    singleton : A → Tree
+    concat    : Tree → Tree → Tree
+    rotate    : Tree → Maybe Tree
+    head      : Tree → Maybe A
+    tail      : Tree → Maybe Tree
+\end{code}
+}
+
+\newcommand{\RotationLabelled}{
+\AgdaHide{
+\begin{code}
+module RotationLabelled where
+\end{code}
+}
+\begin{code}
+  data Tree (A : Type) : Type where
+    leaf : A → Tree A
+    node : Tree A → Tree A → Tree A
+
+  singleton : A → Tree A
+  singleton = leaf
+
+  concat : Tree A → Tree A → Tree A
+  concat = node
+
+  rotate : Tree A → Maybe (Tree A)
+  rotate (node (node t₁ t₂) t₃) = just (node t₁ (node t₂ t₃))
+  rotate _ = nothing
+
+  head : Tree A → Maybe A
+  head (node (leaf a) _) = just a
+  head _ = nothing
+
+  tail : Tree A → Maybe (Tree A)
+  tail (node (leaf _) t) = just t
+  tail _ = nothing
+\end{code}
+}
+
+\newcommand{\Rotation}{
+\AgdaHide{
+\begin{code}
+module Rotation where
+  infix 8 _∙_
+\end{code}
+}
+\begin{code}
+  data Tree : Type where
+    ε   : Tree
+    _∙_ : Tree → Tree → Tree
+
+  rotate : Tree → Maybe Tree
+  rotate ((t₁ ∙ t₂) ∙ t₃) = just (t₁ ∙ (t₂ ∙ t₃))
+  rotate _ = nothing
+
+  tail : Tree → Maybe Tree
+  tail (ε ∙ t) = just t
+  tail _ = nothing
+\end{code}
+}
+
+
+\newcommand{\Rota}{
+\AgdaHide{
+\begin{code}
+module Rot where
+  infix 8 _∙_
+\end{code}
+}
+\begin{code}
+  data Tree : Type where
+    ε   : Tree
+    _∙_ : Tree → Tree → Tree
+
+  rotate : Tree → Maybe Tree
+  rotate ((t₁ ∙ t₂) ∙ t₃) = just (t₁ ∙ (t₂ ∙ t₃))
+  rotate _ = nothing
+
+\end{code}
+}
