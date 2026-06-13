@@ -270,7 +270,7 @@
 Binary trees are constant-time catenable queues.
 
 This paper is accompanied by an Agda formalization.
-Checkmarks \agdaref{Main}{Amortization} are clickable and lead to the Agda formalization of the concept adjacent to the checkmark.  The formalization may contain extra detail that we chose to omit in the text to keep the presentation concise.
+Checkmarks \agdaref{Main}[Amortization]{amortization} are clickable and lead to the Agda formalization of the concept adjacent to the checkmark.  The formalization may contain extra detail that we chose to omit in the text to keep the presentation concise.
 
 % https://hackage.haskell.org/package/alist
 
@@ -318,7 +318,7 @@ We will prove that in move sequences starting in an inital forest $\varepsilon^{
 
 To amortize the rotations, we raise some fees $k_\tC$ and $k_\tT$ that have to be paid for concatenation and tail operations.
 Those are stored on a virtual bank account $k$ (attached to a forest as subscript $\vts_k$) so that we can pay a unit cost of $1$ for each rotation.
-For uniformity, let us set $k_\tR = -1$ and refine move execution by the bank account \agdaref{MultiTreeGame}{RMoves}:
+For uniformity, let us set $k_\tR = -1$ and refine move execution by the bank account \agdaref{MultiTreeGame}[RMoves]{rmoves}:
 \[
   \vts_k \, m = \vtsp_{k'} \mbox{ if } k' = k + k_m \geq 0 \mbox{ and } \vts \, m = \vtsp
   .
@@ -328,7 +328,7 @@ Moreover, for an initial forest $\vts = \varepsilon^n$ the resourced execution s
 
 One solution is $k_\tC = k_\tT = 2$, and we prove its correctness via the potential method.
 To this end, we define the following potential functions on forests \agdaref{MultiTreeGame}{Φs}
-and trees \agdaref{Tree}{Potential}:
+and trees \agdaref{Tree}[Potential]{Φₗ}:
 \[
 \begin{array}{lll}
 \Phi(t_0,\dots,t_n) & = & \sum_{i=0..n} \Phi(t_i) \\
